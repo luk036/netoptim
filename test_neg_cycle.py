@@ -15,15 +15,15 @@ def test_cycle():
     N = negCycleFinder(G, newnode)
     v = N.find_neg_cycle()
     assert v == 0
-    print (sorted(N.pred.items()))
-    print (sorted(N.dist.items()))
+    print(sorted(N.pred.items()))
+    print(sorted(N.dist.items()))
 
     #dist = {newnode: 0}
     #pred = {newnode: None}
     v = N.find_neg_cycle()
     assert v == 0
-    print (sorted(N.pred.items()))
-    print (sorted(N.dist.items()))
+    print(sorted(N.pred.items()))
+    print(sorted(N.dist.items()))
 
     source = 0
     #dist = {source: 0}
@@ -32,10 +32,10 @@ def test_cycle():
     M = negCycleFinder(G, source)
     v = M.find_neg_cycle()
     assert v == None
-    print (sorted(M.pred.items()))
-    print (sorted(M.dist.items()))
+    print(sorted(M.pred.items()))
+    print(sorted(M.dist.items()))
 
     v = M.find_neg_cycle()
     assert v == None
-    print (sorted(M.pred.items()))
-    print (sorted(M.dist.items()))
+    print(sorted(M.pred.items()))
+    print(sorted(M.dist.items()))
