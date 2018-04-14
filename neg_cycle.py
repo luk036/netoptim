@@ -3,6 +3,8 @@
 Negative cycle detection for weighed graphs.
 (based on Bellman-Ford algorithm)
 """
+from __future__ import print_function
+from pprint import pprint
 
 from collections import deque
 import networkx as nx
@@ -10,155 +12,146 @@ import networkx as nx
 
 class negCycleFinder:
 
-    def __init__(self, G, source):
+    def __init__(self, G):
         """Relaxation loop for Bellman–Ford algorithm
 
         Parameters
         ----------
         G : NetworkX graph
-
-        source: list
-            List of source nodes
-
-        Raises
-        ------
-        NetworkXUnbounded
-           If the (di)graph contains a negative cost (di)cycle, the
-           algorithm raises an exception to indicate the presence of the
-           negative cost (di)cycle.  Note: any negative weight edge in an
-           undirected graph is a negative cost cycle
         """
+
         self.G = G
-        self.source = source
+        self.dist = {v: 0 for v in self.G.nodes}
+        self.pred = {v: None for v in self.G.nodes}
 
-        if source not in G:
-            raise KeyError("Node %s is not found in the graph" % source)
+    def find_cycle(self, G, pred):
+        """Find a cycle on policy graph
 
-        self.q = deque([source])
-        self.in_q = set([source])
-        self.dist = {source: 0}
-        self.pred = {source: None}
+        Arguments:
+            G {NetworkX graph} 
+            pred {dictionary} -- policy graph
 
-    def find_neg_cycle(self, weight='weight'):
-        """Compute negative cycle in weighted graphs.
-
-        The algorithm has a running time of O(mn) where n is the number of
-        nodes and m is the number of edges.
-
-        Parameters
-        ----------
-        weight: string, optional (default='weight')
-           Edge data key corresponding to the edge weight
-
-        Returns
-        -------
-        pred, dist : dictionaries
-           Returns two dictionaries keyed by node to predecessor in the
-           negative cycle and to the distance from the source respectively.
-
-        Notes
-        -----
-        Edge weight attributes must be numerical.
-        Distances are calculated as sums of weighted edges traversed.
-
-        The dictionaries returned only have keys for nodes reachable from
-        the source.
-
-        In the case where the (di)graph is not connected, if a component
-        not containing the source contains a negative cost (di)cycle, it
-        will not be detected.
-
+        Returns:
+            handle -- a start node of the cycle
         """
-        for u, v, attr in self.G.selfloop_edges(data=True):
-            if attr.get(weight, 1) < 0:
-                raise nx.NetworkXUnbounded(
-                    "Self loop negative cost cycle detected.")
 
-        if len(self.G) == 1:
-            return None
-
-        if self.q:
-            source = self.q.popleft()
-            self.q.append(source)
-        else:
-            source = self.source
-            self.q.append(source)
-            self.in_q = set([source])
-
-        self.dist = {source: 0}
-        self.pred = {source: None}
-
-        v = self.neg_cycle_relaxation(self.pred, self.dist, [source], weight)
-        return v
-
-
-    def neg_cycle_relaxation(self, pred, dist, source, weight):
-        """Relaxation loop for Bellman–Ford algorithm
-
-        Parameters
-        ----------
-        G : NetworkX graph
-
-        pred: dict
-            Keyed by node to predecessor in the path
-
-        dist: dict
-            Keyed by node to the distance from the source
-
-        source: list
-            List of source nodes
-
-        weight: string
-           Edge data key corresponding to the edge weight
-
-        Returns
-        -------
-        Returns two dictionaries keyed by node to predecessor in the
-           path and to the distance from the source respectively.
-
-        Raises
-        ------
-        NetworkXUnbounded
-           If the (di)graph contains a negative cost (di)cycle, the
-           algorithm raises an exception to indicate the presence of the
-           negative cost (di)cycle.  Note: any negative weight edge in an
-           undirected graph is a negative cost cycle
-        """
-        G = self.G
-        if G.is_multigraph():
-            def get_weight(edge_dict):
-                return min(eattr.get(weight, 1) for eattr in edge_dict.values())
-        else:
-            def get_weight(edge_dict):
-                return edge_dict.get(weight, 1)
-
-        G_succ = G.succ if G.is_directed() else G.adj
-        inf = float('inf')
-        n = len(G)
-
-        count = {}
-        # q = deque(source)
-        # in_q = set(source)
-        q = self.q
-        in_q = self.in_q
-        while q:
-            u = q.popleft()
-            in_q.remove(u)
-            # Skip relaxations if the predecessor of u is in the queue.
-            if pred[u] not in in_q:
-                dist_u = dist[u]
-                for v, e in G_succ[u].items():
-                    dist_v = dist_u + get_weight(e)
-                    if dist_v < dist.get(v, inf):
-                        if v not in in_q:
-                            count_v = count.get(v, 0) + 1
-                            if count_v == n:
-                                return v
-                            q.append(v)
-                            in_q.add(v)
-                            count[v] = count_v
-                        dist[v] = dist_v
-                        pred[v] = u
-
+        visited = {v: None for v in G.nodes}
+        for v in G.nodes:
+            if visited[v] != None:
+                continue
+            u = v
+            while True:
+                visited[u] = v
+                u = pred[u]
+                if u == None:
+                    break
+                if visited[u] != None:
+                    break
+            if u == None:
+                continue
+            if visited[u] == v:
+                return v
         return None
 
+    def relax(self, G, dist, pred, weight='weight'):
+        """Perform a updating of dist and pred
+
+        Arguments:
+            G {NetworkX graph} -- [description]
+            dist {dictionary} -- [description]
+            pred {dictionary} -- [description]
+
+        Keyword Arguments:
+            weight {str} -- [description] (default: {'weight'})
+
+        Returns:
+            [type] -- [description]
+        """
+
+        changed = False
+        for (u, v, wt) in G.edges.data(weight):
+            dist_new = dist[u] + wt
+            if dist[v] > dist_new:
+                dist[v] = dist_new
+                pred[v] = u
+                changed = True
+        return changed
+
+    def find_neg_cycle(self, weight='weight'):
+        """Perform a updating of dist and pred
+
+        Arguments:
+            G {[type]} -- [description]
+            dist {dictionary} -- [description]
+            pred {dictionary} -- [description]
+
+        Keyword Arguments:
+            weight {str} -- [description] (default: {'weight'})
+
+        Returns:
+            [type] -- [description]
+        """
+        self.dist = {v: 0. for v in self.G.nodes}
+        self.pred = {v: None for v in self.G.nodes}
+        G = self.G
+        for (u, v) in G.edges:
+            if not G[u][v].get(weight, None):
+                G[u][v][weight] = 1
+
+        v = self.neg_cycle_relax(weight)
+        return v
+
+    def neg_cycle_relax(self, weight):
+        dist = self.dist
+        pred = self.pred
+        G = self.G
+        while True:
+            changed = self.relax(G, dist, pred, weight)
+            if changed:
+                v = self.find_cycle(G, pred)
+                if v != None:
+                    return v
+            else:
+                break
+        return None
+
+
+
+if __name__ == "__main__":
+    from networkx.utils import generate_unique_node
+    import networkx as nx
+
+    G = nx.cycle_graph(5, create_using=nx.DiGraph())
+    G[1][2]['weight'] = -5
+    newnode = generate_unique_node()
+    G.add_edges_from([(newnode, n) for n in G])
+
+    N = negCycleFinder(G)
+    v = N.find_neg_cycle()
+    # assert v == 0
+    print(v)
+    print(N.pred.items())
+    print(N.dist.items())
+
+    #dist = {newnode: 0}
+    #pred = {newnode: None}
+    v = N.find_neg_cycle()
+    # assert v == 0
+    print(v)
+    print(N.pred.items())
+    print(N.dist.items())
+
+    source = 0
+    #dist = {source: 0}
+    #pred = {source: None}
+    G = nx.path_graph(5, create_using=nx.DiGraph())
+    M = negCycleFinder(G)
+    v = M.find_neg_cycle()
+    assert v == None
+    print(M.pred.items())
+    print(M.dist.items())
+
+    v = M.find_neg_cycle()
+    assert v == None
+    print(M.pred.items())
+    print(M.dist.items())
