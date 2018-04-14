@@ -24,7 +24,7 @@ class negCycleFinder:
         self.dist = {v: 0 for v in self.G.nodes}
         self.pred = {v: None for v in self.G.nodes}
 
-    def find_cycle(self, G, pred):
+    def find_cycle(self):
         """Find a cycle on policy graph
 
         Arguments:
@@ -35,25 +35,23 @@ class negCycleFinder:
             handle -- a start node of the cycle
         """
 
-        visited = {v: None for v in G.nodes}
-        for v in G.nodes:
+        visited = {v: None for v in self.G}
+        for v in self.G:
             if visited[v] != None:
                 continue
             u = v
             while True:
                 visited[u] = v
-                u = pred[u]
+                u = self.pred[u]
                 if u == None:
                     break
                 if visited[u] != None:
+                    if visited[u] == v:
+                        return v
                     break
-            if u == None:
-                continue
-            if visited[u] == v:
-                return v
         return None
 
-    def relax(self, G, dist, pred, weight='weight'):
+    def relax(self, weight):
         """Perform a updating of dist and pred
 
         Arguments:
@@ -62,18 +60,18 @@ class negCycleFinder:
             pred {dictionary} -- [description]
 
         Keyword Arguments:
-            weight {str} -- [description] (default: {'weight'})
+            weight {str} -- [description]
 
         Returns:
             [type] -- [description]
         """
 
         changed = False
-        for (u, v, wt) in G.edges.data(weight):
-            dist_new = dist[u] + wt
-            if dist[v] > dist_new:
-                dist[v] = dist_new
-                pred[v] = u
+        for (u, v, wt) in self.G.edges.data(weight):
+            dist_new = self.dist[u] + wt
+            if self.dist[v] > dist_new:
+                self.dist[v] = dist_new
+                self.pred[v] = u
                 changed = True
         return changed
 
@@ -91,9 +89,9 @@ class negCycleFinder:
         Returns:
             [type] -- [description]
         """
-        self.dist = {v: 0. for v in self.G.nodes}
-        self.pred = {v: None for v in self.G.nodes}
         G = self.G
+        self.dist = {v: 0. for v in G}
+        self.pred = {v: None for v in G}
         for (u, v) in G.edges:
             if not G[u][v].get(weight, None):
                 G[u][v][weight] = 1
@@ -102,13 +100,10 @@ class negCycleFinder:
         return v
 
     def neg_cycle_relax(self, weight):
-        dist = self.dist
-        pred = self.pred
-        G = self.G
         while True:
-            changed = self.relax(G, dist, pred, weight)
+            changed = self.relax(weight)
             if changed:
-                v = self.find_cycle(G, pred)
+                v = self.find_cycle()
                 if v != None:
                     return v
             else:
