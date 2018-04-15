@@ -8,6 +8,22 @@ from pprint import pprint
 
 from collections import deque
 import networkx as nx
+from networkx.utils import generate_unique_node
+
+
+def set_default(G, weight):
+    for (u, v) in G.edges:
+        if not G[u][v].get(weight, None):
+            G[u][v][weight] = 1
+    
+
+def create_test_case1():
+    G = nx.cycle_graph(5, create_using=nx.DiGraph())
+    G[1][2]['weight'] = -5
+    newnode = generate_unique_node()
+    G.add_edges_from([(newnode, n) for n in G])
+    return G
+
 
 class negCycleFinder:
 
@@ -93,10 +109,7 @@ class negCycleFinder:
         G = self.G
         self.dist = {v: 0. for v in G}
         self.pred = {v: None for v in G}
-        for (u, v) in G.edges:
-            if not G[u][v].get(weight, None):
-                G[u][v][weight] = 1
-
+        set_default(G, weight)
         v = self.neg_cycle_relax(weight)
         return v
 

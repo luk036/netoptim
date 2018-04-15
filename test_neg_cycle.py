@@ -6,38 +6,23 @@ from networkx.utils import generate_unique_node
 import networkx as nx
 from neg_cycle import *
 
-def test_cycle():
-    G = nx.cycle_graph(5, create_using=nx.DiGraph())
-    G[1][2]['weight'] = -5
-    newnode = generate_unique_node()
-    G.add_edges_from([(newnode, n) for n in G])
+
+def do_case(G):
     dist = {v: 0 for v in G}
     pred = {v: None for v in G}
 
     N = negCycleFinder(G, dist, pred)
     v = N.find_neg_cycle()
-    assert v != None
     print(N.pred.items())
     print(N.dist.items())
+    return v
 
-    #dist = {newnode: 0}
-    #pred = {newnode: None}
-    v = N.find_neg_cycle()
+
+def test_cycle():
+    G = create_test_case1()
+    v = do_case(G)
     assert v != None
-    print(N.pred.items())
-    print(N.dist.items())
 
-    source = 0
-    #dist = {source: 0}
-    #pred = {source: None}
     G = nx.path_graph(5, create_using=nx.DiGraph())
-    M = negCycleFinder(G, dist, pred)
-    v = M.find_neg_cycle()
+    v = do_case(G)
     assert v == None
-    print(M.pred.items())
-    print(M.dist.items())
-
-    v = M.find_neg_cycle()
-    assert v == None
-    print(M.pred.items())
-    print(M.dist.items())

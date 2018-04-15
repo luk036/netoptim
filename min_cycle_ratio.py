@@ -8,6 +8,19 @@ from neg_cycle import *
 
 
 def calc_ratio(G, handle, pred, mu, sigma):
+    """Calculate the ratio of the cycle
+    
+    Arguments:
+        G {Networkx Graph} -- [description]
+        handle {Networkx Node} -- [description]
+        pred {dictionary} -- [description]
+        mu {str} -- cost
+        sigma {str} -- time
+    
+    Returns:
+        float -- the ratio
+    """
+
     v = handle
     total_cost = 0.
     total_time = 0.
@@ -22,12 +35,8 @@ def calc_ratio(G, handle, pred, mu, sigma):
 
 
 def min_cycle_ratio(G, r=1000., mu='cost', sigma='time'):
-    for (u, v) in G.edges:
-        if not G[u][v].get(sigma, None):
-            G[u][v][sigma] = 1
-        if not G[u][v].get(mu, None):
-            G[u][v][mu] = 1
-
+    set_default(G, mu)
+    set_default(G, sigma)
     pred = {v: None for v in G}
     dist = {v: 0 for v in G}
     detector = negCycleFinder(G, pred, dist)
@@ -45,13 +54,13 @@ def min_cycle_ratio(G, r=1000., mu='cost', sigma='time'):
     return r, handle, pred, detector.dist
 
 
-if __name__ == "__main__":
-    G = nx.cycle_graph(5, create_using=nx.DiGraph())
-    G[1][2]['cost'] = 6.
-    newnode = generate_unique_node()
-    G.add_edges_from([(newnode, n) for n in G])
-    r, v, pred, dist = min_cycle_ratio(G)
-    assert v != None
-    print(r)
-    print(pred.items())
-    print(dist.items())
+# if __name__ == "__main__":
+#     G = nx.cycle_graph(5, create_using=nx.DiGraph())
+#     G[1][2]['cost'] = 6.
+#     newnode = generate_unique_node()
+#     G.add_edges_from([(newnode, n) for n in G])
+#     r, v, pred, dist = min_cycle_ratio(G)
+#     assert v != None
+#     print(r)
+#     print(pred.items())
+#     print(dist.items())
