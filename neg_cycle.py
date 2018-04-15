@@ -11,10 +11,10 @@ import networkx as nx
 from networkx.utils import generate_unique_node
 
 
-def set_default(G, weight):
+def set_default(G, weight, value):
     for (u, v) in G.edges:
         if not G[u][v].get(weight, None):
-            G[u][v][weight] = 1
+            G[u][v][weight] = value
     
 
 def create_test_case1():
@@ -27,7 +27,7 @@ def create_test_case1():
 
 class negCycleFinder:
 
-    def __init__(self, G, dist, pred):
+    def __init__(self, G):
         """Relaxation loop for Bellman–Ford algorithm
 
         Parameters
@@ -38,8 +38,8 @@ class negCycleFinder:
         self.G = G
         #self.dist = {v: 0 for v in G}
         #self.pred = {v: None for v in G}
-        self.dist = dist.copy()
-        self.pred = pred.copy()
+        #self.dist = dist.copy()
+        #self.pred = pred.copy()
 
     def find_cycle(self):
         """Find a cycle on policy graph
@@ -109,11 +109,11 @@ class negCycleFinder:
         G = self.G
         self.dist = {v: 0. for v in G}
         self.pred = {v: None for v in G}
-        set_default(G, weight)
+        set_default(G, weight, 1)
         v = self.neg_cycle_relax(weight)
         return v
 
-    def neg_cycle_relax(self, weight):
+    def neg_cycle_relax(self, weight='weight'):
         while True:
             changed = self.relax(weight)
             if changed:

@@ -35,11 +35,12 @@ def calc_ratio(G, handle, pred, mu, sigma):
 
 
 def min_cycle_ratio(G, r=1000., mu='cost', sigma='time'):
-    set_default(G, mu)
-    set_default(G, sigma)
+    set_default(G, mu, 1)
+    set_default(G, sigma, 1)
+    #dist = {v: 0. for v in G}
     pred = {v: None for v in G}
-    dist = {v: 0 for v in G}
-    detector = negCycleFinder(G, pred, dist)
+    handle = None
+    detector = negCycleFinder(G)
 
     while True:
         for (u, v) in G.edges:
