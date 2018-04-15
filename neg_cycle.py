@@ -9,10 +9,9 @@ from pprint import pprint
 from collections import deque
 import networkx as nx
 
-
 class negCycleFinder:
 
-    def __init__(self, G):
+    def __init__(self, G, dist, pred):
         """Relaxation loop for Bellman–Ford algorithm
 
         Parameters
@@ -21,8 +20,10 @@ class negCycleFinder:
         """
 
         self.G = G
-        self.dist = {v: 0 for v in self.G.nodes}
-        self.pred = {v: None for v in self.G.nodes}
+        #self.dist = {v: 0 for v in G}
+        #self.pred = {v: None for v in G}
+        self.dist = dist.copy()
+        self.pred = pred.copy()
 
     def find_cycle(self):
         """Find a cycle on policy graph

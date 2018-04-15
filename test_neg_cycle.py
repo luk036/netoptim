@@ -11,8 +11,10 @@ def test_cycle():
     G[1][2]['weight'] = -5
     newnode = generate_unique_node()
     G.add_edges_from([(newnode, n) for n in G])
+    dist = {v: 0 for v in G}
+    pred = {v: None for v in G}
 
-    N = negCycleFinder(G)
+    N = negCycleFinder(G, dist, pred)
     v = N.find_neg_cycle()
     assert v != None
     print(N.pred.items())
@@ -29,7 +31,7 @@ def test_cycle():
     #dist = {source: 0}
     #pred = {source: None}
     G = nx.path_graph(5, create_using=nx.DiGraph())
-    M = negCycleFinder(G)
+    M = negCycleFinder(G, dist, pred)
     v = M.find_neg_cycle()
     assert v == None
     print(M.pred.items())
