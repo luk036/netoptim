@@ -60,14 +60,14 @@ def min_cycle_ratio(G, mu='cost', sigma='time'):
     c_keep = None
 
     while True:
-        # for (u, v) in G.edges:
-        #    G[u][v]['weight'] = G[u][v][mu] - r * G[u][v][sigma]
-        for (u, v, cost) in G.edges.data(mu):
-            G[u][v]['weight'] = cost
-        for (u, v, time) in G.edges.data(sigma):
-            G[u][v]['weight'] -= r * time
+        for (u, v) in G.edges:
+            G[u][v]['weight'] = G[u][v][mu] - r * G[u][v][sigma]
+        # for (u, v, cost) in G.edges.data(mu):
+        #     G[u][v]['weight'] = cost
+        # for (u, v, time) in G.edges.data(sigma):
+        #     G[u][v]['weight'] -= r * time
 
-        c = detector.find_neg_cycle()
+        c = detector.neg_cycle_relax()
         if c == None:
             break
         # pred = detector.pred.copy()
@@ -78,7 +78,7 @@ def min_cycle_ratio(G, mu='cost', sigma='time'):
         if r_new + 0.0000001 > r:
             break
         r = r_new
-        # update_cycle(G, c, r, detector.dist, mu, sigma)
+        update_cycle(G, c, r, detector.dist, mu, sigma)
     return r, c_keep, detector.dist
 
 

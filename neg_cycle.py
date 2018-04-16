@@ -114,8 +114,8 @@ class negCycleFinder:
         self.dist = {v: 0. for v in G}
         self.pred = {v: None for v in G}
         set_default(G, weight, 1)
-        v = self.neg_cycle_relax(weight)
-        return v
+        c = self.neg_cycle_relax(weight)
+        return c
 
     def neg_cycle_relax(self, weight='weight'):
         G = self.G
