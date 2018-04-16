@@ -8,9 +8,6 @@ from neg_cycle import *
 
 
 def do_case(G):
-    #dist = {v: 0 for v in G}
-    #pred = {v: None for v in G}
-
     N = negCycleFinder(G)
     c = N.find_neg_cycle()
     print(N.pred.items())

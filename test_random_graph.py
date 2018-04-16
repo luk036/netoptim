@@ -117,11 +117,11 @@ def formGraph(T, pos, eta, seed=None):
 #     return fig, ax
 
 
-def test_random_graph():
 # if __name__ == "__main__":
+def test_random_graph():
     N = 158
     M = 40
-    r = 4
+#    r = 4
 
     T = N+M
     xbase = 2
@@ -144,7 +144,7 @@ def test_random_graph():
 
     r, c, _ = min_cycle_ratio(G)
     assert c != None
-    
+
     pathlist = c
     print(pathlist)
 #    pos2 = dict(enumerate(pos))

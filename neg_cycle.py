@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Negative cycle detection for weighed graphs.
-(based on Bellman-Ford algorithm)
 """
 from __future__ import print_function
 from pprint import pprint
@@ -15,7 +14,7 @@ def set_default(G, weight, value):
     for (u, v) in G.edges:
         if G[u][v].get(weight, None) == None:
             G[u][v][weight] = value
-    
+
 
 def create_test_case1():
     G = nx.cycle_graph(5, create_using=nx.DiGraph())
@@ -51,10 +50,6 @@ class negCycleFinder:
         Returns:
             handle -- a start node of the cycle
         """
-        # for (u, v, wt) in self.G.edges.data(weight):
-        #     d = self.dist[u] + wt
-        #     if self.dist[v] > d:
-        #         self.pred[v] = u
 
         visited = {v: None for v in self.G}
         for v in self.G:
@@ -142,4 +137,3 @@ class negCycleFinder:
             if v == handle:
                 break
         return cycle
-
