@@ -13,7 +13,7 @@ from networkx.utils import generate_unique_node
 
 def set_default(G, weight, value):
     for (u, v) in G.edges:
-        if not G[u][v].get(weight, None):
+        if G[u][v].get(weight, None) == None:
             G[u][v][weight] = value
     
 
@@ -127,7 +127,19 @@ class negCycleFinder:
             if changed:
                 v = self.find_cycle(weight)
                 if v != None:
-                    return v
+                    return self.cycle_list(v)
             else:
                 break
         return None
+
+    def cycle_list(self, handle):
+        v = handle
+        cycle = list()
+        while True:
+            u = self.pred[v]
+            cycle += {(u, v)}
+            v = u
+            if v == handle:
+                break
+        return cycle
+

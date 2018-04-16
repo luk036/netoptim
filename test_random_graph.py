@@ -21,20 +21,17 @@ def vdcorput(n, base=2):
     return [vdc(i, base) for i in range(n)]
 
 
-def formGraph(T, pos, mu, eta, seed=None):
-    ''' Form N by N grid of nodes, perturb by mu and connect nodes within eta.
+def formGraph(T, pos, eta, seed=None):
+    ''' Form N by N grid of nodes, connect nodes within eta.
         mu and eta are relative to 1/(N-1)
     '''
     if seed is not None:
         np.random.seed(seed)
 
     N = np.sqrt(T)
-    mu = mu/(N-1)
     eta = eta/(N-1)
 
     # generate perterbed grid positions for the nodes
-    # pos = [(i + mu*np.random.randn(), j + mu*np.random.randn())\
-    #     for i in np.linspace(0,1,N) for j in np.linspace(1,0,N)]
     pos = dict(enumerate(pos))
     n = len(pos)
 
@@ -121,7 +118,7 @@ def formGraph(T, pos, mu, eta, seed=None):
 
 
 def test_random_graph():
-#if __name__ == "__main__":
+# if __name__ == "__main__":
     N = 158
     M = 40
     r = 4
@@ -132,11 +129,11 @@ def test_random_graph():
     x = [i for i in vdcorput(T, xbase)]
     y = [i for i in vdcorput(T, ybase)]
     pos = zip(x, y)
-    G = formGraph(T, pos, .12, 1.6, seed=5)
-    n = G.number_of_nodes()
-    pos2 = dict(enumerate(pos))
+    G = formGraph(T, pos, 1.6, seed=5)
+#    n = G.number_of_nodes()
+#    pos2 = dict(enumerate(pos))
 #    fig, ax = showPaths(G, pos2, N)
-    #plt.show()
+#    plt.show()
 
     # Add a sink, connect all spareTSV to it.
     ## pos = pos + [(1.5,.5)]
@@ -145,18 +142,11 @@ def test_random_graph():
         #G[u][v]['cost'] = np.sqrt(np.dot(h, h))
         G[u][v]['cost'] = h[0] + h[1]
 
-    r, handle, pred, dist = min_cycle_ratio(G)
-    assert handle != None
+    r, c, _ = min_cycle_ratio(G)
+    assert c != None
     
-    pathlist = []
-    v = handle
-    while True:
-        u = pred[v]
-        pathlist += [(u, v)]
-        v = u
-        if v == handle:
-            break
+    pathlist = c
     print(pathlist)
-    pos2 = dict(enumerate(pos))
+#    pos2 = dict(enumerate(pos))
 #    fig, ax = showPaths(G, pos2, N, path=pathlist)
-    # plt.show()
+#    plt.show()

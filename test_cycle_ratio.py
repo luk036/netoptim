@@ -6,12 +6,12 @@ from networkx.utils import generate_unique_node
 import networkx as nx
 from min_cycle_ratio import *
 
-
+ 
 def test_cycle_ratio():
     G = create_test_case1()
     G[1][2]['cost'] = 5
-    r, v, pred, dist = min_cycle_ratio(G)
-    assert v != None
+    r, c, dist = min_cycle_ratio(G)
+    assert c != None
     print(r)
-    print(pred.items())
+    print(c)
     print(dist.items())

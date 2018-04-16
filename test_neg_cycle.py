@@ -12,17 +12,17 @@ def do_case(G):
     #pred = {v: None for v in G}
 
     N = negCycleFinder(G)
-    v = N.find_neg_cycle()
+    c = N.find_neg_cycle()
     print(N.pred.items())
     print(N.dist.items())
-    return v
+    return c
 
 
 def test_cycle():
     G = create_test_case1()
-    v = do_case(G)
-    assert v != None
+    c = do_case(G)
+    assert c != None
 
     G = nx.path_graph(5, create_using=nx.DiGraph())
-    v = do_case(G)
-    assert v == None
+    c = do_case(G)
+    assert c == None
