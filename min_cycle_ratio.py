@@ -58,7 +58,8 @@ def min_cycle_ratio(G, mu='cost', sigma='time'):
 
     while True:
         for (u, v) in G.edges:
-            G[u][v]['weight'] = G[u][v][mu] - r * G[u][v][sigma]
+            wt = G[u][v][mu] - r * G[u][v][sigma]
+            G[u][v]['weight'] = wt
 
         c = detector.neg_cycle_relax()
         if c == None:
