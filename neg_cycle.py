@@ -36,8 +36,8 @@ class negCycleFinder:
         """
 
         self.G = G
-        #self.dist = {v: 0 for v in G}
-        #self.pred = {v: None for v in G}
+        self.dist = {v: 0 for v in G}
+        self.pred = {v: None for v in G}
         #self.dist = dist.copy()
         #self.pred = pred.copy()
 
@@ -85,9 +85,9 @@ class negCycleFinder:
 
         changed = False
         for (u, v, wt) in self.G.edges.data(weight):
-            dist_new = self.dist[u] + wt
-            if self.dist[v] > dist_new:
-                self.dist[v] = dist_new
+            d = self.dist[u] + wt
+            if self.dist[v] > d:
+                self.dist[v] = d
                 self.pred[v] = u
                 changed = True
         return changed
