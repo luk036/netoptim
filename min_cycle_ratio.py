@@ -46,7 +46,7 @@ def update_cycle(G, handle, r, dist, pred, mu, sigma):
     """
 
     v = handle
-    dist[v] = 0.
+    #dist[v] = 0.
     while True:
         u = pred[v]
         wt = G[u][v][mu] - r * G[u][v][sigma]
@@ -79,16 +79,21 @@ def min_cycle_ratio(G, mu='cost', sigma='time'):
             break
         pred = detector.pred.copy()
         handle = v
-        r = calc_ratio(G, handle, pred, mu, sigma)
+        r_new = calc_ratio(G, handle, pred, mu, sigma)
+        # print(r)
+        if r_new + 0.0000001 > r:
+            break
+        r = r_new
         update_cycle(G, handle, r, detector.dist, pred, mu, sigma)
     return r, handle, pred, detector.dist
 
 
 if __name__ == "__main__":
     import networkx as nx
+    from networkx.utils import generate_unique_node
 
     G = nx.cycle_graph(5, create_using=nx.DiGraph())
-    G[1][2]['cost'] = 6.
+    G[1][2]['cost'] = -6.
     newnode = generate_unique_node()
     G.add_edges_from([(newnode, n) for n in G])
     r, v, pred, dist = min_cycle_ratio(G)

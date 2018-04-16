@@ -41,7 +41,7 @@ class negCycleFinder:
         #self.dist = dist.copy()
         #self.pred = pred.copy()
 
-    def find_cycle(self):
+    def find_cycle(self, weight):
         """Find a cycle on policy graph
 
         Arguments:
@@ -51,6 +51,10 @@ class negCycleFinder:
         Returns:
             handle -- a start node of the cycle
         """
+        # for (u, v, wt) in self.G.edges.data(weight):
+        #     d = self.dist[u] + wt
+        #     if self.dist[v] > d:
+        #         self.pred[v] = u
 
         visited = {v: None for v in self.G}
         for v in self.G:
@@ -64,7 +68,7 @@ class negCycleFinder:
                     break
                 if visited[u] != None:
                     if visited[u] == v:
-                        return v
+                        return u
                     break
         return None
 
@@ -114,10 +118,14 @@ class negCycleFinder:
         return v
 
     def neg_cycle_relax(self, weight='weight'):
+        G = self.G
+        #self.dist = {v: 0. for v in G}
+        self.pred = {v: None for v in G}
+
         while True:
             changed = self.relax(weight)
             if changed:
-                v = self.find_cycle()
+                v = self.find_cycle(weight)
                 if v != None:
                     return v
             else:
