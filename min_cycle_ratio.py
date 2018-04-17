@@ -15,25 +15,14 @@ def calc_ratio(G, C):
 
     Arguments:
         G {Networkx Graph} -- [description]
-        handle {Networkx Node} -- [description]
-        pred {dictionary} -- [description]
-        mu {str} -- cost
-        sigma {str} -- time
+        C {list} -- [description]
 
     Returns:
-        float -- the ratio
+        float -- cycle ratio
     """
-
     total_cost = sum(G[u][v]['cost'] for (u, v) in C)
     total_time = sum(G[u][v]['time'] for (u, v) in C)
     return total_cost/total_time
-
-
-def init_r(G, mu, sigma):
-    max_cost = max(cost for _, _, cost in G.edges.data(mu))
-    min_time = min(time for _, _, time in G.edges.data(sigma))
-    # assume positive time
-    return max_cost * G.number_of_edges() / min_time
 
 
 def min_cycle_ratio(G):
@@ -41,8 +30,10 @@ def min_cycle_ratio(G):
     sigma = 'time'
     set_default(G, mu, 1)
     set_default(G, sigma, 1)
-    r = init_r(G, mu, sigma)
-    return max_parametric(G, r, calc_weight, calc_ratio)
+    max_cost = max(cost for _, _, cost in G.edges.data(mu))
+    min_time = min(time for _, _, time in G.edges.data(sigma))
+    r0 = max_cost * G.number_of_edges() / min_time
+    return max_parametric(G, r0, calc_weight, calc_ratio)
 
 
 if __name__ == "__main__":

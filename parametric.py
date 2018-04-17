@@ -7,32 +7,6 @@ import networkx as nx
 from neg_cycle import *
 
 
-# def calc_ratio(G, c, ):
-#     """Calculate the ratio of the cycle
-
-#     Arguments:
-#         G {Networkx Graph} -- [description]
-#         handle {Networkx Node} -- [description]
-#         pred {dictionary} -- [description]
-#         mu {str} -- cost
-#         sigma {str} -- time
-
-#     Returns:
-#         float -- the ratio
-#     """
-
-#     total_cost = sum(G[u][v][mu] for (u, v) in c)
-#     total_time = sum(G[u][v][sigma] for (u, v) in c)
-#     return total_cost/total_time
-
-
-# def init_r(G, mu, sigma):
-#     max_cost = max(cost for _, _, cost in G.edges.data(mu))
-#     min_time = min(time for _, _, time in G.edges.data(sigma))
-#     # assume positive time
-#     return max_cost * G.number_of_edges() / min_time
-
-
 def max_parametric(G, r, d, zero_cancel):
     """maximum parametric problem:
 
@@ -53,10 +27,7 @@ def max_parametric(G, r, d, zero_cancel):
 
     """
 
-    # set_default(G, mu, 1)
-    # set_default(G, sigma, 1)
     S = negCycleFinder(G)
-    # r = init_r(G, mu, sigma)
     C_opt = None
     r_opt = r
 
