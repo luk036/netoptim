@@ -4,7 +4,7 @@ from pprint import pprint
 
 from networkx.utils import generate_unique_node
 import networkx as nx
-from neg_cycle import *
+from neg_cycle import negCycleFinder
 
 
 def max_parametric(G, r, d, zero_cancel):
@@ -36,7 +36,7 @@ def max_parametric(G, r, d, zero_cancel):
             G[u][v]['weight'] = d(G, r, u, v)
 
         C = S.neg_cycle_relax()
-        if C == None:
+        if C is None:
             break
         C_opt = C
         r_opt = zero_cancel(G, C)

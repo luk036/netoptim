@@ -4,7 +4,15 @@ from pprint import pprint
 
 from networkx.utils import generate_unique_node
 import networkx as nx
-from neg_cycle import *
+from neg_cycle import negCycleFinder
+
+
+def create_test_case1():
+    G = nx.cycle_graph(5, create_using=nx.DiGraph())
+    G[1][2]['weight'] = -5
+    newnode = generate_unique_node()
+    G.add_edges_from([(newnode, n) for n in G])
+    return G
 
 
 def do_case(G):
@@ -22,4 +30,4 @@ def test_cycle():
 
     G = nx.path_graph(5, create_using=nx.DiGraph())
     c = do_case(G)
-    assert c == None
+    assert c is None

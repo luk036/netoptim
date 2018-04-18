@@ -4,7 +4,8 @@ from pprint import pprint
 
 from networkx.utils import generate_unique_node
 import networkx as nx
-from min_cycle_ratio import *
+from min_cycle_ratio import min_cycle_ratio
+from test_neg_cycle import create_test_case1
 
  
 def test_cycle_ratio():

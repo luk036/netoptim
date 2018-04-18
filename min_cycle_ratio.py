@@ -2,10 +2,9 @@
 from __future__ import print_function
 from pprint import pprint
 
-from networkx.utils import generate_unique_node
 import networkx as nx
-from neg_cycle import *
-from parametric import *
+from neg_cycle import set_default
+from parametric import max_parametric
 
 def calc_weight(G, r, u, v):
     return G[u][v]['cost'] - r * G[u][v]['time']
