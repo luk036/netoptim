@@ -63,9 +63,11 @@ class negCycleFinder:
                     break
                 if visited[u] != None:
                     if visited[u] == v:
-                        return u
+                        if self.is_negative(u, weight):
+                            return u
                     break
         return None
+
 
     def relax(self, weight):
         """Perform a updating of dist and pred
@@ -137,3 +139,15 @@ class negCycleFinder:
             if v == handle:
                 break
         return cycle
+
+    def is_negative(self, handle, weight):
+        v = handle
+        result = False
+        while True:
+            u = self.pred[v]
+            if (self.dist[v] > self.dist[u] + self.G[u][v][weight]):
+                result = True 
+            v = u
+            if v == handle:
+                break
+        return result
