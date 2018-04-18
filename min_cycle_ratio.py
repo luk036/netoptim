@@ -36,25 +36,25 @@ def min_cycle_ratio(G):
     return max_parametric(G, r0, calc_weight, calc_ratio)
 
 
-if __name__ == "__main__":
-    import networkx as nx
-    from neg_cycle import *
-    from networkx.utils import generate_unique_node
+# if __name__ == "__main__":
+#     import networkx as nx
+#     from neg_cycle import *
+#     from networkx.utils import generate_unique_node
 
-    G = create_test_case1()
-    G[1][2]['cost'] = 5
-    r, c, dist = min_cycle_ratio(G)
-    assert c != None
-    print(r)
-    print(c)
-    print(dist.items())
+#     G = create_test_case1()
+#     G[1][2]['cost'] = 5
+#     r, c, dist = min_cycle_ratio(G)
+#     assert c != None
+#     print(r)
+#     print(c)
+#     print(dist.items())
 
-    G = nx.cycle_graph(5, create_using=nx.DiGraph())
-    G[1][2]['cost'] = -6.
-    newnode = generate_unique_node()
-    G.add_edges_from([(newnode, n) for n in G])
-    r, c, dist = min_cycle_ratio(G)
-    assert c != None
-    print(r)
-    print(c)
-    print(dist.items())
+#     G = nx.cycle_graph(5, create_using=nx.DiGraph())
+#     G[1][2]['cost'] = -6.
+#     newnode = generate_unique_node()
+#     G.add_edges_from([(newnode, n) for n in G])
+#     r, c, dist = min_cycle_ratio(G)
+#     assert c != None
+#     print(r)
+#     print(c)
+#     print(dist.items())
