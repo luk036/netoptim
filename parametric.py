@@ -19,21 +19,23 @@ def max_parametric(G, r, d, zero_cancel):
         r {float} -- parameter to be maximized, initially a large number (infeasible)
         d {[type]} -- monotone decreasing function w.r.t. r
         zero_cancel {[type]} -- [description]
-    
+
     Returns:
         r_opt -- optimal value
         C_opt -- Most critial cycle
         dist -- optimal sol'n
 
     """
+    def get_weight(G, u, v):
+        return d(G, r, u, v)
 
-    S = negCycleFinder(G)
+    S = negCycleFinder(G, get_weight)
     C_opt = None
     r_opt = r
 
     while True:
-        for (u, v) in G.edges:
-            G[u][v]['weight'] = d(G, r, u, v)
+        # for (u, v) in G.edges:
+        #     G[u][v]['weight'] = d(G, r, u, v)
 
         C = S.neg_cycle_relax()
         if C is None:
@@ -45,7 +47,7 @@ def max_parametric(G, r, d, zero_cancel):
         r = r_opt
         # update ???
         for (u, v) in C:
-            S.dist[u] = S.dist[v] - d(G, r, u, v)
+            S.dist[u] = S.dist[v] - get_weight(G, u, v)
 
     return r_opt, C_opt, S.dist
 

@@ -3,8 +3,12 @@ from __future__ import print_function
 from pprint import pprint
 
 import networkx as nx
-from neg_cycle import set_default
 from parametric import max_parametric
+
+def set_default(G, weight, value):
+    for (u, v) in G.edges:
+        if G[u][v].get(weight, None) is None:
+            G[u][v][weight] = value
 
 def calc_weight(G, r, u, v):
     return G[u][v]['cost'] - r * G[u][v]['time']
