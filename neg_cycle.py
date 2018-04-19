@@ -10,7 +10,8 @@ import networkx as nx
 from networkx.utils import generate_unique_node
 
 
-def default_get_weight(G, u, v):
+def default_get_weight(G, e):
+    u, v = e
     return G[u][v].get('weight', 1)
 
 
@@ -76,7 +77,7 @@ class negCycleFinder:
 
         changed = False
         for (u, v) in self.G.edges:
-            wt = self.get_weight(self.G, u, v)
+            wt = self.get_weight(self.G, (u, v))
             d = self.dist[u] + wt
             if self.dist[v] > d:
                 self.dist[v] = d
@@ -135,7 +136,7 @@ class negCycleFinder:
         v = handle
         while True:
             u = self.pred[v]
-            wt = self.get_weight(self.G, u, v)
+            wt = self.get_weight(self.G, (u, v))
             if self.dist[v] > self.dist[u] + wt:
                 return True
             v = u

@@ -10,7 +10,8 @@ def set_default(G, weight, value):
         if G[u][v].get(weight, None) is None:
             G[u][v][weight] = value
 
-def calc_weight(G, r, u, v):
+def calc_weight(G, r, e):
+    u, v = e
     return G[u][v]['cost'] - r * G[u][v]['time']
 
 def calc_ratio(G, C):

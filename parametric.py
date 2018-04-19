@@ -26,8 +26,8 @@ def max_parametric(G, r, d, zero_cancel):
         dist -- optimal sol'n
 
     """
-    def get_weight(G, u, v):
-        return d(G, r, u, v)
+    def get_weight(G, e):
+        return d(G, r, e)
 
     S = negCycleFinder(G, get_weight)
     C_opt = None
@@ -47,7 +47,7 @@ def max_parametric(G, r, d, zero_cancel):
         r = r_opt
         # update ???
         for (u, v) in C:
-            S.dist[u] = S.dist[v] - get_weight(G, u, v)
+            S.dist[u] = S.dist[v] - get_weight(G, (u, v))
 
     return r_opt, C_opt, S.dist
 
