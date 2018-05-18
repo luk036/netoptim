@@ -2,12 +2,7 @@
 """
 Negative cycle detection for weighed graphs.
 """
-from __future__ import print_function
-from pprint import pprint
-
-from collections import deque
 import networkx as nx
-from networkx.utils import generate_unique_node
 
 
 def default_get_weight(G, e):
@@ -18,19 +13,10 @@ def default_get_weight(G, e):
 class negCycleFinder:
 
     def __init__(self, G, get_weight=default_get_weight):
-        """Relaxation loop for Bellman–Ford algorithm
-
-        Parameters
-        ----------
-        G : NetworkX graph
-        """
-
         self.G = G
         self.dist = {v: 0 for v in G}
         self.pred = {v: None for v in G}
         self.get_weight = get_weight
-        #self.dist = dist.copy()
-        #self.pred = pred.copy()
 
     def find_cycle(self):
         """Find a cycle on policy graph
@@ -56,9 +42,9 @@ class negCycleFinder:
                 if visited[u] != None:
                     if visited[u] == v:
                         if self.is_negative(u):
-                            return u
+                            # should be "yield u"
+                            yield u
                     break
-        return None
 
     def relax(self):
         """Perform a updating of dist and pred
@@ -99,34 +85,33 @@ class negCycleFinder:
         Returns:
             [type] -- [description]
         """
-        G = self.G
-        self.dist = {v: 0. for v in G}
-        self.pred = {v: None for v in G}
-        # set_default(G, weight, 1)
-        c = self.neg_cycle_relax()
-        return c
+        self.dist = {v: 0. for v in self.G}
+        self.pred = {v: None for v in self.G}
+        for c in self.neg_cycle_relax():
+            yield c 
 
     def neg_cycle_relax(self):
-        G = self.G
-        #self.dist = {v: 0. for v in G}
-        self.pred = {v: None for v in G}
+        self.pred = {v: None for v in self.G}
 
         while True:
             changed = self.relax()
             if changed:
-                v = self.find_cycle()
-                if v != None:
-                    return self.cycle_list(v)
+                # if v != None:
+                has_cycle = False
+                for v in self.find_cycle():
+                    has_cycle = True
+                    yield self.cycle_list(v)
+                if has_cycle:
+                    break
             else:
                 break
-        return None
 
     def cycle_list(self, handle):
         v = handle
         cycle = list()
         while True:
             u = self.pred[v]
-            cycle += {(u, v)}
+            cycle += [(u, v)]
             v = u
             if v == handle:
                 break

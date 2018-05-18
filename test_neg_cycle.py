@@ -17,17 +17,18 @@ def create_test_case1():
 
 def do_case(G):
     N = negCycleFinder(G)
-    c = N.find_neg_cycle()
-    print(N.pred.items())
-    print(N.dist.items())
-    return c
-
+    hasNeg = False
+    for _ in N.find_neg_cycle():
+        print(N.pred.items())
+        print(N.dist.items())
+        hasNeg = True
+    return hasNeg
 
 def test_cycle():
     G = create_test_case1()
-    c = do_case(G)
-    assert c != None
+    hasNeg = do_case(G)
+    assert hasNeg
 
     G = nx.path_graph(5, create_using=nx.DiGraph())
-    c = do_case(G)
-    assert c is None
+    hasNeg = do_case(G)
+    assert not hasNeg

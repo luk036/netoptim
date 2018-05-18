@@ -36,17 +36,22 @@ def max_parametric(G, r, d, zero_cancel):
     while True:
         # for (u, v) in G.edges:
         #     G[u][v]['weight'] = d(G, r, u, v)
+        r_min = float('Inf')
+        C_min = None
+        for Ci in S.neg_cycle_relax():
+            ri = zero_cancel(G, Ci)
+            if r_min > ri:
+                r_min = ri
+                C_min = Ci
 
-        C = S.neg_cycle_relax()
-        if C is None:
+        if C_min is None:
             break
-        C_opt = C
-        r_opt = zero_cancel(G, C)
-        if r_opt + 0.0000001 > r:
+        if r_min + 0.0000001 > r_opt:
             break
-        r = r_opt
+        C_opt = C_min
+        r_opt = r_min
         # update ???
-        for (u, v) in C:
+        for (u, v) in C_opt:
             S.dist[u] = S.dist[v] - get_weight(G, (u, v))
 
     return r_opt, C_opt, S.dist
