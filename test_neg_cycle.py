@@ -22,6 +22,7 @@ def do_case(G):
         print(N.pred.items())
         print(N.dist.items())
         hasNeg = True
+        break
     return hasNeg
 
 def test_cycle():
