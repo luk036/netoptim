@@ -88,7 +88,7 @@ class negCycleFinder:
         self.dist = {v: 0. for v in self.G}
         self.pred = {v: None for v in self.G}
         for c in self.neg_cycle_relax():
-            yield c 
+            yield c
 
     def neg_cycle_relax(self):
         self.pred = {v: None for v in self.G}

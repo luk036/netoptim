@@ -7,7 +7,7 @@ import networkx as nx
 from min_cycle_ratio import min_cycle_ratio, set_default
 from test_neg_cycle import create_test_case1
 from fractions import Fraction
- 
+
 
 def test_cycle_ratio():
     G = create_test_case1()

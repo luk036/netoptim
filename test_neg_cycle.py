@@ -25,6 +25,7 @@ def do_case(G):
         break
     return hasNeg
 
+
 def test_cycle():
     G = create_test_case1()
     hasNeg = do_case(G)

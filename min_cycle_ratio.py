@@ -5,14 +5,17 @@ from pprint import pprint
 import networkx as nx
 from parametric import max_parametric
 
+
 def set_default(G, weight, value):
     for (u, v) in G.edges:
         if G[u][v].get(weight, None) is None:
             G[u][v][weight] = value
 
+
 def calc_weight(G, r, e):
     u, v = e
     return G[u][v]['cost'] - r * G[u][v]['time']
+
 
 def calc_ratio(G, C):
     """Calculate the ratio of the cycle
