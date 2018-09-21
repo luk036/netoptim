@@ -14,9 +14,9 @@ class negCycleFinder:
 
     def __init__(self, G, get_weight=default_get_weight):
         self.G = G
+        self.get_weight = get_weight
         self.dist = {v: 0 for v in G}
         self.pred = {v: None for v in G}
-        self.get_weight = get_weight
 
     def find_cycle(self):
         """Find a cycle on policy graph
@@ -28,10 +28,9 @@ class negCycleFinder:
         Returns:
             handle -- a start node of the cycle
         """
-
-        visited = {v: None for v in self.G}
+        visited = {}
         for v in self.G:
-            if visited[v] != None:
+            if v in visited:
                 continue
             u = v
             while True:
@@ -39,7 +38,7 @@ class negCycleFinder:
                 u = self.pred[u]
                 if u is None:
                     break
-                if visited[u] != None:
+                if u in visited:
                     if visited[u] == v:
                         if self.is_negative(u):
                             # should be "yield u"
@@ -60,10 +59,10 @@ class negCycleFinder:
         Returns:
             [type] -- [description]
         """
-
         changed = False
-        for (u, v) in self.G.edges:
-            wt = self.get_weight(self.G, (u, v))
+        for e in self.G.edges:
+            wt = self.get_weight(self.G, e)
+            u, v = e
             d = self.dist[u] + wt
             if self.dist[v] > d:
                 self.dist[v] = d
@@ -95,15 +94,14 @@ class negCycleFinder:
 
         while True:
             changed = self.relax()
-            if changed:
-                # if v != None:
-                has_cycle = False
-                for v in self.find_cycle():
-                    has_cycle = True
-                    yield self.cycle_list(v)
-                if has_cycle:
-                    break
-            else:
+            if not changed:
+                break
+            # if v != None:
+            has_cycle = False
+            for v in self.find_cycle():
+                has_cycle = True
+                yield self.cycle_list(v)
+            if has_cycle:
                 break
 
     def cycle_list(self, handle):

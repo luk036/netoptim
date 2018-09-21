@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
-from pprint import pprint
-
-from networkx.utils import generate_unique_node
 import networkx as nx
 from neg_cycle import negCycleFinder
 
@@ -64,6 +60,8 @@ def max_parametric(G, r, d, zero_cancel):
 
 
 # if __name__ == "__main__":
+#     from __future__ import print_function
+#     from pprint import pprint
 #     import networkx as nx
 #     from neg_cycle import *
 #     from networkx.utils import generate_unique_node
