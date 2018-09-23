@@ -16,7 +16,8 @@ class negCycleFinder:
         self.G = G
         self.get_weight = get_weight
         self.dist = {v: 0 for v in G}
-        self.pred = {v: None for v in G}
+        # self.pred = {v: None for v in G}
+        self.pred = {}
 
     def find_cycle(self):
         """Find a cycle on policy graph
@@ -35,9 +36,11 @@ class negCycleFinder:
             u = v
             while True:
                 visited[u] = v
-                u = self.pred[u]
-                if u is None:
+                if u not in self.pred:
                     break
+                u = self.pred[u]
+                # if u is None:
+                #    break
                 if u in visited:
                     if visited[u] == v:
                         if self.is_negative(u):
@@ -85,12 +88,13 @@ class negCycleFinder:
             [type] -- [description]
         """
         self.dist = {v: 0. for v in self.G}
-        self.pred = {v: None for v in self.G}
+        # self.pred = {v: None for v in self.G}
+        self.pred = {}
         for c in self.neg_cycle_relax():
             yield c
 
     def neg_cycle_relax(self):
-        self.pred = {v: None for v in self.G}
+        # self.pred = {v: None for v in self.G}
 
         while True:
             changed = self.relax()
