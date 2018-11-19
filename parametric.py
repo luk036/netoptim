@@ -20,7 +20,6 @@ def max_parametric(G, r, d, zero_cancel):
         r_opt -- optimal value
         C_opt -- Most critial cycle
         dist -- optimal sol'n
-
     """
     def get_weight(G, e):
         return d(G, r, e)

@@ -7,12 +7,29 @@ from parametric import max_parametric
 
 
 def set_default(G, weight, value):
-    for (u, v) in G.edges:
+    """[summary]
+
+    Arguments:
+        G {[type]} -- [description]
+        weight {[type]} -- [description]
+        value {[type]} -- [description]
+    """
+    for u, v in G.edges:
         if G[u][v].get(weight, None) is None:
             G[u][v][weight] = value
 
 
 def calc_weight(G, r, e):
+    """[summary]
+
+    Arguments:
+        G {[type]} -- [description]
+        r {[type]} -- [description]
+        e {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
+    """
     u, v = e
     return G[u][v]['cost'] - r * G[u][v]['time']
 
@@ -33,6 +50,14 @@ def calc_ratio(G, C):
 
 
 def min_cycle_ratio(G):
+    """[summary]
+
+    Arguments:
+        G {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
+    """
     mu = 'cost'
     sigma = 'time'
     set_default(G, mu, 1)
