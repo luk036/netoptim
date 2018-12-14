@@ -7,5 +7,5 @@ import networkx as nx
 N = 100
 M1 = sp.rand(N, N, density=0.1)
 A = M1 + M1.T  # make symmetric
-D = nx.to_networkx_graph(A,create_using=nx.DiGraph())
+D = nx.to_networkx_graph(A, create_using=nx.DiGraph())
 nx.bellman_ford(G, source)

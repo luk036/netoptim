@@ -14,6 +14,7 @@ def create_test_case1():
     G.add_edges_from([(newnode, n) for n in G])
     return G
 
+
 def create_test_case_timing():
     G = nx.DiGraph()
     G.add_nodes_from([1, 2, 3])
@@ -30,6 +31,7 @@ def create_test_case_timing():
     G[3][1]['weight'] = 2
     G[1][3]['weight'] = 5
     return G
+
 
 def do_case(G):
     N = negCycleFinder(G)
