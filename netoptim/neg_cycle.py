@@ -70,7 +70,6 @@ class negCycleFinder:
                             # should be "yield u"
                             yield u
                     break
-        return None
 
     def relax(self):
         """Perform a updating of dist and pred
