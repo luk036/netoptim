@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import networkx as nx
-from neg_cycle import negCycleFinder
+from .neg_cycle import negCycleFinder
 
 
 def max_parametric(G, r, d, zero_cancel):
@@ -53,7 +53,9 @@ def max_parametric(G, r, d, zero_cancel):
         r_opt = r_min
         # update ???
         for (u, v) in C_opt:
-            S.dist[u] = S.dist[v] - get_weight(G, (u, v))
+            i_v = G.nodemap[v]
+            i_u = G.nodemap[u]
+            S.dist[i_u] = S.dist[i_v] - get_weight(G, (u, v))
 
     return r_opt, C_opt, S.dist
 

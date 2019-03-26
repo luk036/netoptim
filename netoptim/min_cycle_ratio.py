@@ -3,7 +3,7 @@ from __future__ import print_function
 from pprint import pprint
 
 import networkx as nx
-from parametric import max_parametric
+from .parametric import max_parametric
 
 
 def set_default(G, weight, value):

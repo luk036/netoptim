@@ -1,7 +1,7 @@
 # import matplotlib.pyplot as plt
 import numpy as np
 import networkx as nx
-from min_cycle_ratio import *
+from ..min_cycle_ratio import *
 
 
 def vdc(n, base=2):
@@ -21,6 +21,9 @@ def vdcorput(n, base=2):
     return [vdc(i, base) for i in range(n)]
 
 
+class SimpleDiGraph(nx.DiGraph):
+    nodemap = {}
+
 def formGraph(T, pos, eta, seed=None):
     ''' Form N by N grid of nodes, connect nodes within eta.
         mu and eta are relative to 1/(N-1)
@@ -37,7 +40,8 @@ def formGraph(T, pos, eta, seed=None):
 
     # connect nodes with edges
     G = nx.random_geometric_graph(n, eta, pos=pos)
-    G = nx.DiGraph(G)
+    G = SimpleDiGraph(nx.DiGraph(G))
+    G.nodemap = range(G.number_of_nodes())
     return G
 
 
