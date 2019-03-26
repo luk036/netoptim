@@ -80,4 +80,4 @@ notifications:
   email: false
   slack:
     rooms:
-      - loksu:jErzuILLSNn9qGYkkILvBwje#netoptim
+      - loksu:jErzuILLSNn9qGYkkILvBwje#ellpy
