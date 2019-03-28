@@ -146,7 +146,7 @@ def test_random_graph():
         #G[u][v]['cost'] = np.sqrt(np.dot(h, h))
         G[u][v]['cost'] = h[0] + h[1]
 
-    r, c, _ = min_cycle_ratio(G)
+    _, c, _ = min_cycle_ratio(G)
     assert c != None
 
     pathlist = c

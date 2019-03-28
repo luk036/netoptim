@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import networkx as nx
+# import networkx as nx
 from .neg_cycle import negCycleFinder
 
 
