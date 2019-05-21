@@ -55,15 +55,6 @@ def do_case(G):
         [type] -- [description]
     """
     def get_weight(G, e):
-        """[summary]
-
-        Arguments:
-            G {[type]} -- [description]
-            e {[type]} -- [description]
-
-        Returns:
-            [type] -- [description]
-        """
         u, v = e
         return G[u][v].get('weight', 1)
 
@@ -75,18 +66,20 @@ def do_case(G):
     return hasNeg
 
 
-def test_cycle():
-    """[summary]
-    """
+def test_neg_cycle():
     G = create_test_case1()
     hasNeg = do_case(G)
     assert hasNeg
 
+
+def test_no_neg_cycle():
     G = SimpleDiGraph(nx.path_graph(5, create_using=nx.DiGraph()))
     G.nodemap = range(G.number_of_nodes())
     hasNeg = do_case(G)
     assert not hasNeg
 
+
+def test_timing_graph():
     G = create_test_case_timing()
     hasNeg = do_case(G)
     assert not hasNeg

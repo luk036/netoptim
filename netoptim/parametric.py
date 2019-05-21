@@ -7,11 +7,11 @@ def max_parametric(G, r, d, zero_cancel):
     """maximum parametric problem:
 
         max  r
-        s.t. dist[v] - dist[v] <= d(u,v,r)
+        s.t. dist[v] - dist[v] <= d(u, v, r)
              for all (u, v) in G
 
     Arguments:
-        G {[type]} -- [description]
+        G {[type]} -- directed graph
         r {float} -- parameter to be maximized, initially a large number (infeasible)
         d {[type]} -- monotone decreasing function w.r.t. r
         zero_cancel {[type]} -- [description]
@@ -29,16 +29,6 @@ def max_parametric(G, r, d, zero_cancel):
     r_opt = r
 
     while True:
-        # for (u, v) in G.edges:
-        #     G[u][v]['weight'] = d(G, r, u, v)
-
-        # r_min = float('Inf')
-        # C_min = None
-        # for Ci in S.neg_cycle_relax():
-        #     ri = zero_cancel(G, Ci)
-        #     if r_min > ri:
-        #         r_min = ri
-        #         C_min = Ci
         C_lst = [C for C in S.neg_cycle_relax()]
         if C_lst is []:
             break
@@ -52,10 +42,11 @@ def max_parametric(G, r, d, zero_cancel):
         C_opt = C_min
         r_opt = r_min
         # update ???
-        for (u, v) in C_opt:
+        for e in C_opt:
+            u, v = e
             i_v = G.nodemap[v]
             i_u = G.nodemap[u]
-            S.dist[i_u] = S.dist[i_v] - get_weight(G, (u, v))
+            S.dist[i_u] = S.dist[i_v] - get_weight(G, e)
 
     return r_opt, C_opt, S.dist
 

@@ -29,6 +29,8 @@ def test_cycle_ratio_timing():
     G['a3']['a2']['cost'] = Fraction(0, 1)
     G['a3']['a1']['cost'] = Fraction(2, 1)
     G['a1']['a3']['cost'] = Fraction(4, 1)
-    r, c, dist = min_cycle_ratio(G)
+    # make sure no parallel edges in above!!!
+
+    r, c, _ = min_cycle_ratio(G)
     assert c != None
     assert r == Fraction(3, 2)

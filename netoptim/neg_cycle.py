@@ -20,6 +20,7 @@ def default_get_weight(G, e):
 
 
 class negCycleFinder:
+    pred = {}
 
     def __init__(self, G, get_weight=default_get_weight):
         """[summary]
@@ -32,10 +33,7 @@ class negCycleFinder:
         """
         self.G = G
         self.get_weight = get_weight
-        # self.dist = {v: 0 for v in G}
         self.dist = list(0 for _ in self.G)
-        # self.pred = {v: None for v in G}
-        self.pred = {}
 
     def find_cycle(self):
         """Find a cycle on policy graph

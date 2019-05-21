@@ -10,7 +10,7 @@ def set_default(G, weight, value):
     """[summary]
 
     Arguments:
-        G {[type]} -- [description]
+        G {Networkx Graph} -- directed graph
         weight {[type]} -- [description]
         value {[type]} -- [description]
     """
@@ -23,7 +23,7 @@ def calc_weight(G, r, e):
     """[summary]
 
     Arguments:
-        G {[type]} -- [description]
+        G {Networkx Graph} -- directed graph
         r {[type]} -- [description]
         e {[type]} -- [description]
 
@@ -38,8 +38,8 @@ def calc_ratio(G, C):
     """Calculate the ratio of the cycle
 
     Arguments:
-        G {Networkx Graph} -- [description]
-        C {list} -- [description]
+        G {Networkx Graph} -- directed graph
+        C {list} -- cycle list
 
     Returns:
         float -- cycle ratio
@@ -50,7 +50,7 @@ def calc_ratio(G, C):
 
 
 def min_cycle_ratio(G):
-    """[summary]
+    """[summary] todo: parameterize cost and time 
 
     Arguments:
         G {[type]} -- [description]
