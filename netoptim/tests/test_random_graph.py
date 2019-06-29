@@ -24,6 +24,7 @@ def vdcorput(n, base=2):
 class SimpleDiGraph(nx.DiGraph):
     nodemap = {}
 
+
 def formGraph(T, pos, eta, seed=None):
     ''' Form N by N grid of nodes, connect nodes within eta.
         mu and eta are relative to 1/(N-1)
