@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-# from pprint import pprint
 
 # import networkx as nx
 from .parametric import max_parametric
+
+# from pprint import pprint
 
 
 def set_default(G, weight, value):
@@ -46,11 +47,11 @@ def calc_ratio(G, C):
     """
     total_cost = sum(G[u][v]['cost'] for (u, v) in C)
     total_time = sum(G[u][v]['time'] for (u, v) in C)
-    return total_cost/total_time
+    return total_cost / total_time
 
 
 def min_cycle_ratio(G):
-    """[summary] todo: parameterize cost and time 
+    """[summary] todo: parameterize cost and time
 
     Arguments:
         G {[type]} -- [description]
@@ -76,7 +77,7 @@ def min_cycle_ratio(G):
 #     G = create_test_case1()
 #     G[1][2]['cost'] = 5
 #     r, c, dist = min_cycle_ratio(G)
-#     assert c != None
+#     assert c is not None
 #     print(r)
 #     print(c)
 #     print(dist.items())
@@ -86,7 +87,7 @@ def min_cycle_ratio(G):
 #     newnode = generate_unique_node()
 #     G.add_edges_from([(newnode, n) for n in G])
 #     r, c, dist = min_cycle_ratio(G)
-#     assert c != None
+#     assert c is not None
 #     print(r)
 #     print(c)
 #     print(dist.items())

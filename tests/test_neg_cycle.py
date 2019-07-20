@@ -3,6 +3,7 @@ from __future__ import print_function
 
 # from networkx.utils import generate_unique_node
 import networkx as nx
+
 from netoptim.neg_cycle import negCycleFinder
 
 

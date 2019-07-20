@@ -162,4 +162,3 @@ class negCycleFinder:
                         pred[v] = u
 
         return None
-
