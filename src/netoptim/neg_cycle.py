@@ -110,9 +110,7 @@ class negCycleFinder:
         Returns:
             [type] -- [description]
         """
-        # self.dist = {v: 0. for v in self.G}
         self.dist = list(0 for _ in self.G)
-        # self.pred = {v: None for v in self.G}
         self.pred = {}
         for c in self.neg_cycle_relax():
             yield c
@@ -123,8 +121,6 @@ class negCycleFinder:
         Returns:
             [type] -- [description]
         """
-        # self.pred = {v: None for v in self.G}
-
         while True:
             changed = self.relax()
             if not changed:

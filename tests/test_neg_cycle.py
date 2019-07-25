@@ -19,7 +19,6 @@ def create_test_case1():
     """
     G = SimpleDiGraph(nx.cycle_graph(5, create_using=nx.DiGraph()))
     G[1][2]['weight'] = -5
-    # newnode = generate_unique_node()
     G.add_edges_from([(5, n) for n in G])
     G.nodemap = range(6)
     return G

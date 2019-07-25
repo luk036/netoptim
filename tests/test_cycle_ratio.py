@@ -4,7 +4,6 @@ from __future__ import print_function
 from fractions import Fraction
 
 # from networkx.utils import generate_unique_node
-# import networkx as nx
 from netoptim.min_cycle_ratio import min_cycle_ratio, set_default
 
 from .test_neg_cycle import create_test_case1, create_test_case_timing
