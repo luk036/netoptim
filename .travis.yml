@@ -32,7 +32,7 @@ script:
     fi
 after_success:
   - |
-  - if [[ "$COVERAGE" == "true" ]]; then
+    if [[ "$COVERAGE" == "true" ]]; then
       coveralls || echo "failed"
       codecov || echo "failed"
     fi
