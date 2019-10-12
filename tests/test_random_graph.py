@@ -21,10 +21,6 @@ def vdcorput(n, base=2):
     return [vdc(i, base) for i in range(n)]
 
 
-class SimpleDiGraph(nx.DiGraph):
-    nodemap = {}
-
-
 def formGraph(T, pos, eta, seed=None):
     ''' Form N by N grid of nodes, connect nodes within eta.
         mu and eta are relative to 1/(N-1)
@@ -41,8 +37,6 @@ def formGraph(T, pos, eta, seed=None):
 
     # connect nodes with edges
     G = nx.random_geometric_graph(n, eta, pos=pos)
-    G = SimpleDiGraph(nx.DiGraph(G))
-    G.nodemap = range(G.number_of_nodes())
     return G
 
 
@@ -68,10 +62,11 @@ def test_random_graph():
     # pos = pos + [(1.5,.5)]
     for u, v in G.edges():
         h = np.array(G.node[u]['pos']) - np.array(G.node[v]['pos'])
-        # G[u][v]['cost'] = np.sqrt(np.dot(h, h))
-        G[u][v]['cost'] = h[0] + h[1]
+        G[u][v]['cost'] = np.sqrt(np.dot(h, h))
+        # G[u][v]['cost'] = h[0] + h[1]
 
-    _, c, _ = min_cycle_ratio(G)
+    dist = list(0 for _ in G)
+    _, c = min_cycle_ratio(G, dist)
     assert c is not None
 
     pathlist = c

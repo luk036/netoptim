@@ -13,9 +13,11 @@ from .test_neg_cycle import create_test_case1, create_test_case_timing
 
 def test_cycle_ratio():
     G = create_test_case1()
+    set_default(G, 'time', Fraction(1, 1))
     set_default(G, 'cost', Fraction(1, 1))
     G[1][2]['cost'] = Fraction(5, 1)
-    r, c, _ = min_cycle_ratio(G)
+    dist = list(Fraction(0, 1) for _ in G)
+    r, c = min_cycle_ratio(G, dist)
     assert c is not None
     assert r == Fraction(9, 5)
     print(r)
@@ -32,7 +34,7 @@ def test_cycle_ratio_timing():
     G['a3']['a1']['cost'] = Fraction(2, 1)
     G['a1']['a3']['cost'] = Fraction(4, 1)
     # make sure no parallel edges in above!!!
-
-    r, c, _ = min_cycle_ratio(G)
+    dist = {v: Fraction(0, 1) for v in G}
+    r, c = min_cycle_ratio(G, dist)
     assert c is not None
-    assert r == Fraction(3, 2)
+    assert r == Fraction(1, 1)

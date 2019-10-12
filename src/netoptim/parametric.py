@@ -2,7 +2,7 @@
 from .neg_cycle import negCycleFinder
 
 
-def max_parametric(G, r, d, zero_cancel):
+def max_parametric(G, r_opt, C_opt, d, zero_cancel, dist):
     """maximum parametric problem:
 
         max  r
@@ -21,33 +21,35 @@ def max_parametric(G, r, d, zero_cancel):
         dist -- optimal sol'n
     """
     def get_weight(G, e):
-        return d(G, r, e)
+        return d(G, r_opt, e)
 
     S = negCycleFinder(G, get_weight)
-    C_opt = None
-    r_opt = r
+    # C_opt = None
+    r_min = r_opt
 
     while True:
-        C_lst = [C for C in S.neg_cycle_relax()]
-        if C_lst is []:
+        C_min = None
+        for C in S.find_neg_cycle(dist):
+            r_min = zero_cancel(G, C)
+            C_min = C
+            break  # get only first one
+
+        if C_min is None:
             break
-        rlst = [zero_cancel(G, C) for C in C_lst]
-        r_min = min(rlst)
-        idx = rlst.index(r_min)
-        C_min = C_lst[idx]
 
         if r_min >= r_opt:
             break
+
         C_opt = C_min
         r_opt = r_min
         # update ???
         for e in C_opt:
             u, v = e
-            i_v = G.nodemap[v]
-            i_u = G.nodemap[u]
-            S.dist[i_u] = S.dist[i_v] - get_weight(G, e)
+            # i_v = G.nodemap[v]
+            # i_u = G.nodemap[u]
+            dist[u] = dist[v] - get_weight(G, e)
 
-    return r_opt, C_opt, S.dist
+    return r_opt, C_opt
 
 
 # if __name__ == "__main__":
