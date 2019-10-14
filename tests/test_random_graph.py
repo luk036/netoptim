@@ -25,7 +25,7 @@ def formGraph(T, pos, eta, seed=None):
     ''' Form N by N grid of nodes, connect nodes within eta.
         mu and eta are relative to 1/(N-1)
     '''
-    if seed is not None:
+    if seed:
         np.random.seed(seed)
 
     N = np.sqrt(T)

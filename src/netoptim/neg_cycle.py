@@ -5,24 +5,10 @@ Negative cycle detection for weighed graphs.
 """
 
 
-def default_get_weight(G, e):
-    """[summary]
-
-    Arguments:
-        G {[type]} -- [description]
-        e {[type]} -- [description]
-
-    Returns:
-        [type] -- [description]
-    """
-    u, v = e
-    return G[u][v].get('weight', 1)
-
-
 class negCycleFinder:
     pred = {}
 
-    def __init__(self, G, get_weight=default_get_weight):
+    def __init__(self, G):
         """[summary]
 
         Arguments:
@@ -32,7 +18,7 @@ class negCycleFinder:
             get_weight {[type]} -- [description] (default: {default_get_weight})
         """
         self.G = G
-        self.get_weight = get_weight
+        # self.get_weight = get_weight
         # self.dist = list(0 for _ in self.G)
 
     def find_cycle(self):
@@ -66,7 +52,7 @@ class negCycleFinder:
                         yield u
                     break
 
-    def relax(self, dist):
+    def relax(self, dist, get_weight):
         """Perform a updating of dist and pred
 
         Arguments:
@@ -82,7 +68,7 @@ class negCycleFinder:
         """
         changed = False
         for e in self.G.edges():
-            wt = self.get_weight(self.G, e)
+            wt = get_weight(self.G, e)
             u, v = e
             d = dist[u] + wt
             if dist[v] > d:
@@ -91,7 +77,7 @@ class negCycleFinder:
                 changed = True
         return changed
 
-    def find_neg_cycle(self, dist):
+    def find_neg_cycle(self, dist, get_weight):
         """Perform a updating of dist and pred
 
         Arguments:
@@ -107,24 +93,15 @@ class negCycleFinder:
         """
         # self.dist = list(0 for _ in self.G)
         self.pred = {}
-        for c in self.neg_cycle_relax(dist):
-            yield c
-
-    def neg_cycle_relax(self, dist):
-        """[summary]
-
-        Returns:
-            [type] -- [description]
-        """
         found = False
         while not found:
-            changed = self.relax(dist)
+            changed = self.relax(dist, get_weight)
             if not changed:
                 break
             # has_cycle = False
             for v in self.find_cycle():
                 # Will zero cycle be found???
-                assert self.is_negative(v, dist)
+                assert self.is_negative(v, dist, get_weight)
                 found = True
                 yield self.cycle_list(v)
 
@@ -147,7 +124,7 @@ class negCycleFinder:
                 break
         return cycle
 
-    def is_negative(self, handle, dist):
+    def is_negative(self, handle, dist, get_weight):
         """[summary]
 
         Arguments:
@@ -160,7 +137,7 @@ class negCycleFinder:
         # do while loop in C++
         while True:
             u = self.pred[v]
-            wt = self.get_weight(self.G, (u, v))
+            wt = get_weight(self.G, (u, v))
             if dist[v] > dist[u] + wt:
                 return True
             v = u

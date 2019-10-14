@@ -23,13 +23,13 @@ def max_parametric(G, r_opt, C_opt, d, zero_cancel, dist):
     def get_weight(G, e):
         return d(G, r_opt, e)
 
-    S = negCycleFinder(G, get_weight)
+    S = negCycleFinder(G)
     # C_opt = None
     r_min = r_opt
 
     while True:
         C_min = None
-        for C in S.find_neg_cycle(dist):
+        for C in S.find_neg_cycle(dist, get_weight):
             r_min = zero_cancel(G, C)
             C_min = C
             break  # get only first one

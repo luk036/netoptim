@@ -52,9 +52,9 @@ def do_case(G, dist):
         u, v = e
         return G[u][v].get('weight', 1)
 
-    N = negCycleFinder(G, get_weight)
+    N = negCycleFinder(G)
     hasNeg = False
-    for _ in N.find_neg_cycle(dist):
+    for _ in N.find_neg_cycle(dist, get_weight):
         hasNeg = True
         break
     return hasNeg
