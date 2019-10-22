@@ -18,10 +18,10 @@ def test_cycle_ratio():
     G[1][2]['cost'] = Fraction(5, 1)
     dist = list(Fraction(0, 1) for _ in G)
     r, c = min_cycle_ratio(G, dist)
-    assert c
-    assert r == Fraction(9, 5)
     print(r)
     print(c)
+    assert c
+    assert r == Fraction(9, 5)
 
 
 def test_cycle_ratio_timing():
@@ -36,5 +36,7 @@ def test_cycle_ratio_timing():
     # make sure no parallel edges in above!!!
     dist = {v: Fraction(0, 1) for v in G}
     r, c = min_cycle_ratio(G, dist)
+    print(r)
+    print(c)
     assert c
     assert r == Fraction(1, 1)

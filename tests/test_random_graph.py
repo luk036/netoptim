@@ -61,7 +61,7 @@ def test_random_graph():
     # Add a sink, connect all spareTSV to it.
     # pos = pos + [(1.5,.5)]
     for u, v in G.edges():
-        h = np.array(G.node[u]['pos']) - np.array(G.node[v]['pos'])
+        h = np.array(G.nodes()[u]['pos']) - np.array(G.nodes()[v]['pos'])
         G[u][v]['cost'] = np.sqrt(np.dot(h, h))
         # G[u][v]['cost'] = h[0] + h[1]
 

@@ -2,55 +2,47 @@
 from .neg_cycle import negCycleFinder
 
 
-def max_parametric(G, r_opt, C_opt, d, zero_cancel, dist):
+def max_parametric(G, r, C, d, zero_cancel, dist, pick_one_only=False):
     """maximum parametric problem:
 
         max  r
         s.t. dist[v] - dist[v] <= d(u, v, r)
              for all (u, v) in G
 
+
+
     Arguments:
         G {[type]} -- directed graph
-        r {float} -- parameter to be maximized, initially a large number (infeasible)
+        r {float} -- parameter to be maximized, initially a big number!!!
         d {[type]} -- monotone decreasing function w.r.t. r
         zero_cancel {[type]} -- [description]
+        pick_one_only {bool} -- [description]
 
     Returns:
-        r_opt -- optimal value
-        C_opt -- Most critial cycle
+        r -- optimal value
+        C -- Most critial cycle
         dist -- optimal sol'n
     """
     def get_weight(G, e):
-        return d(G, r_opt, e)
+        return d(G, r, e)
 
     S = negCycleFinder(G)
-    # C_opt = None
-    r_min = r_opt
+    r_min = r
 
     while True:
-        C_min = None
-        for C in S.find_neg_cycle(dist, get_weight):
-            r_min = zero_cancel(G, C)
-            C_min = C
-            break  # get only first one
-
-        if C_min is None:
+        for Ci in S.find_neg_cycle(dist, get_weight):
+            ri = zero_cancel(G, Ci)
+            if r_min > ri:
+                r_min = ri
+                C_min = Ci
+                if pick_one_only:
+                    break
+        if r_min >= r:
             break
 
-        if r_min >= r_opt:
-            break
-
-        C_opt = C_min
-        r_opt = r_min
-        # update ???
-        for e in C_opt:
-            u, v = e
-            # i_v = G.nodemap[v]
-            # i_u = G.nodemap[u]
-            dist[u] = dist[v] - get_weight(G, e)
-
-    return r_opt, C_opt
-
+        C = C_min
+        r = r_min
+    return r, C
 
 # if __name__ == "__main__":
 #     from __future__ import print_function
