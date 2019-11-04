@@ -60,7 +60,7 @@ class negCycleFinder:
         """
         changed = False
         for e in self.G.edges():
-            wt = get_weight(self.G, e)
+            wt = get_weight(e)
             u, v = e
             d = dist[u] + wt
             if dist[v] > d:
@@ -126,7 +126,7 @@ class negCycleFinder:
         # do while loop in C++
         while True:
             u = self.pred[v]
-            wt = get_weight(self.G, (u, v))
+            wt = get_weight((u, v))
             if dist[v] > dist[u] + wt:
                 return True
             v = u

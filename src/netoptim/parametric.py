@@ -23,7 +23,7 @@ def max_parametric(G, r, C, d, zero_cancel, dist, pick_one_only=False):
         C -- Most critial cycle
         dist -- optimal sol'n
     """
-    def get_weight(G, e):
+    def get_weight(e):
         return d(G, r, e)
 
     S = negCycleFinder(G)
