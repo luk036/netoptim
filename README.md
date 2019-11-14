@@ -1,4 +1,5 @@
-# netoptim
+netoptim
+========
 
 [![Build Status](https://travis-ci.org/luk036/netoptim.svg?branch=master)](https://travis-ci.org/luk036/netoptim)
 [![Build status](https://ci.appveyor.com/api/projects/status/nj8c1r9tl058buh0?svg=true)](https://ci.appveyor.com/project/luk036/netoptim)
@@ -9,3 +10,14 @@
 [![BCH compliance](https://bettercodehub.com/edge/badge/luk036/netoptim?branch=master)](https://bettercodehub.com/)
 
 Network optimization python code
+
+See also
+--------
+
+[netoptimcpp](https://github.com/luk036/netoptimcpp)
+
+Note
+----
+
+This project has been set up using PyScaffold 3.2.1. For details and usage
+information on PyScaffold see <https://pyscaffold.org/>.

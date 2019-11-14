@@ -34,11 +34,10 @@ def min_cycle_ratio(G, dist):
     set_default(G, sigma, 1)
     T = type(dist[next(iter(G))])
 
-    def calc_weight(G, r, e):
+    def calc_weight(r, e):
         """[summary]
 
         Arguments:
-            G {Networkx Graph} -- directed graph
             r {[type]} -- [description]
             e {[type]} -- [description]
 
@@ -48,20 +47,19 @@ def min_cycle_ratio(G, dist):
         u, v = e
         return G[u][v]['cost'] - r * G[u][v]['time']
 
-    def calc_ratio(G, C):
+    def calc_ratio(C):
         """Calculate the ratio of the cycle
 
         Arguments:
-            G {Networkx Graph} -- directed graph
             C {list} -- cycle list
 
         Returns:
-            float -- cycle ratio
+            cycle ratio
         """
         total_cost = sum(G[u][v]['cost'] for (u, v) in C)
         total_time = sum(G[u][v]['time'] for (u, v) in C)
         return T(total_cost) / total_time
 
     C0 = nx.find_cycle(G)
-    r0 = calc_ratio(G, C0)
+    r0 = calc_ratio(C0)
     return max_parametric(G, r0, C0, calc_weight, calc_ratio, dist)

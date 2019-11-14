@@ -24,14 +24,14 @@ def max_parametric(G, r, C, d, zero_cancel, dist, pick_one_only=False):
         dist -- optimal sol'n
     """
     def get_weight(e):
-        return d(G, r, e)
+        return d(r, e)
 
     S = negCycleFinder(G)
     r_min = r
 
     while True:
         for Ci in S.find_neg_cycle(dist, get_weight):
-            ri = zero_cancel(G, Ci)
+            ri = zero_cancel(Ci)
             if r_min > ri:
                 r_min = ri
                 C_min = Ci
