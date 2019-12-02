@@ -9,19 +9,17 @@ def max_parametric(G, r, C, d, zero_cancel, dist, pick_one_only=False):
         s.t. dist[v] - dist[v] <= d(u, v, r)
              for all (u, v) in G
 
-
-
     Arguments:
-        G {[type]} -- directed graph
-        r {float} -- parameter to be maximized, initially a big number!!!
-        d {[type]} -- monotone decreasing function w.r.t. r
-        zero_cancel {[type]} -- [description]
-        pick_one_only {bool} -- [description]
+        G ([type]): directed graph
+        r {float}: parameter to be maximized, initially a big number!!!
+        d ([type]): monotone decreasing function w.r.t. r
+        zero_cancel ([type]): [description]
+        pick_one_only {bool}: [description]
 
     Returns:
-        r -- optimal value
-        C -- Most critial cycle
-        dist -- optimal sol'n
+        r: optimal value
+        C: Most critial cycle
+        dist: optimal sol'n
     """
     def get_weight(e):
         return d(r, e)

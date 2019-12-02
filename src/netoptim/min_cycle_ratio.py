@@ -6,27 +6,27 @@ import networkx as nx
 from .parametric import max_parametric
 
 
-def set_default(G, weight, value):
+def set_default(G: nx.Graph, weight, value):
     """[summary]
 
     Arguments:
-        G {Networkx Graph} -- directed graph
-        weight {[type]} -- [description]
-        value {[type]} -- [description]
+        G (nx.Graph): directed graph
+        weight ([type]): [description]
+        value ([type]): [description]
     """
     for u, v in G.edges:
         if G[u][v].get(weight, None) is None:
             G[u][v][weight] = value
 
 
-def min_cycle_ratio(G, dist):
+def min_cycle_ratio(G: nx.Graph, dist):
     """[summary] todo: parameterize cost and time
 
     Arguments:
-        G {[type]} -- [description]
+        G ([type]): [description]
 
     Returns:
-        [type] -- [description]
+        [type]: [description]
     """
     mu = 'cost'
     sigma = 'time'
@@ -38,11 +38,11 @@ def min_cycle_ratio(G, dist):
         """[summary]
 
         Arguments:
-            r {[type]} -- [description]
-            e {[type]} -- [description]
+            r ([type]): [description]
+            e ([type]): [description]
 
         Returns:
-            [type] -- [description]
+            [type]: [description]
         """
         u, v = e
         return G[u][v]['cost'] - r * G[u][v]['time']
@@ -51,7 +51,7 @@ def min_cycle_ratio(G, dist):
         """Calculate the ratio of the cycle
 
         Arguments:
-            C {list} -- cycle list
+            C {list}: cycle list
 
         Returns:
             cycle ratio

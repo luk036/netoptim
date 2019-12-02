@@ -3,31 +3,25 @@
 Negative cycle detection for weighed graphs.
 1. Support Lazy evalution
 """
+from typing import Dict
 
 
 class negCycleFinder:
-    pred = {}
+    pred: Dict = {}
 
     def __init__(self, G):
         """[summary]
 
         Arguments:
-            G {[type]} -- [description]
-
-        Keyword Arguments:
-            get_weight -- [description] (default: {default_get_weight})
+            G: Graph
         """
         self.G = G
 
     def find_cycle(self):
-        """Find a cycle on policy graph
+        """Find a cycle on the policy graph
 
-        Arguments:
-            G {NetworkX graph}
-            pred {dictionary} -- policy graph
-
-        Returns:
-            handle -- a start node of the cycle
+        Yields:
+            node: a start node of the cycle
         """
         visited = {}
         for v in self.G:
@@ -48,15 +42,11 @@ class negCycleFinder:
         """Perform a updating of dist and pred
 
         Arguments:
-            G {NetworkX graph} -- [description]
-            dist {dictionary} -- [description]
-            pred {dictionary} -- [description]
-
-        Keyword Arguments:
-            weight {str} -- [description]
+            dist (Union[List, Dict]): [description]
+            get_weight (Callable): [description]
 
         Returns:
-            [type] -- [description]
+            [type]: [description]
         """
         changed = False
         for e in self.G.edges():
@@ -73,15 +63,11 @@ class negCycleFinder:
         """Perform a updating of dist and pred
 
         Arguments:
-            G {[type]} -- [description]
-            dist {dictionary} -- [description]
-            pred {dictionary} -- [description]
+            dist (Union[List, Dict]): [description]
+            get_weight (Callable): [description]
 
-        Keyword Arguments:
-            weight {str} -- [description] (default: {'weight'})
-
-        Returns:
-            [type] -- [description]
+        Yields:
+            list of edges: cycle list
         """
         # self.dist = list(0 for _ in self.G)
         self.pred = {}
@@ -95,13 +81,13 @@ class negCycleFinder:
                 yield self.cycle_list(v)
 
     def cycle_list(self, handle):
-        """[summary]
+        """Cycle list started from handle
 
         Arguments:
-            handle {[type]} -- [description]
+            handle: graph node
 
         Returns:
-            [type] -- [description]
+            list of edges: cycle list
         """
         v = handle
         cycle = list()
@@ -114,13 +100,14 @@ class negCycleFinder:
         return cycle
 
     def is_negative(self, handle, dist, get_weight):
-        """[summary]
+        """Check if the cycle list is negative
 
         Arguments:
-            handle {[type]} -- [description]
+            handle: graph node
+            get_weight (Callable): [description]
 
         Returns:
-            [type] -- [description]
+            bool: [description]
         """
         v = handle
         # do while loop in C++
