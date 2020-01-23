@@ -1,6 +1,7 @@
 netoptim
 ========
 
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/luk036/netoptim)
 [![Build Status](https://travis-ci.org/luk036/netoptim.svg?branch=master)](https://travis-ci.org/luk036/netoptim)
 [![Build status](https://ci.appveyor.com/api/projects/status/nj8c1r9tl058buh0?svg=true)](https://ci.appveyor.com/project/luk036/netoptim)
 [![Documentation Status](https://readthedocs.org/projects/netoptim/badge/?version=latest)](https://netoptim.readthedocs.io/en/latest/?badge=latest)
