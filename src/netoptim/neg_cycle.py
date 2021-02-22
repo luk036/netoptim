@@ -73,7 +73,7 @@ class negCycleFinder:
         self.pred = {}
         found = False
         while not found and self.relax(dist, get_weight):
-            v = self.find_cycle()
+            # v = self.find_cycle()
             for v in self.find_cycle():
                 # Will zero cycle be found???
                 assert self.is_negative(v, dist, get_weight)
