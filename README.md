@@ -1,5 +1,4 @@
-netoptim
-========
+# netoptim
 
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/luk036/netoptim)
 ![Python application](https://github.com/luk036/netoptim/workflows/Python%20application/badge.svg)
@@ -19,8 +18,9 @@ See also
 
 [netoptimcpp](https://github.com/luk036/netoptimcpp)
 
-Note
-----
+<!-- pyscaffold-notes -->
 
-This project has been set up using PyScaffold 3.2.1. For details and usage
-information on PyScaffold see <https://pyscaffold.org/>.
+## Note
+
+This project has been set up using PyScaffold 4.0.2. For details and usage
+information on PyScaffold see https://pyscaffold.org/.
