@@ -31,5 +31,7 @@ jobs:
         shell: bash -l {0}
         run: |
             conda install pytest
+            git clone https://github.com/luk036/ellalgo.git
+            pip install ./ellalgo
             python setup.py develop
             pytest
