@@ -82,13 +82,11 @@ class optscaling_oracle:
             cutting_plane_dc
         """
         s = x[0] - x[1]
-        fj = s - t
         g = np.array([1.0, -1.0])
-        if fj >= 0.0:
+        if (fj := s - t) >= 0.0:
             return (g, fj), None
 
-        cut = self._network(x)
-        if cut:
+        if (cut := self._network(x)):
             return cut, None
 
         return (g, 0.0), s

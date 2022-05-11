@@ -24,9 +24,7 @@ class negCycleFinder:
             node: a start node of the cycle
         """
         visited = {}
-        for v in self.G:
-            if v in visited:
-                continue
+        for v in filter(lambda v: v not in visited, self.G):
             u = v
             while True:
                 visited[u] = v
