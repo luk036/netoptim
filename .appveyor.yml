@@ -31,7 +31,7 @@ install:
 
   # Check that we have the expected version and architecture for Python
   - "python --version"
-  - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
+  - 'python -c "import struct; print(struct.calcsize(''P'') * 8)"'
 
   # install required packages
   - "pip install --cache-dir=%CACHE_DIR% -r requirements.txt"
@@ -50,4 +50,4 @@ test_script:
 
 cache:
   # Avoid re-downloading large packages
-  - '%CACHE_DIR%'
+  - "%CACHE_DIR%"

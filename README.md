@@ -13,8 +13,7 @@
 
 Network optimization python code
 
-See also
---------
+## See also
 
 [netoptimcpp](https://github.com/luk036/netoptimcpp)
 
