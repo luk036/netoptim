@@ -4,7 +4,7 @@ from __future__ import print_function
 # from networkx.utils import generate_unique_node
 import networkx as nx
 
-from netoptim.neg_cycle import negCycleFinder
+from netoptim.neg_cycle import NegCycleFinder
 
 
 def create_test_case1():
@@ -52,7 +52,7 @@ def do_case(G, dist):
         u, v = e
         return G[u][v].get('weight', 1)
 
-    N = negCycleFinder(G)
+    N = NegCycleFinder(G)
     hasNeg = False
     for _ in N.find_neg_cycle(dist, get_weight):
         hasNeg = True

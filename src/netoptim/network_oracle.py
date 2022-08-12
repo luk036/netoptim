@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from typing import Any, Optional, Tuple
 
-from .neg_cycle import negCycleFinder
+from .neg_cycle import NegCycleFinder
 
 Cut = Tuple[Any, float]
 
@@ -26,7 +26,7 @@ class network_oracle:
         self._G = G
         self._u = u
         self._h = h
-        self._S = negCycleFinder(G)
+        self._S = NegCycleFinder(G)
 
     def update(self, t):
         """[summary]

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .neg_cycle import negCycleFinder
+from .neg_cycle import NegCycleFinder
 
 
 def max_parametric(G, r, C, d, zero_cancel, dist, pick_one_only=False):
@@ -24,7 +24,7 @@ def max_parametric(G, r, C, d, zero_cancel, dist, pick_one_only=False):
     def get_weight(e):
         return d(r, e)
 
-    S = negCycleFinder(G)
+    S = NegCycleFinder(G)
     r_min = r
 
     while True:

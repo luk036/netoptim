@@ -6,7 +6,7 @@ Negative cycle detection for weighed graphs.
 from typing import Dict
 
 
-class negCycleFinder:
+class NegCycleFinder:
     pred: Dict = {}
 
     def __init__(self, G):
@@ -47,14 +47,14 @@ class negCycleFinder:
             [type]: [description]
         """
         changed = False
-        for e in self.G.edges():
-            wt = get_weight(e)
-            u, v = e
-            d = dist[u] + wt
-            if dist[v] > d:
-                dist[v] = d
-                self.pred[v] = u
-                changed = True
+        for u in self.G:
+            for v in self.G.neighbors(u):
+                wt = get_weight((u, v))
+                d = dist[u] + wt
+                if dist[v] > d:
+                    dist[v] = d
+                    self.pred[v] = u
+                    changed = True
         return changed
 
     def find_neg_cycle(self, dist, get_weight):
