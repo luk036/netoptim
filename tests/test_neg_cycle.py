@@ -5,6 +5,7 @@ from __future__ import print_function
 import networkx as nx
 
 from netoptim.neg_cycle import NegCycleFinder
+from netoptim.lict import Lict, TinyDiGraph
 
 
 def create_test_case1():
@@ -35,6 +36,25 @@ def create_test_case_timing():
         ('a3', 'a2', {'weight': 1}),
         ('a3', 'a1', {'weight': 2}),
         ('a1', 'a3', {'weight': 5})
+    ])
+    return G
+
+
+def create_tiny_graph():
+    """[summary]
+
+    Returns:
+        [type]: [description]
+    """
+    G = TinyDiGraph()
+    G.init_nodes(3)
+    G.add_edges_from([
+        (0, 1, {'weight': 7}),
+        (1, 0, {'weight': 0}),
+        (1, 2, {'weight': 3}),
+        (2, 1, {'weight': 1}),
+        (2, 0, {'weight': 2}),
+        (0, 2, {'weight': 5})
     ])
     return G
 
@@ -77,5 +97,12 @@ def test_no_neg_cycle():
 def test_timing_graph():
     G = create_test_case_timing()
     dist = {v: 0 for v in G}
+    hasNeg = do_case(G, dist)
+    assert not hasNeg
+
+
+def test_tiny_graph():
+    G = create_tiny_graph()
+    dist = Lict([0, 0, 0])
     hasNeg = do_case(G, dist)
     assert not hasNeg

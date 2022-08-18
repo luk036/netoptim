@@ -2,9 +2,9 @@ import networkx as nx
 
 
 class Lict:
-    def __init__(self, n, fn):
-        self.rng = range(n)
-        self.lst = [fn() for _ in self.rng]
+    def __init__(self, lst):
+        self.rng = range(len(lst))
+        self.lst = lst
 
     def items(self):
         return enumerate(self.lst)
@@ -24,36 +24,35 @@ class Lict:
     def __len__(self):
         return len(self.rng)
 
+    def values(self):
+        return iter(self.lst)
 
-NUM_NODES = 1000;
+
+# NUM_NODES = 1000
 
 
-class TinyGraph(nx.Graph):
-    all_edge_dict = {"weight": 1}
-    all_node_dict = {"weight": 1}
+class TinyDiGraph(nx.DiGraph):
+    num_nodes = 0
 
-    def single_edge_dict(self):
-        return self.all_edge_dict
- 
-    def single_node_dict(self):
-        return self.all_node_dict
- 
-    def trick_node_dict(self):
-        return Lict(NUM_NODES, self.single_node_dict)
+    def cheat_node_dict(self):
+        return Lict([dict() for _ in range(self.num_nodes)])
 
-    def trick_adjlist_outer_dict(self):
-        return Lict(NUM_NODES, dict)
+    def cheat_adjlist_outer_dict(self):
+        return Lict([dict() for _ in range(self.num_nodes)])
 
-    edge_attr_dict_factory = single_edge_dict
-    node_attr_dict_factory = single_node_dict
-    node_dict_factory = trick_node_dict
-    adjlist_outer_dict_factory = trick_adjlist_outer_dict
-    # adjlist_inner_dict_factory = dict
-    # node_attr_dict_factory = dict
+    node_dict_factory = cheat_node_dict
+    adjlist_outer_dict_factory = cheat_adjlist_outer_dict
+
+    def init_nodes(self, n: int):
+        self.num_nodes = n
+        self._node = self.cheat_node_dict()
+        self._adj = self.cheat_adjlist_outer_dict()
+        self._pred = self.cheat_adjlist_outer_dict()
 
 
 if __name__ == "__main__":
-    gr = TinyGraph()
+    gr = TinyDiGraph()
+    gr.init_nodes(1000)
     gr.add_edge(2, 1)
     print(gr.number_of_nodes())
     print(gr.number_of_edges())
@@ -62,7 +61,7 @@ if __name__ == "__main__":
         for v in gr.neighbors(u):
             print(f"{u}, {v}")
 
-    a = Lict(8, int)
+    a = Lict([0] * 8)
     for i in a:
         a[i] = i * i
     for i, v in a.items():
