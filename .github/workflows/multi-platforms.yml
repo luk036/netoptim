@@ -34,4 +34,4 @@ jobs:
           git clone https://github.com/luk036/ellalgo.git
           pip install ./ellalgo
           python setup.py develop
-          pytest --cov=src/
+          pytest
