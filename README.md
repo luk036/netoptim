@@ -15,7 +15,7 @@ Network optimization python code
 
 ## See also
 
-[netoptimcpp](https://github.com/luk036/netoptimcpp)
+[netoptim-cpp](https://github.com/luk036/netoptim-cpp)
 
 <!-- pyscaffold-notes -->
 
