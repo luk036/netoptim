@@ -3,7 +3,7 @@ from __future__ import print_function
 
 import networkx as nx
 import numpy as np
-from ellalgo.cutting_plane import cutting_plane_dc
+from ellalgo.cutting_plane import cutting_plane_optim
 from ellalgo.ell import ell
 
 from netoptim.optscaling_oracle import optscaling_oracle
@@ -118,7 +118,7 @@ def test_optscaling():
     E = ell(1.5 * t, x0)
     dist = list(0 for _ in G)
     P = optscaling_oracle(G, dist, get_cost)
-    _, _, ell_info = cutting_plane_dc(P, E, float("inf"))
+    _, _, ell_info = cutting_plane_optim(P, E, float("inf"))
     # fmt = '{:f} {} {} {}'
     # print(np.exp(xb))
     # print(fmt.format(np.exp(fb), niter, feasible, status))

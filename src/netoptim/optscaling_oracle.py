@@ -68,8 +68,8 @@ class optscaling_oracle:
         """
         self._network = network_oracle(G, u, self.Ratio(G, get_cost))
 
-    def __call__(self, x: Arr, t: float) -> Tuple[Cut, Optional[float]]:
-        """Make object callable for cutting_plane_dc()
+    def assess_optim(self, x: Arr, t: float) -> Tuple[Cut, Optional[float]]:
+        """Make object callable for cutting_plane_optim()
 
         Arguments:
             x (Arr): (π, ψ) in log scale
@@ -79,14 +79,14 @@ class optscaling_oracle:
             Tuple[Cut, float]
 
         See also:
-            cutting_plane_dc
+            cutting_plane_optim
         """
         s = x[0] - x[1]
         g = np.array([1.0, -1.0])
         if (fj := s - t) >= 0.0:
             return (g, fj), None
 
-        if (cut := self._network(x)):
+        if (cut := self._network.assess_feas(x)):
             return cut, None
 
         return (g, 0.0), s

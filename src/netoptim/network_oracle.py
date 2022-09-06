@@ -36,7 +36,7 @@ class network_oracle:
         """
         self._h.update(t)
 
-    def __call__(self, x) -> Optional[Cut]:
+    def assess_feas(self, x) -> Optional[Cut]:
         """Make object callable for cutting_plane_feas()
 
         Arguments:
