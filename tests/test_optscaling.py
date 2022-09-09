@@ -4,9 +4,9 @@ from __future__ import print_function
 import networkx as nx
 import numpy as np
 from ellalgo.cutting_plane import cutting_plane_optim
-from ellalgo.ell import ell
+from ellalgo.ell import Ell
 
-from netoptim.optscaling_oracle import optscaling_oracle
+from netoptim.optscaling_oracle import OptScalingOracle
 
 
 def vdc(n, base=2):
@@ -115,9 +115,9 @@ def test_optscaling():
     """
     x0 = np.array([cmax, cmin])
     t = cmax - cmin
-    E = ell(1.5 * t, x0)
+    E = Ell(1.5 * t, x0)
     dist = list(0 for _ in G)
-    P = optscaling_oracle(G, dist, get_cost)
+    P = OptScalingOracle(G, dist, get_cost)
     xb, _, _, _ = cutting_plane_optim(P, E, float("inf"))
     # fmt = '{:f} {} {} {}'
     # print(np.exp(xb))

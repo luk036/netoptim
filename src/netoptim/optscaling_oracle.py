@@ -3,14 +3,14 @@ from typing import Optional, Tuple, Union
 
 import numpy as np
 
-from .network_oracle import network_oracle
+from .network_oracle import NetworkOracle
 
 # np.ndarray = np.ndarray
 Arr = Union[np.ndarray, float]
 Cut = Tuple[Arr, float]
 
 
-class optscaling_oracle:
+class OptScalingOracle:
     """Oracle for Optimal Matrix Scaling
 
     This example is taken from[Orlin and Rothblum, 1985]
@@ -66,7 +66,7 @@ class optscaling_oracle:
         Arguments:
             G ([type]): [description]
         """
-        self._network = network_oracle(G, u, self.Ratio(G, get_cost))
+        self._network = NetworkOracle(G, u, self.Ratio(G, get_cost))
 
     def assess_optim(self, x: Arr, t: float) -> Tuple[Cut, Optional[float]]:
         """Make object callable for cutting_plane_optim()

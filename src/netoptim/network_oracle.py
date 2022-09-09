@@ -6,7 +6,7 @@ from .neg_cycle import NegCycleFinder
 Cut = Tuple[Any, float]
 
 
-class network_oracle:
+class NetworkOracle:
     """Oracle for Parametric Network Problem:
 
     find    x, u
@@ -60,5 +60,5 @@ class network_oracle:
         for Ci in self._S.find_neg_cycle(self._u, get_weight):
             f = -sum(self._h.eval(e, x) for e in Ci)
             g = -sum(self._h.grad(e, x) for e in Ci)
-            return g, f
+            return g, f  # use the first Ci only
         return None
