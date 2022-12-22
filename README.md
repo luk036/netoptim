@@ -1,25 +1,27 @@
+<!-- These are examples of badges you might want to add to your README:
+     please update the URLs accordingly
+
+[![Built Status](https://api.cirrus-ci.com/github/<USER>/netoptim.svg?branch=main)](https://cirrus-ci.com/github/<USER>/netoptim)
+[![ReadTheDocs](https://readthedocs.org/projects/netoptim/badge/?version=latest)](https://netoptim.readthedocs.io/en/stable/)
+[![Coveralls](https://img.shields.io/coveralls/github/<USER>/netoptim/main.svg)](https://coveralls.io/r/<USER>/netoptim)
+[![PyPI-Server](https://img.shields.io/pypi/v/netoptim.svg)](https://pypi.org/project/netoptim/)
+[![Conda-Forge](https://img.shields.io/conda/vn/conda-forge/netoptim.svg)](https://anaconda.org/conda-forge/netoptim)
+[![Monthly Downloads](https://pepy.tech/badge/netoptim/month)](https://pepy.tech/project/netoptim)
+[![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Twitter)](https://twitter.com/netoptim)
+-->
+
+[![Project generated with PyScaffold](https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold)](https://pyscaffold.org/)
+
 # netoptim
 
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/luk036/netoptim)
-![Python application](https://github.com/luk036/netoptim/workflows/Python%20application/badge.svg)
-[![Build Status](https://travis-ci.org/luk036/netoptim.svg?branch=master)](https://travis-ci.org/luk036/netoptim)
-[![Build status](https://ci.appveyor.com/api/projects/status/nj8c1r9tl058buh0?svg=true)](https://ci.appveyor.com/project/luk036/netoptim)
-[![Documentation Status](https://readthedocs.org/projects/netoptim/badge/?version=latest)](https://netoptim.readthedocs.io/en/latest/?badge=latest)
-[![Coverage Status](https://coveralls.io/repos/github/luk036/netoptim/badge.svg?branch=master)](https://coveralls.io/github/luk036/netoptim?branch=master)
-[![codecov](https://codecov.io/gh/luk036/netoptim/branch/master/graph/badge.svg)](https://codecov.io/gh/luk036/netoptim)
-[![Maintainability](https://api.codeclimate.com/v1/badges/268433ba00862ac40d1e/maintainability)](https://codeclimate.com/github/luk036/netoptim/maintainability)
-[![CodeFactor](https://www.codefactor.io/repository/github/luk036/netoptim/badge)](https://www.codefactor.io/repository/github/luk036/netoptim)
-[![BCH compliance](https://bettercodehub.com/edge/badge/luk036/netoptim?branch=master)](https://bettercodehub.com/)
+> Network Optimization Python Code
 
-Network optimization python code
+A longer description of your project goes here...
 
-## See also
-
-[netoptimcpp](https://github.com/luk036/netoptim-cpp)
 
 <!-- pyscaffold-notes -->
 
 ## Note
 
-This project has been set up using PyScaffold 4.0.2. For details and usage
+This project has been set up using PyScaffold 4.3.1. For details and usage
 information on PyScaffold see https://pyscaffold.org/.

@@ -51,6 +51,4 @@ MANIFEST
 # Per-project virtualenvs
 .venv*/
 .conda*/
-
-# MyPi
-.mypy_cache/
+.python-version
