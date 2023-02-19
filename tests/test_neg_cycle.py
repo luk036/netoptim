@@ -4,8 +4,8 @@ from __future__ import print_function
 # from networkx.utils import generate_unique_node
 import networkx as nx
 
-from netoptim.neg_cycle import NegCycleFinder
 from netoptim.lict import Lict, TinyDiGraph
+from netoptim.neg_cycle import NegCycleFinder
 
 
 def create_test_case1():

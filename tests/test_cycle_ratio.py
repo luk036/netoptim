@@ -3,12 +3,16 @@ from __future__ import print_function
 
 from fractions import Fraction
 
+from netoptim.lict import Lict
+
 # from networkx.utils import generate_unique_node
 from netoptim.min_cycle_ratio import min_cycle_ratio, set_default
 
-from .test_neg_cycle import create_test_case1, create_test_case_timing
-from .test_neg_cycle import create_tiny_graph
-from netoptim.lict import Lict
+from .test_neg_cycle import (
+    create_test_case1,
+    create_test_case_timing,
+    create_tiny_graph,
+)
 
 # from pprint import pprint
 
