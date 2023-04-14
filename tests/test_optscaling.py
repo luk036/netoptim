@@ -118,7 +118,7 @@ def test_optscaling():
     E = Ell(1.5 * t, x0)
     dist = list(0 for _ in G)
     P = OptScalingOracle(G, dist, get_cost)
-    xb, _, _, _ = cutting_plane_optim(P, E, float("inf"))
+    xb, _, _ = cutting_plane_optim(P, E, float("inf"))
     # fmt = '{:f} {} {} {}'
     # print(np.exp(xb))
     # print(fmt.format(np.exp(fb), niter, feasible, status))
