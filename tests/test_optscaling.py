@@ -113,14 +113,14 @@ def test_optscaling():
     Returns:
         [type]: [description]
     """
-    x0 = np.array([cmax, cmin])
+    xinit = np.array([cmax, cmin])
     t = cmax - cmin
-    E = Ell(1.5 * t, x0)
+    ellip = Ell(1.5 * t, xinit)
     dist = list(0 for _ in G)
-    P = OptScalingOracle(G, dist, get_cost)
-    xb, _, _ = cutting_plane_optim(P, E, float("inf"))
+    omega = OptScalingOracle(G, dist, get_cost)
+    xbest, _, _ = cutting_plane_optim(omega, ellip, float("inf"))
     # fmt = '{:f} {} {} {}'
-    # print(np.exp(xb))
+    # print(np.exp(xbest))
     # print(fmt.format(np.exp(fb), niter, feasible, status))
-    assert xb is not None
+    assert xbest is not None
     # return ell_info.num_iters
