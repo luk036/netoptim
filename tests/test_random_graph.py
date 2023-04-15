@@ -36,8 +36,8 @@ def formGraph(T, pos, eta, seed=None):
     n = len(pos)
 
     # connect nodes with edges
-    G = nx.random_geometric_graph(n, eta, pos=pos)
-    return G
+    gra = nx.random_geometric_graph(n, eta, pos=pos)
+    return gra
 
 
 # if __name__ == "__main__":
@@ -52,21 +52,21 @@ def test_random_graph():
     x = [i for i in vdcorput(T, xbase)]
     y = [i for i in vdcorput(T, ybase)]
     pos = zip(x, y)
-    G = formGraph(T, pos, 1.6, seed=5)
-    #    n = G.number_of_nodes()
+    gra = formGraph(T, pos, 1.6, seed=5)
+    #    n = gra.number_of_nodes()
     #    pos2 = dict(enumerate(pos))
-    #    fig, ax = showPaths(G, pos2, N)
+    #    fig, ax = showPaths(gra, pos2, N)
     #    plt.show()
 
     # Add a sink, connect all spareTSV to it.
     # pos = pos + [(1.5,.5)]
-    for u, v in G.edges():
-        h = np.array(G.nodes()[u]['pos']) - np.array(G.nodes()[v]['pos'])
-        G[u][v]['cost'] = np.sqrt(np.dot(h, h))
-        # G[u][v]['cost'] = h[0] + h[1]
+    for u, v in gra.edges():
+        h = np.array(gra.nodes()[u]['pos']) - np.array(gra.nodes()[v]['pos'])
+        gra[u][v]['cost'] = np.sqrt(np.dot(h, h))
+        # gra[u][v]['cost'] = h[0] + h[1]
 
-    dist = list(0 for _ in G)
-    _, c = min_cycle_ratio(G, dist)
+    dist = list(0 for _ in gra)
+    _, c = min_cycle_ratio(gra, dist)
     assert c is not None
 
     pathlist = c
@@ -74,5 +74,5 @@ def test_random_graph():
 
 
 #    pos2 = dict(enumerate(pos))
-#    fig, ax = showPaths(G, pos2, N, path=pathlist)
+#    fig, ax = showPaths(gra, pos2, N, path=pathlist)
 #    plt.show()

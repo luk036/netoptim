@@ -6,33 +6,33 @@ import networkx as nx
 from .parametric import max_parametric
 
 
-def set_default(G: nx.Graph, weight, value):
+def set_default(gra: nx.Graph, weight, value):
     """[summary]
 
     Arguments:
-        G (nx.Graph): directed graph
+        gra (nx.Graph): directed graph
         weight ([type]): [description]
         value ([type]): [description]
     """
-    for u, v in G.edges:
-        if G[u][v].get(weight, None) is None:
-            G[u][v][weight] = value
+    for u, v in gra.edges:
+        if gra[u][v].get(weight, None) is None:
+            gra[u][v][weight] = value
 
 
-def min_cycle_ratio(G: nx.Graph, dist):
+def min_cycle_ratio(gra: nx.Graph, dist):
     """[summary] todo: parameterize cost and time
 
     Arguments:
-        G ([type]): [description]
+        gra ([type]): [description]
 
     Returns:
         [type]: [description]
     """
     mu = "cost"
     sigma = "time"
-    set_default(G, mu, 1)
-    set_default(G, sigma, 1)
-    T = type(dist[next(iter(G))])
+    set_default(gra, mu, 1)
+    set_default(gra, sigma, 1)
+    T = type(dist[next(iter(gra))])
 
     def calc_weight(r, e):
         """[summary]
@@ -45,7 +45,7 @@ def min_cycle_ratio(G: nx.Graph, dist):
             [type]: [description]
         """
         u, v = e
-        return G[u][v]["cost"] - r * G[u][v]["time"]
+        return gra[u][v]["cost"] - r * gra[u][v]["time"]
 
     def calc_ratio(C):
         """Calculate the ratio of the cycle
@@ -56,11 +56,11 @@ def min_cycle_ratio(G: nx.Graph, dist):
         Returns:
             cycle ratio
         """
-        total_cost = sum(G[u][v]["cost"] for (u, v) in C)
-        total_time = sum(G[u][v]["time"] for (u, v) in C)
+        total_cost = sum(gra[u][v]["cost"] for (u, v) in C)
+        total_time = sum(gra[u][v]["time"] for (u, v) in C)
         return T(total_cost) / total_time
 
-    C0 = nx.find_cycle(G)
+    C0 = nx.find_cycle(gra)
     r0 = calc_ratio(C0)
-    r, C = max_parametric(G, r0, calc_weight, calc_ratio, dist)
+    r, C = max_parametric(gra, r0, calc_weight, calc_ratio, dist)
     return r, C if C else C0

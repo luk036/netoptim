@@ -70,12 +70,12 @@ def formGraph(T, pos, eta, seed=None):
     n = len(pos)
 
     # connect nodes with edges
-    G = nx.random_geometric_graph(n, eta, pos=pos)
-    G = nx.DiGraph(G)
-    # G.add_node('dummy', pos = (0.3, 0.4))
-    # G.add_edge('dummy', 1)
-    # G.nodemap = {v : i_v for i_v, v in enumerate(G.nodes())}
-    return G
+    gra = nx.random_geometric_graph(n, eta, pos=pos)
+    gra = nx.DiGraph(gra)
+    # gra.add_node('dummy', pos = (0.3, 0.4))
+    # gra.add_edge('dummy', 1)
+    # gra.nodemap = {v : i_v for i_v, v in enumerate(gra.nodes())}
+    return gra
 
 
 N = 75
@@ -86,22 +86,22 @@ ybase = 3
 x = [i for i in vdcorput(T, xbase)]
 y = [i for i in vdcorput(T, ybase)]
 pos = zip(x, y)
-G = formGraph(T, pos, 1.6, seed=5)
-# for u, v in G.edges():
-#     h = np.array(G.nodes()[u]['pos']) - np.array(G.nodes()[v]['pos'])
-#     G[u][v]['cost'] = np.sqrt(h @ h)
+gra = formGraph(T, pos, 1.6, seed=5)
+# for u, v in gra.edges():
+#     h = np.array(gra.nodes()[u]['pos']) - np.array(gra.nodes()[v]['pos'])
+#     gra[u][v]['cost'] = np.sqrt(h @ h)
 
-for u, v in G.edges():
-    h = np.array(G.nodes()[u]["pos"]) - np.array(G.nodes()[v]["pos"])
-    G[u][v]["cost"] = np.log(np.sqrt(h @ h))
+for u, v in gra.edges():
+    h = np.array(gra.nodes()[u]["pos"]) - np.array(gra.nodes()[v]["pos"])
+    gra[u][v]["cost"] = np.log(np.sqrt(h @ h))
 
-cmax = max(c for _, _, c in G.edges.data("cost"))
-cmin = min(c for _, _, c in G.edges.data("cost"))
+cmax = max(c for _, _, c in gra.edges.data("cost"))
+cmin = min(c for _, _, c in gra.edges.data("cost"))
 
 
 def get_cost(e):
     u, v = e
-    return G[u][v]["cost"]
+    return gra[u][v]["cost"]
 
 
 def test_optscaling():
@@ -116,8 +116,8 @@ def test_optscaling():
     xinit = np.array([cmax, cmin])
     t = cmax - cmin
     ellip = Ell(1.5 * t, xinit)
-    dist = list(0 for _ in G)
-    omega = OptScalingOracle(G, dist, get_cost)
+    dist = list(0 for _ in gra)
+    omega = OptScalingOracle(gra, dist, get_cost)
     xbest, _, _ = cutting_plane_optim(omega, ellip, float("inf"))
     # fmt = '{:f} {} {} {}'
     # print(np.exp(xbest))

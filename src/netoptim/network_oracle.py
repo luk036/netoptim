@@ -15,18 +15,18 @@ class NetworkOracle:
 
     """
 
-    def __init__(self, G, u, h):
+    def __init__(self, gra, u, h):
         """[summary]
 
         Arguments:
-            G: a directed graph (V, E)
+            gra: a directed graph (V, E)
             u: list or dictionary
             h: function evaluation and gradient
         """
-        self._G = G
+        self._gra = gra
         self._u = u
         self._h = h
-        self._S = NegCycleFinder(G)
+        self._S = NegCycleFinder(gra)
 
     def update(self, t):
         """[summary]

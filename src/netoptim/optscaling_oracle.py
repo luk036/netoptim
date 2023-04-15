@@ -22,13 +22,13 @@ class OptScalingOracle:
     """
 
     class Ratio:
-        def __init__(self, G, get_cost):
+        def __init__(self, gra, get_cost):
             """[summary]
 
             Arguments:
-                G ([type]): [description]
+                gra ([type]): [description]
             """
-            self._G = G
+            self._gra = gra
             self._get_cost = get_cost
 
         def eval(self, e, x: Arr) -> float:
@@ -60,13 +60,13 @@ class OptScalingOracle:
             assert u != v
             return np.array([1.0, 0.0] if u < v else [0.0, -1.0])
 
-    def __init__(self, G, u, get_cost):
+    def __init__(self, gra, u, get_cost):
         """Construct a new optscaling oracle object
 
         Arguments:
-            G ([type]): [description]
+            gra ([type]): [description]
         """
-        self._network = NetworkOracle(G, u, self.Ratio(G, get_cost))
+        self._network = NetworkOracle(gra, u, self.Ratio(gra, get_cost))
 
     def assess_optim(self, x: Arr, t: float) -> Tuple[Cut, Optional[float]]:
         """Make object callable for cutting_plane_optim()

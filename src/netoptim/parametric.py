@@ -2,15 +2,15 @@
 from .neg_cycle import NegCycleFinder
 
 
-def max_parametric(G, r, d, zero_cancel, dist, pick_one_only=False):
+def max_parametric(gra, r, d, zero_cancel, dist, pick_one_only=False):
     """maximum parametric problem:
 
         max  r
         s.t. dist[v] - dist[v] <= d(u, v, r)
-             for all (u, v) in G
+             for all (u, v) in gra
 
     Arguments:
-        G ([type]): directed graph
+        gra ([type]): directed graph
         r {float}: parameter to be maximized, initially a big number!!!
         d ([type]): monotone decreasing function w.r.t. r
         zero_cancel ([type]): [description]
@@ -25,7 +25,7 @@ def max_parametric(G, r, d, zero_cancel, dist, pick_one_only=False):
     def get_weight(e):
         return d(r, e)
 
-    S = NegCycleFinder(G)
+    S = NegCycleFinder(gra)
     r_min = r
     C = []
 
@@ -52,19 +52,19 @@ def max_parametric(G, r, d, zero_cancel, dist, pick_one_only=False):
 #     from neg_cycle import *
 #     from networkx.utils import generate_unique_node
 
-#     G = create_test_case1()
-#     G[1][2]['cost'] = 5
-#     r, c, dist = min_cycle_ratio(G)
+#     gra = create_test_case1()
+#     gra[1][2]['cost'] = 5
+#     r, c, dist = min_cycle_ratio(gra)
 #     assert c != None
 #     print(r)
 #     print(c)
 #     print(dist.items())
 
-#     G = nx.cycle_graph(5, create_using=nx.DiGraph())
-#     G[1][2]['cost'] = -6.
+#     gra = nx.cycle_graph(5, create_using=nx.DiGraph())
+#     gra[1][2]['cost'] = -6.
 #     newnode = generate_unique_node()
-#     G.add_edges_from([(newnode, n) for n in G])
-#     r, c, dist = min_cycle_ratio(G)
+#     gra.add_edges_from([(newnode, n) for n in gra])
+#     r, c, dist = min_cycle_ratio(gra)
 #     assert c != None
 #     print(r)
 #     print(c)
