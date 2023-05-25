@@ -86,7 +86,7 @@ class OptScalingOracle:
         if (fj := s - t) >= 0.0:
             return (g, fj), None
 
-        if (cut := self._network.assess_feas(x)):
+        if cut := self._network.assess_feas(x):
             return cut, None
 
         return (g, 0.0), s

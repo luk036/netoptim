@@ -14,17 +14,17 @@ def vdc(n, base=2):
 
 
 def vdcorput(n, base=2):
-    '''
+    """
     n - number of vectors
     base - seeds
-    '''
+    """
     return [vdc(i, base) for i in range(n)]
 
 
 def formGraph(T, pos, eta, seed=None):
-    ''' Form N by N grid of nodes, connect nodes within eta.
-        mu and eta are relative to 1/(N-1)
-    '''
+    """Form N by N grid of nodes, connect nodes within eta.
+    mu and eta are relative to 1/(N-1)
+    """
     if seed:
         np.random.seed(seed)
 
@@ -61,8 +61,8 @@ def test_random_graph():
     # Add a sink, connect all spareTSV to it.
     # pos = pos + [(1.5,.5)]
     for u, v in gra.edges():
-        h = np.array(gra.nodes()[u]['pos']) - np.array(gra.nodes()[v]['pos'])
-        gra[u][v]['cost'] = np.sqrt(np.dot(h, h))
+        h = np.array(gra.nodes()[u]["pos"]) - np.array(gra.nodes()[v]["pos"])
+        gra[u][v]["cost"] = np.sqrt(np.dot(h, h))
         # gra[u][v]['cost'] = h[0] + h[1]
 
     dist = list(0 for _ in gra)

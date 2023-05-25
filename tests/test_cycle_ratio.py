@@ -19,9 +19,9 @@ from .test_neg_cycle import (
 
 def test_cycle_ratio():
     gra = create_test_case1()
-    set_default(gra, 'time', 1)
-    set_default(gra, 'cost', 1)
-    gra[1][2]['cost'] = 5
+    set_default(gra, "time", 1)
+    set_default(gra, "cost", 1)
+    gra[1][2]["cost"] = 5
     dist = list(Fraction(0, 1) for _ in gra)
     r, c = min_cycle_ratio(gra, dist)
     print(r)
@@ -32,13 +32,13 @@ def test_cycle_ratio():
 
 def test_cycle_ratio_timing():
     gra = create_test_case_timing()
-    set_default(gra, 'time',  1)
-    gra['a1']['a2']['cost'] = 7
-    gra['a2']['a1']['cost'] = -1
-    gra['a2']['a3']['cost'] = 3
-    gra['a3']['a2']['cost'] = 0
-    gra['a3']['a1']['cost'] = 2
-    gra['a1']['a3']['cost'] = 4
+    set_default(gra, "time", 1)
+    gra["a1"]["a2"]["cost"] = 7
+    gra["a2"]["a1"]["cost"] = -1
+    gra["a2"]["a3"]["cost"] = 3
+    gra["a3"]["a2"]["cost"] = 0
+    gra["a3"]["a1"]["cost"] = 2
+    gra["a1"]["a3"]["cost"] = 4
     # make sure no parallel edges in above!!!
     dist = {v: Fraction(0, 1) for v in gra}
     r, c = min_cycle_ratio(gra, dist)
@@ -50,13 +50,13 @@ def test_cycle_ratio_timing():
 
 def test_cycle_ratio_tiny_graph():
     gra = create_tiny_graph()
-    set_default(gra, 'time',  1)
-    gra[0][1]['cost'] = 7
-    gra[1][0]['cost'] = -1
-    gra[1][2]['cost'] = 3
-    gra[2][1]['cost'] = 0
-    gra[2][0]['cost'] = 2
-    gra[0][2]['cost'] = 4
+    set_default(gra, "time", 1)
+    gra[0][1]["cost"] = 7
+    gra[1][0]["cost"] = -1
+    gra[1][2]["cost"] = 3
+    gra[2][1]["cost"] = 0
+    gra[2][0]["cost"] = 2
+    gra[0][2]["cost"] = 4
     # make sure no parallel edges in above!!!
     dist = Lict([Fraction(0, 1) for _ in range(3)])
     r, c = min_cycle_ratio(gra, dist)
