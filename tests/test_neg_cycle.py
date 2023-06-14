@@ -9,6 +9,48 @@ from netoptim.tiny_digraph import TinyDiGraph
 from netoptim.neg_cycle import NegCycleFinder
 
 
+def test_raw_graph_by_lict():
+    gra = Lict(
+        [
+            {1: 7, 2: 5},
+            {0: 0, 2: 3},
+            {1: 1, 0: 2},
+        ]
+    )
+
+    def get_weight(e):
+        u, v = e
+        return gra[u][v]
+
+    dist = Lict([0, 0, 0])
+    finder = NegCycleFinder(gra)
+    hasNeg = False
+    for _ in finder.find_neg_cycle(dist, get_weight):
+        hasNeg = True
+        break
+    assert not hasNeg
+
+
+def test_raw_graph_by_dict():
+    gra = {
+        "a0": {"a1": 7, "a2": 5},
+        "a1": {"a0": 0, "a2": 3},
+        "a2": {"a1": 1, "a0": 2},
+    }
+
+    def get_weight(e):
+        u, v = e
+        return gra[u][v]
+
+    dist = {v: 0 for v in gra}
+    finder = NegCycleFinder(gra)
+    hasNeg = False
+    for _ in finder.find_neg_cycle(dist, get_weight):
+        hasNeg = True
+        break
+    assert not hasNeg
+
+
 def create_test_case1():
     """[summary]
 
@@ -78,9 +120,9 @@ def do_case(gra, dist):
         u, v = e
         return gra[u][v].get("weight", 1)
 
-    N = NegCycleFinder(gra)
+    finder = NegCycleFinder(gra)
     hasNeg = False
-    for _ in N.find_neg_cycle(dist, get_weight):
+    for _ in finder.find_neg_cycle(dist, get_weight):
         hasNeg = True
         break
     return hasNeg
