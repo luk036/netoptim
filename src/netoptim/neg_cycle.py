@@ -48,7 +48,7 @@ class NegCycleFinder:
         """
         changed = False
         for u in self.gra:
-            for v in self.gra.neighbors(u):
+            for v in self.gra[u]:
                 wt = get_weight((u, v))
                 d = dist[u] + wt
                 if dist[v] > d:
