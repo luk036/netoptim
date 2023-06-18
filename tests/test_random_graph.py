@@ -66,7 +66,7 @@ def test_random_graph():
         # gra[u][v]['cost'] = h[0] + h[1]
 
     dist = list(0 for _ in gra)
-    _, c = min_cycle_ratio(gra, dist)
+    _, c = min_cycle_ratio(gra, dist, 1e100)
     assert c is not None
 
     pathlist = c
