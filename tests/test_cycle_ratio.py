@@ -23,7 +23,7 @@ def test_cycle_ratio():
     set_default(gra, "cost", 1)
     gra[1][2]["cost"] = 5
     dist = list(Fraction(0, 1) for _ in gra)
-    r, c = min_cycle_ratio(gra, dist)
+    r, c = min_cycle_ratio(gra, dist, Fraction(10000, 1))
     print(r)
     print(c)
     assert c
@@ -41,7 +41,7 @@ def test_cycle_ratio_timing():
     gra["a1"]["a3"]["cost"] = 4
     # make sure no parallel edges in above!!!
     dist = {v: Fraction(0, 1) for v in gra}
-    r, c = min_cycle_ratio(gra, dist)
+    r, c = min_cycle_ratio(gra, dist, Fraction(10000, 1))
     print(r)
     print(c)
     assert c
@@ -59,7 +59,7 @@ def test_cycle_ratio_tiny_graph():
     gra[0][2]["cost"] = 4
     # make sure no parallel edges in above!!!
     dist = Lict([Fraction(0, 1) for _ in range(3)])
-    r, c = min_cycle_ratio(gra, dist)
+    r, c = min_cycle_ratio(gra, dist, Fraction(10000, 1))
     print(r)
     print(c)
     assert c

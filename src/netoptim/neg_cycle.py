@@ -1,42 +1,52 @@
 # -*- coding: utf-8 -*-
 """
 Negative cycle detection for weighed graphs.
-1. Support Lazy evalution
+1. Based on Howard's policy graph algorithm
+2. Looking for more than one negative cycles
 """
-from typing import Dict
+from typing import Dict, Callable, Generator, Sequence, Tuple, List
+from typing import MutableMapping, Mapping, TypeVar, Generic, Any
+from fractions import Fraction
+
+V = TypeVar("V")  # Hashable
+R = TypeVar("R", int, float, Fraction)  # Comparable Ring
+Digraph = Mapping[V, Sequence[V]]
+Cycle = List[Tuple[V, V]]
 
 
-class NegCycleFinder:
-    pred: Dict = {}
+class NegCycleFinder(Generic[V]):
+    pred: Dict[V, V] = {}
 
-    def __init__(self, gra):
+    def __init__(self, gra: Digraph) -> None:
         """[summary]
 
         Arguments:
-            gra: Graph
+            gra: directed graph
         """
-        self.gra = gra
+        self.digraph = gra
 
-    def find_cycle(self):
+    def find_cycle(self) -> Generator[V, None, None]:
         """Find a cycle on the policy graph
 
         Yields:
             node: a start node of the cycle
         """
-        visited = {}
-        for v in filter(lambda v: v not in visited, self.gra):
-            u = v
+        visited: Dict[V, V] = {}
+        for vtx in filter(lambda vtx: vtx not in visited, self.digraph):
+            utx = vtx
             while True:
-                visited[u] = v
-                if u not in self.pred:
+                visited[utx] = vtx
+                if utx not in self.pred:
                     break
-                u = self.pred[u]
-                if u in visited:
-                    if visited[u] == v:
-                        yield u
+                utx = self.pred[utx]
+                if utx in visited:
+                    if visited[utx] == vtx:
+                        yield utx
                     break
 
-    def relax(self, dist, get_weight):
+    def relax(
+        self, dist: MutableMapping[V, R], get_weight: Callable[[Tuple[V, V]], R]
+    ) -> bool:
         """Perform a updating of dist and pred
 
         Arguments:
@@ -47,17 +57,19 @@ class NegCycleFinder:
             [type]: [description]
         """
         changed = False
-        for u in self.gra:
-            for v in self.gra[u]:
-                wt = get_weight((u, v))
-                d = dist[u] + wt
-                if dist[v] > d:
-                    dist[v] = d
-                    self.pred[v] = u
+        for utx in self.digraph:
+            for vtx in self.digraph[utx]:
+                weight = get_weight((utx, vtx))
+                distance = dist[utx] + weight
+                if dist[vtx] > distance:
+                    dist[vtx] = distance
+                    self.pred[vtx] = utx
                     changed = True
         return changed
 
-    def find_neg_cycle(self, dist, get_weight):
+    def find_neg_cycle(
+        self, dist: MutableMapping[V, R], get_weight: Callable[[Tuple[V, V]], R]
+    ) -> Generator[Cycle, None, None]:
         """Perform a updating of dist and pred
 
         Arguments:
@@ -67,18 +79,16 @@ class NegCycleFinder:
         Yields:
             list of edges: cycle list
         """
-        # self.dist = list(0 for _ in self.gra)
         self.pred = {}
         found = False
         while not found and self.relax(dist, get_weight):
-            # v = self.find_cycle()
-            for v in self.find_cycle():
+            for vtx in self.find_cycle():
                 # Will zero cycle be found???
-                assert self.is_negative(v, dist, get_weight)
+                assert self.is_negative(vtx, dist, get_weight)
                 found = True
-                yield self.cycle_list(v)
+                yield self.cycle_list(vtx)
 
-    def cycle_list(self, handle):
+    def cycle_list(self, handle: V) -> Cycle:
         """Cycle list started from handle
 
         Arguments:
@@ -87,17 +97,22 @@ class NegCycleFinder:
         Returns:
             list of edges: cycle list
         """
-        v = handle
+        vtx = handle
         cycle = list()
         while True:
-            u = self.pred[v]
-            cycle += [(u, v)]
-            v = u
-            if v == handle:
+            utx = self.pred[vtx]
+            cycle += [(utx, vtx)]
+            vtx = utx
+            if vtx == handle:
                 break
         return cycle
 
-    def is_negative(self, handle, dist, get_weight):
+    def is_negative(
+        self,
+        handle: V,
+        dist: MutableMapping[V, Any],
+        get_weight: Callable[[Tuple[V, V]], Any],
+    ) -> bool:
         """Check if the cycle list is negative
 
         Arguments:
@@ -107,14 +122,14 @@ class NegCycleFinder:
         Returns:
             bool: [description]
         """
-        v = handle
+        vtx = handle
         # do while loop in C++
         while True:
-            u = self.pred[v]
-            wt = get_weight((u, v))
-            if dist[v] > dist[u] + wt:
+            utx = self.pred[vtx]
+            weight = get_weight((utx, vtx))
+            if dist[vtx] > dist[utx] + weight:
                 return True
-            v = u
-            if v == handle:
+            vtx = utx
+            if vtx == handle:
                 break
         return False

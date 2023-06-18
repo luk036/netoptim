@@ -6,7 +6,7 @@ import networkx as nx
 from .parametric import max_parametric
 
 
-def set_default(gra: nx.Graph, weight, value):
+def set_default(gra, weight, value):
     """[summary]
 
     Arguments:
@@ -19,7 +19,37 @@ def set_default(gra: nx.Graph, weight, value):
             gra[u][v][weight] = value
 
 
-def min_cycle_ratio(gra: nx.Graph, dist):
+class CycleRatioOracle:
+    def __init__(self, gra):
+        self.gra = gra
+
+    def distance(self, r, e):
+        """[summary]
+
+        Arguments:
+            r ([type]): [description]
+            e ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        u, v = e
+        return self.gra[u][v]["cost"] - r * self.gra[u][v]["time"]
+
+    def zero_cancel(self, cycle):
+        """Calculate the ratio of the cycle
+
+        Arguments:
+            cycle {list}: cycle list
+
+        Returns:
+            cycle ratio
+        """
+        total_cost = sum(self.gra[u][v]["cost"] for (u, v) in cycle)
+        total_time = sum(self.gra[u][v]["time"] for (u, v) in cycle)
+        return total_cost, total_time
+
+def min_cycle_ratio(gra, dist, r0):
     """[summary] todo: parameterize cost and time
 
     Arguments:
@@ -32,35 +62,7 @@ def min_cycle_ratio(gra: nx.Graph, dist):
     sigma = "time"
     set_default(gra, mu, 1)
     set_default(gra, sigma, 1)
-    T = type(dist[next(iter(gra))])
-
-    def calc_weight(r, e):
-        """[summary]
-
-        Arguments:
-            r ([type]): [description]
-            e ([type]): [description]
-
-        Returns:
-            [type]: [description]
-        """
-        u, v = e
-        return gra[u][v]["cost"] - r * gra[u][v]["time"]
-
-    def calc_ratio(C):
-        """Calculate the ratio of the cycle
-
-        Arguments:
-            C {list}: cycle list
-
-        Returns:
-            cycle ratio
-        """
-        total_cost = sum(gra[u][v]["cost"] for (u, v) in C)
-        total_time = sum(gra[u][v]["time"] for (u, v) in C)
-        return T(total_cost) / total_time
-
-    C0 = nx.find_cycle(gra)
-    r0 = calc_ratio(C0)
-    r, C = max_parametric(gra, r0, calc_weight, calc_ratio, dist)
-    return r, C if C else C0
+    # T = type(dist[next(iter(gra))])
+    omega = CycleRatioOracle(gra)
+    ratio, cycle = max_parametric(gra, r0, omega, dist)
+    return ratio, cycle

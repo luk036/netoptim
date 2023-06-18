@@ -1,48 +1,63 @@
 # -*- coding: utf-8 -*-
 from .neg_cycle import NegCycleFinder
+from typing import Sequence, Tuple, List
+from typing import MutableMapping, Mapping, TypeVar
+from fractions import Fraction
+
+R = TypeVar("R", float, Fraction)  # Comparable field
+V = TypeVar("V")
+Cycle = List[Tuple[V, V]]
 
 
-def max_parametric(gra, r, d, zero_cancel, dist, pick_one_only=False):
+def max_parametric(
+    gra: Mapping[V, Sequence[V]],
+    ratio: R,
+    omega,
+    # distance: Callable[[R, Tuple[V, V]], R],
+    # zero_cancel: Callable[[Cycle], R],
+    dist: MutableMapping[V, R],
+):
     """maximum parametric problem:
 
-        max  r
-        s.t. dist[v] - dist[v] <= d(u, v, r)
+        max  ratio
+        s.t. dist[v] - dist[v] <= distance(u, v, ratio)
              for all (u, v) in gra
 
     Arguments:
         gra ([type]): directed graph
-        r {float}: parameter to be maximized, initially a big number!!!
+        ratio {float}: parameter to be maximized, initially a big number!!!
         d ([type]): monotone decreasing function w.r.t. r
         zero_cancel ([type]): [description]
         pick_one_only {bool}: [description]
 
     Returns:
-        r: optimal value
+        ratio: optimal value
         C: Most critial cycle
         dist: optimal sol'n
     """
 
-    def get_weight(e):
-        return d(r, e)
+    def get_weight(edge: Tuple[V, V]) -> R:
+        return omega.distance(ratio, edge)
 
-    S = NegCycleFinder(gra)
-    r_min = r
-    C = []
+    ncf = NegCycleFinder(gra)
+    r_min = ratio
+    c_min = []
+    cycle = []
+    K = type(ratio)
 
     while True:
-        for Ci in S.find_neg_cycle(dist, get_weight):
-            ri = zero_cancel(Ci)
+        for ci in ncf.find_neg_cycle(dist, get_weight):
+            cost, time = omega.zero_cancel(ci)
+            ri = K(cost) / time
             if r_min > ri:
                 r_min = ri
-                C_min = Ci
-                if pick_one_only:
-                    break
-        if r_min >= r:
+                c_min = ci
+        if r_min >= ratio:
             break
 
-        C = C_min
-        r = r_min
-    return r, C
+        cycle = c_min
+        ratio = r_min
+    return ratio, cycle
 
 
 # if __name__ == "__main__":
