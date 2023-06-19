@@ -4,20 +4,19 @@ Negative cycle detection for weighed graphs.
 1. Based on Howard's policy graph algorithm
 2. Looking for more than one negative cycles
 """
-from typing import Dict, Callable, Generator, Sequence, Tuple, List
+from typing import Dict, Callable, Generator, Tuple, List
 from typing import MutableMapping, Mapping, TypeVar, Generic, Any
 from fractions import Fraction
 
 V = TypeVar("V")  # Hashable
 D = TypeVar("D", int, float, Fraction)  # Comparable Ring
-Digraph = Mapping[V, Sequence[V]]
 Cycle = List[Tuple[V, V]]
 
 
 class NegCycleFinder(Generic[V]):
     pred: Dict[V, V] = {}
 
-    def __init__(self, gra: Mapping[V, Sequence[V]]) -> None:
+    def __init__(self, gra: Mapping[V, Mapping[V, Any]]) -> None:
         """[summary]
 
         Arguments:

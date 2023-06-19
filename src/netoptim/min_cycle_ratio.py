@@ -48,6 +48,7 @@ class CycleRatioAPI:
         total_time = sum(self.gra[u][v]["time"] for (u, v) in cycle)
         return self.T(total_cost) / total_time
 
+
 def min_cycle_ratio(gra, dist, r0):
     """[summary] todo: parameterize cost and time
 

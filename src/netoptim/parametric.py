@@ -10,6 +10,7 @@ R = TypeVar("R", float, Fraction)  # Comparable field
 V = TypeVar("V")
 Cycle = List[Tuple[V, V]]
 
+
 class ParametricAPI(ABC):
     @abstractmethod
     def distance(self, ratio: R, edge: Tuple[V, V]) -> R:

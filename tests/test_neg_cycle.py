@@ -22,7 +22,7 @@ def test_raw_graph_by_lict():
         u, v = e
         return gra[u][v]
 
-    dist = [0, 0, 0]
+    dist = Lict([0, 0, 0])
     finder = NegCycleFinder(gra)
     hasNeg = False
     for _ in finder.find_neg_cycle(dist, get_weight):
