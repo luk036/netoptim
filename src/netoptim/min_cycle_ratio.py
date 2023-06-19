@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-
-import networkx as nx
-
 from .parametric import max_parametric
 
 
@@ -14,14 +11,16 @@ def set_default(gra, weight, value):
         weight ([type]): [description]
         value ([type]): [description]
     """
-    for u, v in gra.edges:
-        if gra[u][v].get(weight, None) is None:
-            gra[u][v][weight] = value
+    for u in gra:
+        for v in gra[u]:
+            if gra[u][v].get(weight, None) is None:
+                gra[u][v][weight] = value
 
 
-class CycleRatioOracle:
-    def __init__(self, gra):
+class CycleRatioAPI:
+    def __init__(self, gra, T: type):
         self.gra = gra
+        self.T = T
 
     def distance(self, r, e):
         """[summary]
@@ -47,7 +46,7 @@ class CycleRatioOracle:
         """
         total_cost = sum(self.gra[u][v]["cost"] for (u, v) in cycle)
         total_time = sum(self.gra[u][v]["time"] for (u, v) in cycle)
-        return total_cost, total_time
+        return self.T(total_cost) / total_time
 
 def min_cycle_ratio(gra, dist, r0):
     """[summary] todo: parameterize cost and time
@@ -63,6 +62,6 @@ def min_cycle_ratio(gra, dist, r0):
     set_default(gra, mu, 1)
     set_default(gra, sigma, 1)
     # T = type(dist[next(iter(gra))])
-    omega = CycleRatioOracle(gra)
+    omega = CycleRatioAPI(gra, type(r0))
     ratio, cycle = max_parametric(gra, r0, omega, dist)
     return ratio, cycle

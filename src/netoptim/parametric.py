@@ -1,12 +1,23 @@
 # -*- coding: utf-8 -*-
+from abc import ABC, abstractmethod
 from .neg_cycle import NegCycleFinder
 from typing import Sequence, Tuple, List
 from typing import MutableMapping, Mapping, TypeVar
 from fractions import Fraction
 
+
 R = TypeVar("R", float, Fraction)  # Comparable field
 V = TypeVar("V")
 Cycle = List[Tuple[V, V]]
+
+class ParametricAPI(ABC):
+    @abstractmethod
+    def distance(self, ratio: R, edge: Tuple[V, V]) -> R:
+        pass
+
+    @abstractmethod
+    def zero_cancel(self, Cycle) -> R:
+        pass
 
 
 def max_parametric(
@@ -26,13 +37,13 @@ def max_parametric(
     Arguments:
         gra ([type]): directed graph
         ratio {float}: parameter to be maximized, initially a big number!!!
-        d ([type]): monotone decreasing function w.r.t. r
+        distance ([type]): monotone decreasing function w.r.t. r
         zero_cancel ([type]): [description]
         pick_one_only {bool}: [description]
 
     Returns:
         ratio: optimal value
-        C: Most critial cycle
+        cycle: Most critial cycle
         dist: optimal sol'n
     """
 
@@ -43,12 +54,10 @@ def max_parametric(
     r_min = ratio
     c_min = []
     cycle = []
-    K = type(ratio)
 
     while True:
         for ci in ncf.find_neg_cycle(dist, get_weight):
-            cost, time = omega.zero_cancel(ci)
-            ri = K(cost) / time
+            ri = omega.zero_cancel(ci)
             if r_min > ri:
                 r_min = ri
                 c_min = ci

@@ -9,7 +9,7 @@ from typing import MutableMapping, Mapping, TypeVar, Generic, Any
 from fractions import Fraction
 
 V = TypeVar("V")  # Hashable
-R = TypeVar("R", int, float, Fraction)  # Comparable Ring
+D = TypeVar("D", int, float, Fraction)  # Comparable Ring
 Digraph = Mapping[V, Sequence[V]]
 Cycle = List[Tuple[V, V]]
 
@@ -17,7 +17,7 @@ Cycle = List[Tuple[V, V]]
 class NegCycleFinder(Generic[V]):
     pred: Dict[V, V] = {}
 
-    def __init__(self, gra: Digraph) -> None:
+    def __init__(self, gra: Mapping[V, Sequence[V]]) -> None:
         """[summary]
 
         Arguments:
@@ -45,7 +45,7 @@ class NegCycleFinder(Generic[V]):
                     break
 
     def relax(
-        self, dist: MutableMapping[V, R], get_weight: Callable[[Tuple[V, V]], R]
+        self, dist: MutableMapping[V, D], get_weight: Callable[[Tuple[V, V]], D]
     ) -> bool:
         """Perform a updating of dist and pred
 
@@ -68,7 +68,7 @@ class NegCycleFinder(Generic[V]):
         return changed
 
     def find_neg_cycle(
-        self, dist: MutableMapping[V, R], get_weight: Callable[[Tuple[V, V]], R]
+        self, dist: MutableMapping[V, D], get_weight: Callable[[Tuple[V, V]], D]
     ) -> Generator[Cycle, None, None]:
         """Perform a updating of dist and pred
 
