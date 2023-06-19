@@ -17,10 +17,10 @@ class NegCycleFinder(Generic[V]):
     pred: Dict[V, V] = {}
 
     def __init__(self, gra: Mapping[V, Mapping[V, Any]]) -> None:
-        """[summary]
+        """_summary_
 
-        Arguments:
-            gra: directed graph
+        Args:
+            gra (Mapping[V, Mapping[V, Any]]): adjacent list
         """
         self.digraph = gra
 
@@ -28,7 +28,7 @@ class NegCycleFinder(Generic[V]):
         """Find a cycle on the policy graph
 
         Yields:
-            node: a start node of the cycle
+            Generator[V, None, None]: node: a start node of the cycle
         """
         visited: Dict[V, V] = {}
         for vtx in filter(lambda vtx: vtx not in visited, self.digraph):
@@ -48,12 +48,12 @@ class NegCycleFinder(Generic[V]):
     ) -> bool:
         """Perform a updating of dist and pred
 
-        Arguments:
-            dist (Union[List, Dict]): [description]
-            get_weight (Callable): [description]
+        Args:
+            dist (MutableMapping[V, D]): _description_
+            get_weight (Callable[[Tuple[V, V]], D]): _description_
 
         Returns:
-            [type]: [description]
+            bool: _description_
         """
         changed = False
         for utx in self.digraph:
@@ -69,14 +69,14 @@ class NegCycleFinder(Generic[V]):
     def find_neg_cycle(
         self, dist: MutableMapping[V, D], get_weight: Callable[[Tuple[V, V]], D]
     ) -> Generator[Cycle, None, None]:
-        """Perform a updating of dist and pred
+        """_summary_
 
-        Arguments:
-            dist (Union[List, Dict]): [description]
-            get_weight (Callable): [description]
+        Args:
+            dist (MutableMapping[V, D]): _description_
+            get_weight (Callable[[Tuple[V, V]], D]): _description_
 
         Yields:
-            list of edges: cycle list
+            Generator[Cycle, None, None]: cycle list
         """
         self.pred = {}
         found = False
@@ -90,11 +90,11 @@ class NegCycleFinder(Generic[V]):
     def cycle_list(self, handle: V) -> Cycle:
         """Cycle list started from handle
 
-        Arguments:
-            handle: graph node
+        Args:
+            handle (V): _description_
 
         Returns:
-            list of edges: cycle list
+            Cycle: _description_
         """
         vtx = handle
         cycle = list()
@@ -114,12 +114,13 @@ class NegCycleFinder(Generic[V]):
     ) -> bool:
         """Check if the cycle list is negative
 
-        Arguments:
-            handle: graph node
-            get_weight (Callable): [description]
+        Args:
+            handle (V): _description_
+            dist (MutableMapping[V, Any]): _description_
+            get_weight (Callable[[Tuple[V, V]], Any]): _description_
 
         Returns:
-            bool: [description]
+            bool: _description_
         """
         vtx = handle
         # do while loop in C++

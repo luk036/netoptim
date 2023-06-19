@@ -74,7 +74,7 @@ def formGraph(T, pos, eta, seed=None):
     gra = nx.DiGraph(gra)
     # gra.add_node('dummy', pos = (0.3, 0.4))
     # gra.add_edge('dummy', 1)
-    # gra.nodemap = {v : i_v for i_v, v in enumerate(gra.nodes())}
+    # gra.nodemap = {vtx : i_v for i_v, vtx in enumerate(gra.nodes())}
     return gra
 
 
@@ -87,21 +87,21 @@ x = [i for i in vdcorput(T, xbase)]
 y = [i for i in vdcorput(T, ybase)]
 pos = zip(x, y)
 gra = formGraph(T, pos, 1.6, seed=5)
-# for u, v in gra.edges():
-#     h = np.array(gra.nodes()[u]['pos']) - np.array(gra.nodes()[v]['pos'])
-#     gra[u][v]['cost'] = np.sqrt(h @ h)
+# for utx, vtx in gra.edges():
+#     h = np.array(gra.nodes()[utx]['pos']) - np.array(gra.nodes()[vtx]['pos'])
+#     gra[utx][vtx]['cost'] = np.sqrt(h @ h)
 
-for u, v in gra.edges():
-    h = np.array(gra.nodes()[u]["pos"]) - np.array(gra.nodes()[v]["pos"])
-    gra[u][v]["cost"] = np.log(np.sqrt(h @ h))
+for utx, vtx in gra.edges():
+    h = np.array(gra.nodes()[utx]["pos"]) - np.array(gra.nodes()[vtx]["pos"])
+    gra[utx][vtx]["cost"] = np.log(np.sqrt(h @ h))
 
-cmax = max(c for _, _, c in gra.edges.data("cost"))
-cmin = min(c for _, _, c in gra.edges.data("cost"))
+cmax = max(cycle for _, _, cycle in gra.edges.data("cost"))
+cmin = min(cycle for _, _, cycle in gra.edges.data("cost"))
 
 
-def get_cost(e):
-    u, v = e
-    return gra[u][v]["cost"]
+def get_cost(edge):
+    utx, vtx = edge
+    return gra[utx][vtx]["cost"]
 
 
 def test_optscaling():

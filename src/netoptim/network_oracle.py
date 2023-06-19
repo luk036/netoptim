@@ -9,22 +9,22 @@ Cut = Tuple[Any, float]
 class NetworkOracle:
     """Oracle for Parametric Network Problem:
 
-    find    x, u
-    s.t.    u[j] − u[i] ≤ h(e, x)
-            ∀ e(i, j) ∈ E
+    find    x, utx
+    s.t.    utx[j] − utx[i] ≤ h(edge, x)
+            ∀ edge(i, j) ∈ E
 
     """
 
-    def __init__(self, gra, u, h):
+    def __init__(self, gra, utx, h):
         """[summary]
 
         Arguments:
             gra: a directed graph (V, E)
-            u: list or dictionary
+            utx: list or dictionary
             h: function evaluation and gradient
         """
         self._gra = gra
-        self._u = u
+        self._u = utx
         self._h = h
         self._S = NegCycleFinder(gra)
 
@@ -46,19 +46,19 @@ class NetworkOracle:
             Optional[Cut]: [description]
         """
 
-        def get_weight(e):
+        def get_weight(edge):
             """[summary]
 
             Arguments:
-                e ([type]): [description]
+                edge ([type]): [description]
 
             Returns:
                 Any: [description]
             """
-            return self._h.eval(e, x)
+            return self._h.eval(edge, x)
 
         for Ci in self._S.find_neg_cycle(self._u, get_weight):
-            f = -sum(self._h.eval(e, x) for e in Ci)
-            g = -sum(self._h.grad(e, x) for e in Ci)
+            f = -sum(self._h.eval(edge, x) for edge in Ci)
+            g = -sum(self._h.grad(edge, x) for edge in Ci)
             return g, f  # use the first Ci only
         return None

@@ -1,62 +1,75 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-from .parametric import max_parametric, ParametricAPI
+from .parametric import max_parametric, ParametricAPI, R, V, Cycle
+from typing import Tuple, List, Any
+from typing import MutableMapping, Mapping, TypeVar
+from fractions import Fraction
+
+D = TypeVar("D", int, float, Fraction)  # Comparable Ring
 
 
-def set_default(gra, weight, value):
-    """[summary]
+def set_default(gra: Mapping[V, Mapping[V, Any]], weight: D, value: D) -> None:
+    """_summary_
 
-    Arguments:
-        gra (nx.Graph): directed graph
-        weight ([type]): [description]
-        value ([type]): [description]
+    Args:
+        gra (Mapping[V, Mapping[V, Any]]): _description_
+        weight (D): _description_
+        value (D): _description_
     """
-    for u in gra:
-        for v in gra[u]:
-            if gra[u][v].get(weight, None) is None:
-                gra[u][v][weight] = value
+    for utx in gra:
+        for vtx in gra[utx]:
+            if gra[utx][vtx].get(weight, None) is None:
+                gra[utx][vtx][weight] = value
 
 
 class CycleRatioAPI(ParametricAPI):
-    def __init__(self, gra, T: type):
+    def __init__(self, gra: Mapping[V, Mapping[V, Any]], T: type) -> None:
+        """_summary_
+
+        Args:
+            gra (Mapping[V, Mapping[V, Any]]): _description_
+            T (type): _description_
+        """
         self.gra = gra
         self.T = T
 
-    def distance(self, r, e):
+    def distance(self, ratio: R, edge: Tuple[V, V]) -> R:
         """[summary]
 
         Arguments:
-            r ([type]): [description]
-            e ([type]): [description]
+            ratio ([type]): [description]
+            edge ([type]): [description]
 
         Returns:
             [type]: [description]
         """
-        u, v = e
-        return self.gra[u][v]["cost"] - r * self.gra[u][v]["time"]
+        utx, vtx = edge
+        return self.gra[utx][vtx]["cost"] - ratio * self.gra[utx][vtx]["time"]
 
-    def zero_cancel(self, cycle):
+    def zero_cancel(self, cycle: Cycle) -> R:
         """Calculate the ratio of the cycle
 
-        Arguments:
-            cycle {list}: cycle list
+        Args:
+            cycle (Cycle): _description_
 
         Returns:
-            cycle ratio
+            R: _description_
         """
-        total_cost = sum(self.gra[u][v]["cost"] for (u, v) in cycle)
-        total_time = sum(self.gra[u][v]["time"] for (u, v) in cycle)
+        total_cost = sum(self.gra[utx][vtx]["cost"] for (utx, vtx) in cycle)
+        total_time = sum(self.gra[utx][vtx]["time"] for (utx, vtx) in cycle)
         return self.T(total_cost) / total_time
 
 
-def min_cycle_ratio(gra, dist, r0):
-    """[summary] todo: parameterize cost and time
+def min_cycle_ratio(gra: Mapping[V, Mapping[V, Any]], dist: MutableMapping[V, R], r0: R) -> Tuple[R, Cycle]:
+    """_summary_
 
-    Arguments:
-        gra ([type]): [description]
+    Args:
+        gra (Mapping[V, Mapping[V, Any]]): _description_
+        dist (MutableMapping[V, R]): _description_
+        r0 (R): _description_
 
     Returns:
-        [type]: [description]
+        Tuple[R, Cycle]: _description_
     """
     mu = "cost"
     sigma = "time"

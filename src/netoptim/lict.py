@@ -141,6 +141,6 @@ if __name__ == "__main__":
     a = Lict([0] * 8)
     for i in a:
         a[i] = i * i
-    for i, v in a.items():
-        print(f"{i}: {v}")
+    for i, vtx in a.items():
+        print(f"{i}: {vtx}")
     print(3 in a)

@@ -16,9 +16,9 @@ class OptScalingOracle:
     This example is taken from[Orlin and Rothblum, 1985]
 
         min     π/ψ
-        s.t.    ψ ≤ u[i] * |aij| * u[j]^{−1} ≤ π,
+        s.t.    ψ ≤ utx[i] * |aij| * utx[j]^{−1} ≤ π,
                 ∀ aij != 0,
-                π, ψ, u, positive
+                π, ψ, utx, positive
     """
 
     class Ratio:
@@ -31,42 +31,42 @@ class OptScalingOracle:
             self._gra = gra
             self._get_cost = get_cost
 
-        def eval(self, e, x: Arr) -> float:
+        def eval(self, edge, x: Arr) -> float:
             """[summary]
 
             Arguments:
-                e ([type]): [description]
+                edge ([type]): [description]
                 x (Arr): (π, ψ) in log scale
 
             Returns:
                 float: function evaluation
             """
-            u, v = e
-            cost = self._get_cost(e)
-            assert u != v
-            return x[0] - cost if u < v else cost - x[1]
+            utx, vtx = edge
+            cost = self._get_cost(edge)
+            assert utx != vtx
+            return x[0] - cost if utx < vtx else cost - x[1]
 
-        def grad(self, e, x: Arr) -> Arr:
+        def grad(self, edge, x: Arr) -> Arr:
             """[summary]
 
             Arguments:
-                e ([type]): [description]
+                edge ([type]): [description]
                 x (Arr): (π, ψ) in log scale
 
             Returns:
                 [type]: [description]
             """
-            u, v = e
-            assert u != v
-            return np.array([1.0, 0.0] if u < v else [0.0, -1.0])
+            utx, vtx = edge
+            assert utx != vtx
+            return np.array([1.0, 0.0] if utx < vtx else [0.0, -1.0])
 
-    def __init__(self, gra, u, get_cost):
+    def __init__(self, gra, utx, get_cost):
         """Construct a new optscaling oracle object
 
         Arguments:
             gra ([type]): [description]
         """
-        self._network = NetworkOracle(gra, u, self.Ratio(gra, get_cost))
+        self._network = NetworkOracle(gra, utx, self.Ratio(gra, get_cost))
 
     def assess_optim(self, x: Arr, t: float) -> Tuple[Cut, Optional[float]]:
         """Make object callable for cutting_plane_optim()

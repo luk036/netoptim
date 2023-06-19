@@ -60,16 +60,16 @@ def test_random_graph():
 
     # Add a sink, connect all spareTSV to it.
     # pos = pos + [(1.5,.5)]
-    for u, v in gra.edges():
-        h = np.array(gra.nodes()[u]["pos"]) - np.array(gra.nodes()[v]["pos"])
-        gra[u][v]["cost"] = np.sqrt(np.dot(h, h))
-        # gra[u][v]['cost'] = h[0] + h[1]
+    for utx, vtx in gra.edges():
+        h = np.array(gra.nodes()[utx]["pos"]) - np.array(gra.nodes()[vtx]["pos"])
+        gra[utx][vtx]["cost"] = np.sqrt(np.dot(h, h))
+        # gra[utx][vtx]['cost'] = h[0] + h[1]
 
     dist = list(0 for _ in gra)
-    _, c = min_cycle_ratio(gra, dist, 1e100)
-    assert c is not None
+    _, cycle = min_cycle_ratio(gra, dist, 1e100)
+    assert cycle is not None
 
-    pathlist = c
+    pathlist = cycle
     print(pathlist)
 
 

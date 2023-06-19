@@ -18,9 +18,9 @@ def test_raw_graph_by_lict():
         ]
     )
 
-    def get_weight(e):
-        u, v = e
-        return gra[u][v]
+    def get_weight(edge):
+        utx, vtx = edge
+        return gra[utx][vtx]
 
     dist = Lict([0, 0, 0])
     finder = NegCycleFinder(gra)
@@ -38,11 +38,11 @@ def test_raw_graph_by_dict():
         "a2": {"a1": 1, "a0": 2},
     }
 
-    def get_weight(e):
-        u, v = e
-        return gra[u][v]
+    def get_weight(edge):
+        utx, vtx = edge
+        return gra[utx][vtx]
 
-    dist = {v: 0 for v in gra}
+    dist = {vtx: 0 for vtx in gra}
     finder = NegCycleFinder(gra)
     hasNeg = False
     for _ in finder.find_neg_cycle(dist, get_weight):
@@ -116,9 +116,9 @@ def do_case(gra, dist):
         [type]: [description]
     """
 
-    def get_weight(e):
-        u, v = e
-        return gra[u][v].get("weight", 1)
+    def get_weight(edge):
+        utx, vtx = edge
+        return gra[utx][vtx].get("weight", 1)
 
     finder = NegCycleFinder(gra)
     hasNeg = False
@@ -144,7 +144,7 @@ def test_no_neg_cycle():
 
 def test_timing_graph():
     gra = create_test_case_timing()
-    dist = {v: 0 for v in gra}
+    dist = {vtx: 0 for vtx in gra}
     hasNeg = do_case(gra, dist)
     assert not hasNeg
 

@@ -31,13 +31,13 @@ if __name__ == "__main__":
     print(gr.number_of_nodes())
     print(gr.number_of_edges())
 
-    for u in gr:
-        for v in gr.neighbors(u):
-            print(f"{u}, {v}")
+    for utx in gr:
+        for vtx in gr.neighbors(utx):
+            print(f"{utx}, {vtx}")
 
     a = Lict([0] * 8)
     for i in a:
         a[i] = i * i
-    for i, v in a.items():
-        print(f"{i}: {v}")
+    for i, vtx in a.items():
+        print(f"{i}: {vtx}")
     print(3 in a)

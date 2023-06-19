@@ -14,10 +14,27 @@ Cycle = List[Tuple[V, V]]
 class ParametricAPI(ABC):
     @abstractmethod
     def distance(self, ratio: R, edge: Tuple[V, V]) -> R:
+        """_summary_
+
+        Args:
+            ratio (R): _description_
+            edge (Tuple[V, V]): _description_
+
+        Returns:
+            R: _description_
+        """
         pass
 
     @abstractmethod
     def zero_cancel(self, Cycle) -> R:
+        """_summary_
+
+        Args:
+            Cycle (_type_): _description_
+
+        Returns:
+            R: _description_
+        """
         pass
 
 
@@ -26,27 +43,32 @@ def max_parametric(
     ratio: R,
     omega: ParametricAPI,
     dist: MutableMapping[V, R],
-):
-    """maximum parametric problem:
+) -> Tuple[R, Cycle]:
+    """Maximum parametric problem:
 
         max  ratio
-        s.t. dist[v] - dist[v] <= distance(u, v, ratio)
-             for all (u, v) in gra
+        s.t. dist[vtx] - dist[vtx] <= distance(utx, vtx, ratio)
+             for all (utx, vtx) in gra
 
-    Arguments:
-        gra ([type]): directed graph
-        ratio {float}: parameter to be maximized, initially a big number!!!
-        distance ([type]): monotone decreasing function w.r.t. r
-        zero_cancel ([type]): [description]
-        pick_one_only {bool}: [description]
+    Args:
+        gra (Mapping[V, Mapping[V, Any]]): _description_
+        ratio (R): _description_
+        omega (ParametricAPI): _description_
+        dist (MutableMapping[V, R]): _description_
 
     Returns:
-        ratio: optimal value
-        cycle: Most critial cycle
-        dist: optimal sol'n
+        Tuple[R, Cycle]: _description_
     """
 
     def get_weight(edge: Tuple[V, V]) -> R:
+        """_summary_
+
+        Args:
+            edge (Tuple[V, V]): _description_
+
+        Returns:
+            R: _description_
+        """
         return omega.distance(ratio, edge)
 
     ncf = NegCycleFinder(gra)
@@ -66,29 +88,3 @@ def max_parametric(
         cycle = c_min
         ratio = r_min
     return ratio, cycle
-
-
-# if __name__ == "__main__":
-#     from __future__ import print_function
-#     from pprint import pprint
-#     import networkx as nx
-#     from neg_cycle import *
-#     from networkx.utils import generate_unique_node
-
-#     gra = create_test_case1()
-#     gra[1][2]['cost'] = 5
-#     r, c, dist = min_cycle_ratio(gra)
-#     assert c != None
-#     print(r)
-#     print(c)
-#     print(dist.items())
-
-#     gra = nx.cycle_graph(5, create_using=nx.DiGraph())
-#     gra[1][2]['cost'] = -6.
-#     newnode = generate_unique_node()
-#     gra.add_edges_from([(newnode, n) for n in gra])
-#     r, c, dist = min_cycle_ratio(gra)
-#     assert c != None
-#     print(r)
-#     print(c)
-#     print(dist.items())
