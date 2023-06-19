@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-from .parametric import max_parametric
+from .parametric import max_parametric, ParametricAPI
 
 
 def set_default(gra, weight, value):
@@ -17,7 +17,7 @@ def set_default(gra, weight, value):
                 gra[u][v][weight] = value
 
 
-class CycleRatioAPI:
+class CycleRatioAPI(ParametricAPI):
     def __init__(self, gra, T: type):
         self.gra = gra
         self.T = T

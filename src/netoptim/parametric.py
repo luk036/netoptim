@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from abc import ABC, abstractmethod
 from .neg_cycle import NegCycleFinder
-from typing import Sequence, Tuple, List
+from typing import Tuple, List, Any
 from typing import MutableMapping, Mapping, TypeVar
 from fractions import Fraction
 
@@ -22,11 +22,9 @@ class ParametricAPI(ABC):
 
 
 def max_parametric(
-    gra: Mapping[V, Sequence[V]],
+    gra: Mapping[V, Mapping[V, Any]],
     ratio: R,
-    omega,
-    # distance: Callable[[R, Tuple[V, V]], R],
-    # zero_cancel: Callable[[Cycle], R],
+    omega: ParametricAPI,
     dist: MutableMapping[V, R],
 ):
     """maximum parametric problem:
