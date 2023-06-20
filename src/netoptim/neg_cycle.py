@@ -13,7 +13,7 @@ D = TypeVar("D", int, float, Fraction)  # Comparable Ring
 Cycle = List[Tuple[V, V]]
 
 
-class NegCycleFinder(Generic[V]):
+class NegCycleFinder(Generic[V, D]):
     pred: Dict[V, V] = {}
 
     def __init__(self, gra: Mapping[V, Mapping[V, Any]]) -> None:

@@ -1,20 +1,18 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function
-from .parametric import max_parametric, ParametricAPI, R, V, Cycle
-from typing import Tuple, List, Any
+from .parametric import MaxParametricSolver, ParametricAPI, R, V, Cycle
+from typing import Tuple, Any, Generic
 from typing import MutableMapping, Mapping, TypeVar
 from fractions import Fraction
 
 D = TypeVar("D", int, float, Fraction)  # Comparable Ring
 
 
-def set_default(gra: Mapping[V, Mapping[V, Any]], weight: D, value: D) -> None:
+def set_default(gra: Mapping[V, Mapping[V, Any]], weight: str, value: D) -> None:
     """_summary_
 
     Args:
         gra (Mapping[V, Mapping[V, Any]]): _description_
-        weight (D): _description_
-        value (D): _description_
+        weight (str): _description_
+        value (Any): _description_
     """
     for utx in gra:
         for vtx in gra[utx]:
@@ -22,7 +20,7 @@ def set_default(gra: Mapping[V, Mapping[V, Any]], weight: D, value: D) -> None:
                 gra[utx][vtx][weight] = value
 
 
-class CycleRatioAPI(ParametricAPI):
+class CycleRatioAPI(ParametricAPI[V, R]):
     def __init__(self, gra: Mapping[V, Mapping[V, Any]], T: type) -> None:
         """_summary_
 
@@ -60,22 +58,38 @@ class CycleRatioAPI(ParametricAPI):
         return self.T(total_cost) / total_time
 
 
-def min_cycle_ratio(gra: Mapping[V, Mapping[V, Any]], dist: MutableMapping[V, R], r0: R) -> Tuple[R, Cycle]:
-    """_summary_
+class MinCycleRatioSolver(Generic[V, R]):
+    """Minimum cost-to-time ratio problem:
 
-    Args:
-        gra (Mapping[V, Mapping[V, Any]]): _description_
-        dist (MutableMapping[V, R]): _description_
-        r0 (R): _description_
+    Given: G(V, E)
 
-    Returns:
-        Tuple[R, Cycle]: _description_
+    Solve:
+        max  ratio
+        s.t. dist[v] - dist[u] <= cost(u, v) - ratio * time(u, v)
+             for all (u, v) in E
     """
-    mu = "cost"
-    sigma = "time"
-    set_default(gra, mu, 1)
-    set_default(gra, sigma, 1)
-    # T = type(dist[next(iter(gra))])
-    omega = CycleRatioAPI(gra, type(r0))
-    ratio, cycle = max_parametric(gra, r0, omega, dist)
-    return ratio, cycle
+
+    def __init__(self, gra: Mapping[V, Mapping[V, Any]]) -> None:
+        """_summary_
+
+        Args:
+            gra (Mapping[V, Mapping[V, Any]]): _description_
+        """
+        self.gra = gra
+
+    def run(self, dist: MutableMapping[V, R], r0: R) -> Tuple[R, Cycle]:
+        """_summary_
+
+        Args:
+            dist (MutableMapping[V, R]): _description_
+            r0 (R): _description_
+
+        Returns:
+            Tuple[R, Cycle]: _description_
+        """
+        # set_default(self.gra, "cost", 1)
+        # set_default(self.gra, "time", 1)
+        omega = CycleRatioAPI(self.gra, type(r0))
+        solver = MaxParametricSolver(self.gra, omega)
+        ratio, cycle = solver.run(dist, r0)
+        return ratio, cycle

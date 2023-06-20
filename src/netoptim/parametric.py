@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from .neg_cycle import NegCycleFinder
 from typing import Tuple, List, Any
-from typing import MutableMapping, Mapping, TypeVar
+from typing import MutableMapping, Mapping, TypeVar, Generic
 from fractions import Fraction
 
 
@@ -11,7 +11,7 @@ V = TypeVar("V")
 Cycle = List[Tuple[V, V]]
 
 
-class ParametricAPI(ABC):
+class ParametricAPI(Generic[V, R]):
     @abstractmethod
     def distance(self, ratio: R, edge: Tuple[V, V]) -> R:
         """_summary_
@@ -26,7 +26,7 @@ class ParametricAPI(ABC):
         pass
 
     @abstractmethod
-    def zero_cancel(self, Cycle) -> R:
+    def zero_cancel(self, cycle: List[Tuple[V, V]]) -> R:
         """_summary_
 
         Args:
@@ -38,53 +38,52 @@ class ParametricAPI(ABC):
         pass
 
 
-def max_parametric(
-    gra: Mapping[V, Mapping[V, Any]],
-    ratio: R,
-    omega: ParametricAPI,
-    dist: MutableMapping[V, R],
-) -> Tuple[R, Cycle]:
+class MaxParametricSolver(Generic[V, R]):
     """Maximum parametric problem:
 
+    Solve:
         max  ratio
-        s.t. dist[vtx] - dist[vtx] <= distance(utx, vtx, ratio)
-             for all (utx, vtx) in gra
-
-    Args:
-        gra (Mapping[V, Mapping[V, Any]]): _description_
-        ratio (R): _description_
-        omega (ParametricAPI): _description_
-        dist (MutableMapping[V, R]): _description_
-
-    Returns:
-        Tuple[R, Cycle]: _description_
+        s.t. dist[v] - dist[u] <= distance(u, v, ratio)
+             for all (u, v) in gra
     """
 
-    def get_weight(edge: Tuple[V, V]) -> R:
-        """_summary_
+    def __init__(
+        self, gra: Mapping[V, Mapping[V, Any]], omega: ParametricAPI[V, R]
+    ) -> None:
+        """initialize
 
         Args:
-            edge (Tuple[V, V]): _description_
+            gra (Mapping[V, Mapping[V, Any]]): _description_
+            omega (ParametricAPI): _description_
+        """
+        self.ncf = NegCycleFinder(gra)
+        self.omega = omega
+
+    def run(self, dist: MutableMapping[V, R], ratio: R) -> Tuple[R, Cycle]:
+        """run
+
+        Args:
+            ratio (R): _description_
+            dist (MutableMapping[V, R]): _description_
 
         Returns:
-            R: _description_
+            Tuple[R, Cycle]: _description_
         """
-        return omega.distance(ratio, edge)
+        r_min = ratio
+        c_min = []
+        cycle = []
 
-    ncf = NegCycleFinder(gra)
-    r_min = ratio
-    c_min = []
-    cycle = []
+        while True:
+            for ci in self.ncf.find_neg_cycle(
+                dist, lambda e: self.omega.distance(ratio, e)
+            ):
+                ri = self.omega.zero_cancel(ci)
+                if r_min > ri:
+                    r_min = ri
+                    c_min = ci
+            if r_min >= ratio:
+                break
 
-    while True:
-        for ci in ncf.find_neg_cycle(dist, get_weight):
-            ri = omega.zero_cancel(ci)
-            if r_min > ri:
-                r_min = ri
-                c_min = ci
-        if r_min >= ratio:
-            break
-
-        cycle = c_min
-        ratio = r_min
-    return ratio, cycle
+            cycle = c_min
+            ratio = r_min
+        return ratio, cycle

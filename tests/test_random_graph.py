@@ -1,7 +1,7 @@
 import networkx as nx
 import numpy as np
 
-from netoptim.min_cycle_ratio import min_cycle_ratio
+from netoptim.min_cycle_ratio import MinCycleRatioSolver
 
 
 def vdc(n, base=2):
@@ -63,10 +63,12 @@ def test_random_graph():
     for utx, vtx in gra.edges():
         h = np.array(gra.nodes()[utx]["pos"]) - np.array(gra.nodes()[vtx]["pos"])
         gra[utx][vtx]["cost"] = np.sqrt(np.dot(h, h))
+        gra[utx][vtx]["time"] = 1
         # gra[utx][vtx]['cost'] = h[0] + h[1]
 
     dist = list(0 for _ in gra)
-    _, cycle = min_cycle_ratio(gra, dist, 1e100)
+    solver = MinCycleRatioSolver(gra)
+    _, cycle = solver.run(dist, 1e100)
     assert cycle is not None
 
     pathlist = cycle
