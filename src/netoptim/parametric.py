@@ -57,7 +57,7 @@ class MaxParametricSolver(Generic[V, R]):
             omega (ParametricAPI): _description_
         """
         self.ncf = NegCycleFinder(gra)
-        self.omega = omega
+        self.omega: ParametricAPI[V, R] = omega
 
     def run(self, dist: MutableMapping[V, R], ratio: R) -> Tuple[R, Cycle]:
         """run
@@ -74,7 +74,7 @@ class MaxParametricSolver(Generic[V, R]):
         cycle = []
 
         while True:
-            for ci in self.ncf.find_neg_cycle(
+            for ci in self.ncf.howard(
                 dist, lambda e: self.omega.distance(ratio, e)
             ):
                 ri = self.omega.zero_cancel(ci)

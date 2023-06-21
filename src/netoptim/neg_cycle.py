@@ -66,7 +66,7 @@ class NegCycleFinder(Generic[V, D]):
                     changed = True
         return changed
 
-    def find_neg_cycle(
+    def howard(
         self, dist: MutableMapping[V, D], get_weight: Callable[[Tuple[V, V]], D]
     ) -> Generator[Cycle, None, None]:
         """_summary_
@@ -100,7 +100,7 @@ class NegCycleFinder(Generic[V, D]):
         cycle = list()
         while True:
             utx = self.pred[vtx]
-            cycle += [(utx, vtx)]
+            cycle.append((utx, vtx))
             vtx = utx
             if vtx == handle:
                 break
@@ -109,8 +109,8 @@ class NegCycleFinder(Generic[V, D]):
     def is_negative(
         self,
         handle: V,
-        dist: MutableMapping[V, Any],
-        get_weight: Callable[[Tuple[V, V]], Any],
+        dist: MutableMapping[V, D],
+        get_weight: Callable[[Tuple[V, V]], D],
     ) -> bool:
         """Check if the cycle list is negative
 

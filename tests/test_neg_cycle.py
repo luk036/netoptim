@@ -25,7 +25,7 @@ def test_raw_graph_by_lict():
     dist = Lict([0, 0, 0])
     finder = NegCycleFinder(gra)
     hasNeg = False
-    for _ in finder.find_neg_cycle(dist, get_weight):
+    for _ in finder.howard(dist, get_weight):
         hasNeg = True
         break
     assert not hasNeg
@@ -45,7 +45,7 @@ def test_raw_graph_by_dict():
     dist = {vtx: 0 for vtx in gra}
     finder = NegCycleFinder(gra)
     hasNeg = False
-    for _ in finder.find_neg_cycle(dist, get_weight):
+    for _ in finder.howard(dist, get_weight):
         hasNeg = True
         break
     assert not hasNeg
@@ -122,7 +122,7 @@ def do_case(gra, dist):
 
     finder = NegCycleFinder(gra)
     hasNeg = False
-    for _ in finder.find_neg_cycle(dist, get_weight):
+    for _ in finder.howard(dist, get_weight):
         hasNeg = True
         break
     return hasNeg

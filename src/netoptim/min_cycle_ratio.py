@@ -1,16 +1,17 @@
-from .parametric import MaxParametricSolver, ParametricAPI, R, V, Cycle
-from typing import Tuple, Any, Generic
+from .parametric import MaxParametricSolver, ParametricAPI, V, R
+from typing import Tuple, Any, Generic, List
 from typing import MutableMapping, Mapping, TypeVar
 from fractions import Fraction
 
 D = TypeVar("D", int, float, Fraction)  # Comparable Ring
+Cycle = List[Tuple[V, V]]
 
 
-def set_default(gra: Mapping[V, Mapping[V, Any]], weight: str, value: D) -> None:
+def set_default(gra: MutableMapping[V, MutableMapping[V, MutableMapping[str, D]]], weight: str, value: D) -> None:
     """_summary_
 
     Args:
-        gra (Mapping[V, Mapping[V, Any]]): _description_
+        gra (MutableMapping[V, MutableMapping[V, MutableMapping[str, D]]): _description_
         weight (str): _description_
         value (Any): _description_
     """
@@ -21,7 +22,7 @@ def set_default(gra: Mapping[V, Mapping[V, Any]], weight: str, value: D) -> None
 
 
 class CycleRatioAPI(ParametricAPI[V, R]):
-    def __init__(self, gra: Mapping[V, Mapping[V, Any]], T: type) -> None:
+    def __init__(self, gra: Mapping[V, Mapping[V, Mapping[str, R]]], T: type) -> None:
         """_summary_
 
         Args:

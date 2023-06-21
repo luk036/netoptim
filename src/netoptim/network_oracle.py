@@ -57,7 +57,7 @@ class NetworkOracle:
             """
             return self._h.eval(edge, x)
 
-        for Ci in self._S.find_neg_cycle(self._u, get_weight):
+        for Ci in self._S.howard(self._u, get_weight):
             f = -sum(self._h.eval(edge, x) for edge in Ci)
             g = -sum(self._h.grad(edge, x) for edge in Ci)
             return g, f  # use the first Ci only
