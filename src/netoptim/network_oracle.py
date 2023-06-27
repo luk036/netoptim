@@ -19,7 +19,7 @@ class NetworkOracle:
         """[summary]
 
         Arguments:
-            gra: a directed graph (V, E)
+            gra: a directed graph (Node, E)
             utx: list or dictionary
             h: function evaluation and gradient
         """

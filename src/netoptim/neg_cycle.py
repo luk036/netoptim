@@ -8,29 +8,29 @@ from typing import Dict, Callable, Generator, Tuple, List
 from typing import MutableMapping, Mapping, TypeVar, Generic, Any
 from fractions import Fraction
 
-V = TypeVar("V")  # Hashable
-D = TypeVar("D", int, float, Fraction)  # Comparable Ring
-Cycle = List[Tuple[V, V]]
+Node = TypeVar("Node")  # Hashable
+Domain = TypeVar("Domain", int, float, Fraction)  # Comparable Ring
+Cycle = List[Tuple[Node, Node]]
 
 
-class NegCycleFinder(Generic[V, D]):
-    pred: Dict[V, V] = {}
+class NegCycleFinder(Generic[Node, Domain]):
+    pred: Dict[Node, Node] = {}
 
-    def __init__(self, gra: Mapping[V, Mapping[V, Any]]) -> None:
+    def __init__(self, gra: Mapping[Node, Mapping[Node, Any]]) -> None:
         """_summary_
 
         Args:
-            gra (Mapping[V, Mapping[V, Any]]): adjacent list
+            gra (Mapping[Node, Mapping[Node, Any]]): adjacent list
         """
         self.digraph = gra
 
-    def find_cycle(self) -> Generator[V, None, None]:
+    def find_cycle(self) -> Generator[Node, None, None]:
         """Find a cycle on the policy graph
 
         Yields:
-            Generator[V, None, None]: node: a start node of the cycle
+            Generator[Node, None, None]: node: a start node of the cycle
         """
-        visited: Dict[V, V] = {}
+        visited: Dict[Node, Node] = {}
         for vtx in filter(lambda vtx: vtx not in visited, self.digraph):
             utx = vtx
             while True:
@@ -44,13 +44,15 @@ class NegCycleFinder(Generic[V, D]):
                     break
 
     def relax(
-        self, dist: MutableMapping[V, D], get_weight: Callable[[Tuple[V, V]], D]
+        self,
+        dist: MutableMapping[Node, Domain],
+        get_weight: Callable[[Tuple[Node, Node]], Domain],
     ) -> bool:
         """Perform a updating of dist and pred
 
         Args:
-            dist (MutableMapping[V, D]): _description_
-            get_weight (Callable[[Tuple[V, V]], D]): _description_
+            dist (MutableMapping[Node, Domain]): _description_
+            get_weight (Callable[[Tuple[Node, Node]], Domain]): _description_
 
         Returns:
             bool: _description_
@@ -67,13 +69,15 @@ class NegCycleFinder(Generic[V, D]):
         return changed
 
     def howard(
-        self, dist: MutableMapping[V, D], get_weight: Callable[[Tuple[V, V]], D]
+        self,
+        dist: MutableMapping[Node, Domain],
+        get_weight: Callable[[Tuple[Node, Node]], Domain],
     ) -> Generator[Cycle, None, None]:
         """_summary_
 
         Args:
-            dist (MutableMapping[V, D]): _description_
-            get_weight (Callable[[Tuple[V, V]], D]): _description_
+            dist (MutableMapping[Node, Domain]): _description_
+            get_weight (Callable[[Tuple[Node, Node]], Domain]): _description_
 
         Yields:
             Generator[Cycle, None, None]: cycle list
@@ -87,11 +91,11 @@ class NegCycleFinder(Generic[V, D]):
                 found = True
                 yield self.cycle_list(vtx)
 
-    def cycle_list(self, handle: V) -> Cycle:
+    def cycle_list(self, handle: Node) -> Cycle:
         """Cycle list started from handle
 
         Args:
-            handle (V): _description_
+            handle (Node): _description_
 
         Returns:
             Cycle: _description_
@@ -108,16 +112,16 @@ class NegCycleFinder(Generic[V, D]):
 
     def is_negative(
         self,
-        handle: V,
-        dist: MutableMapping[V, D],
-        get_weight: Callable[[Tuple[V, V]], D],
+        handle: Node,
+        dist: MutableMapping[Node, Domain],
+        get_weight: Callable[[Tuple[Node, Node]], Domain],
     ) -> bool:
         """Check if the cycle list is negative
 
         Args:
-            handle (V): _description_
-            dist (MutableMapping[V, Any]): _description_
-            get_weight (Callable[[Tuple[V, V]], Any]): _description_
+            handle (Node): _description_
+            dist (MutableMapping[Node, Any]): _description_
+            get_weight (Callable[[Tuple[Node, Node]], Any]): _description_
 
         Returns:
             bool: _description_

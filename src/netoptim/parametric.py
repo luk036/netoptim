@@ -6,39 +6,39 @@ from typing import MutableMapping, Mapping, TypeVar, Generic
 from fractions import Fraction
 
 
-R = TypeVar("R", float, Fraction)  # Comparable field
-V = TypeVar("V")
-Cycle = List[Tuple[V, V]]
+Ratio = TypeVar("Ratio", float, Fraction)  # Comparable field
+Node = TypeVar("Node")
+Cycle = List[Tuple[Node, Node]]
 
 
-class ParametricAPI(Generic[V, R]):
+class ParametricAPI(Generic[Node, Ratio]):
     @abstractmethod
-    def distance(self, ratio: R, edge: Tuple[V, V]) -> R:
+    def distance(self, ratio: Ratio, edge: Tuple[Node, Node]) -> Ratio:
         """_summary_
 
         Args:
-            ratio (R): _description_
-            edge (Tuple[V, V]): _description_
+            ratio (Ratio): _description_
+            edge (Tuple[Node, Node]): _description_
 
         Returns:
-            R: _description_
+            Ratio: _description_
         """
         pass
 
     @abstractmethod
-    def zero_cancel(self, cycle: List[Tuple[V, V]]) -> R:
+    def zero_cancel(self, cycle: List[Tuple[Node, Node]]) -> Ratio:
         """_summary_
 
         Args:
             Cycle (_type_): _description_
 
         Returns:
-            R: _description_
+            Ratio: _description_
         """
         pass
 
 
-class MaxParametricSolver(Generic[V, R]):
+class MaxParametricSolver(Generic[Node, Ratio]):
     """Maximum parametric problem:
 
     Solve:
@@ -48,35 +48,35 @@ class MaxParametricSolver(Generic[V, R]):
     """
 
     def __init__(
-        self, gra: Mapping[V, Mapping[V, Any]], omega: ParametricAPI[V, R]
+        self, gra: Mapping[Node, Mapping[Node, Any]], omega: ParametricAPI[Node, Ratio]
     ) -> None:
         """initialize
 
         Args:
-            gra (Mapping[V, Mapping[V, Any]]): _description_
+            gra (Mapping[Node, Mapping[Node, Any]]): _description_
             omega (ParametricAPI): _description_
         """
         self.ncf = NegCycleFinder(gra)
-        self.omega: ParametricAPI[V, R] = omega
+        self.omega: ParametricAPI[Node, Ratio] = omega
 
-    def run(self, dist: MutableMapping[V, R], ratio: R) -> Tuple[R, Cycle]:
+    def run(
+        self, dist: MutableMapping[Node, Ratio], ratio: Ratio
+    ) -> Tuple[Ratio, Cycle]:
         """run
 
         Args:
-            ratio (R): _description_
-            dist (MutableMapping[V, R]): _description_
+            ratio (Ratio): _description_
+            dist (MutableMapping[Node, Ratio]): _description_
 
         Returns:
-            Tuple[R, Cycle]: _description_
+            Tuple[Ratio, Cycle]: _description_
         """
         r_min = ratio
         c_min = []
         cycle = []
 
         while True:
-            for ci in self.ncf.howard(
-                dist, lambda e: self.omega.distance(ratio, e)
-            ):
+            for ci in self.ncf.howard(dist, lambda e: self.omega.distance(ratio, e)):
                 ri = self.omega.zero_cancel(ci)
                 if r_min > ri:
                     r_min = ri
