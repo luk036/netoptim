@@ -11,8 +11,6 @@
 -->
 
 [![Project generated with PyScaffold](https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold)](https://pyscaffold.org/)
-[![Documentation Status](https://readthedocs.org/projects/netoptim/badge/?version=latest)](https://netoptim.readthedocs.io/en/latest/?badge=latest)
-[![codecov](https://codecov.io/gh/luk036/netoptim/branch/master/graph/badge.svg?token=BqErpMZbCK)](https://codecov.io/gh/luk036/netoptim)
 
 # netoptim
 
@@ -20,9 +18,10 @@
 
 A longer description of your project goes here...
 
+
 <!-- pyscaffold-notes -->
 
-## 👉 Note
+## Note
 
-This project has been set up using PyScaffold 4.3.1. For details and usage
+This project has been set up using PyScaffold 4.5. For details and usage
 information on PyScaffold see https://pyscaffold.org/.
