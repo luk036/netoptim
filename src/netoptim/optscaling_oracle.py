@@ -5,7 +5,6 @@ import numpy as np
 
 from .network_oracle import NetworkOracle
 
-# np.ndarray = np.ndarray
 Arr = Union[np.ndarray, float]
 Cut = Tuple[Arr, float]
 
@@ -16,7 +15,7 @@ class OptScalingOracle:
     This example is taken from[Orlin and Rothblum, 1985]
 
         min     π/ψ
-        s.t.    ψ ≤ utx[i] * |aij| * utx[j]^{−1} ≤ π,
+        s.t.    ψ ≤ u[i] * |aij| * u[j]^{−1} ≤ π,
                 ∀ aij != 0,
                 π, ψ, utx, positive
     """
@@ -46,7 +45,7 @@ class OptScalingOracle:
             assert utx != vtx
             return x[0] - cost if utx < vtx else cost - x[1]
 
-        def grad(self, edge, x: Arr) -> Arr:
+        def grad(self, edge, _: Arr) -> Arr:
             """[summary]
 
             Arguments:

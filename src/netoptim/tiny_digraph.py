@@ -1,6 +1,6 @@
 import networkx as nx
-from .lict import Lict
 
+from .lict import Lict
 
 # NUM_NODES = 1000
 

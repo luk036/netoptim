@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from abc import abstractmethod
-from .neg_cycle import NegCycleFinder
-from typing import Tuple, List, Any
-from typing import MutableMapping, Mapping, TypeVar, Generic
 from fractions import Fraction
+from typing import Any, Generic, List, Mapping, MutableMapping, Tuple, TypeVar
 
+from .neg_cycle import NegCycleFinder
 
 Ratio = TypeVar("Ratio", float, Fraction)  # Comparable field
 Node = TypeVar("Node")

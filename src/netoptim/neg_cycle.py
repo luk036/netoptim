@@ -4,9 +4,19 @@ Negative cycle detection for weighed graphs.
 1. Based on Howard's policy graph algorithm
 2. Looking for more than one negative cycles
 """
-from typing import Dict, Callable, Generator, Tuple, List
-from typing import MutableMapping, Mapping, TypeVar, Generic, Any
 from fractions import Fraction
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    Generic,
+    List,
+    Mapping,
+    MutableMapping,
+    Tuple,
+    TypeVar,
+)
 
 Node = TypeVar("Node")  # Hashable
 Domain = TypeVar("Domain", int, float, Fraction)  # Comparable Ring

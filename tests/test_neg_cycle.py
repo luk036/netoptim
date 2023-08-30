@@ -5,8 +5,8 @@ from __future__ import print_function
 import networkx as nx
 
 from netoptim.lict import Lict
-from netoptim.tiny_digraph import TinyDiGraph
 from netoptim.neg_cycle import NegCycleFinder
+from netoptim.tiny_digraph import TinyDiGraph
 
 
 def test_raw_graph_by_lict():

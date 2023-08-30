@@ -9,22 +9,30 @@ Cut = Tuple[Any, float]
 class NetworkOracle:
     """Oracle for Parametric Network Problem:
 
-    find    x, utx
-    s.t.    utx[j] − utx[i] ≤ h(edge, x)
+    The `NetworkOracle` class represents an oracle for solving a parametric network problem, where the
+    goal is to find values for variables `x` and `u` that satisfy certain constraints.
+
+    find    x, u
+    s.t.    u[j] − u[i] ≤ h(edge, x)
             ∀ edge(i, j) ∈ E
 
     """
 
-    def __init__(self, gra, utx, h):
-        """[summary]
+    def __init__(self, gra, u, h):
+        """
+        The function initializes an object with a directed graph, a list or dictionary, and a function for
+        evaluation and gradient.
 
-        Arguments:
-            gra: a directed graph (Node, E)
-            utx: list or dictionary
-            h: function evaluation and gradient
+        :param gra: The parameter `gra` is a directed graph represented by a tuple `(Node, E)`. `Node`
+        represents the set of nodes in the graph, and `E` represents the set of edges in the graph
+        :param u: The `u` parameter is either a list or a dictionary. It represents the initial values
+        of the variables in the optimization problem. The specific meaning of these variables depends on the
+        context of the optimization problem being solved
+        :param h: The parameter `h` is a function that is used for evaluation and gradient calculations. It
+        takes in some input and returns the evaluation value and gradient of that input
         """
         self._gra = gra
-        self._u = utx
+        self._potential = u
         self._h = h
         self._S = NegCycleFinder(gra)
 
@@ -57,8 +65,8 @@ class NetworkOracle:
             """
             return self._h.eval(edge, x)
 
-        for Ci in self._S.howard(self._u, get_weight):
-            f = -sum(self._h.eval(edge, x) for edge in Ci)
-            g = -sum(self._h.grad(edge, x) for edge in Ci)
-            return g, f  # use the first Ci only
+        for cycle in self._S.howard(self._potential, get_weight):
+            f = -sum(self._h.eval(edge, x) for edge in cycle)
+            g = -sum(self._h.grad(edge, x) for edge in cycle)
+            return g, f  # use the first cycle only
         return None
