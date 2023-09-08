@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
 from typing import Optional, Tuple
-
 import numpy as np
-
 from .network_oracle import NetworkOracle
 
 Arr = np.ndarray

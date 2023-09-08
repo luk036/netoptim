@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 from typing import Any, Optional, Tuple
-
 from digraphx.neg_cycle import NegCycleFinder
 
 Cut = Tuple[Any, float]
@@ -15,7 +13,6 @@ class NetworkOracle:
     find    x, u
     s.t.    u[j] − u[i] ≤ h(edge, x)
             ∀ edge(i, j) ∈ E
-
     """
 
     def __init__(self, gra, u, h):
@@ -68,5 +65,7 @@ class NetworkOracle:
         for cycle in self._S.howard(self._potential, get_weight):
             f = -sum(self._h.eval(edge, x) for edge in cycle)
             g = -sum(self._h.grad(edge, x) for edge in cycle)
+            # TODO: choose the minumum cycle
             return g, f  # use the first cycle only
+
         return None
