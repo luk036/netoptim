@@ -3,6 +3,7 @@ from __future__ import print_function
 
 import networkx as nx
 import numpy as np
+from digraphx.tiny_digraph import DiGraphAdapter
 from ellalgo.cutting_plane import cutting_plane_optim
 from ellalgo.ell import Ell
 
@@ -44,7 +45,7 @@ def vdcorput(n, base=2):
     return [vdc(i, base) for i in range(n)]
 
 
-def formGraph(T, pos, eta, seed=None):
+def form_graph(T, pos, eta, seed=None):
     """Form N by N grid of nodes, connect nodes within eta.
         mu and eta are relative to 1/(N-1)
 
@@ -72,6 +73,7 @@ def formGraph(T, pos, eta, seed=None):
     # connect nodes with edges
     gra = nx.random_geometric_graph(n, eta, pos=pos)
     gra = nx.DiGraph(gra)
+    gra = DiGraphAdapter(gra)
     # gra.add_node('dummy', pos = (0.3, 0.4))
     # gra.add_edge('dummy', 1)
     # gra.nodemap = {vtx : i_v for i_v, vtx in enumerate(gra.nodes())}
@@ -86,22 +88,25 @@ ybase = 3
 x = [i for i in vdcorput(T, xbase)]
 y = [i for i in vdcorput(T, ybase)]
 pos = zip(x, y)
-gra = formGraph(T, pos, 1.6, seed=5)
+gra = form_graph(T, pos, 1.6, seed=5)
 # for utx, vtx in gra.edges():
 #     h = np.array(gra.nodes()[utx]['pos']) - np.array(gra.nodes()[vtx]['pos'])
 #     gra[utx][vtx]['cost'] = np.sqrt(h @ h)
 
 for utx, vtx in gra.edges():
     h = np.array(gra.nodes()[utx]["pos"]) - np.array(gra.nodes()[vtx]["pos"])
-    gra[utx][vtx]["cost"] = np.log(np.sqrt(h @ h))
+    gra[utx][vtx]["cost"] = np.log(np.sqrt(h.dot(h)))
+    if utx < vtx:
+        gra[utx][vtx]["upperbound"] = True
+    else:
+        gra[utx][vtx]["upperbound"] = False
 
 cmax = max(cycle for _, _, cycle in gra.edges.data("cost"))
 cmin = min(cycle for _, _, cycle in gra.edges.data("cost"))
 
 
 def get_cost(edge):
-    utx, vtx = edge
-    return gra[utx][vtx]["cost"]
+    return edge["cost"], edge["upperbound"]
 
 
 def test_optscaling():

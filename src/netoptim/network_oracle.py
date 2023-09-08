@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from typing import Any, Optional, Tuple
 
-from .neg_cycle import NegCycleFinder
+from digraphx.neg_cycle import NegCycleFinder
 
 Cut = Tuple[Any, float]
 

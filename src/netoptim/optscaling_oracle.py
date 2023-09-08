@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import numpy as np
 
 from .network_oracle import NetworkOracle
 
-Arr = Union[np.ndarray, float]
+Arr = np.ndarray
 Cut = Tuple[Arr, float]
 
 
@@ -40,10 +40,8 @@ class OptScalingOracle:
             Returns:
                 float: function evaluation
             """
-            utx, vtx = edge
-            cost = self._get_cost(edge)
-            assert utx != vtx
-            return x[0] - cost if utx < vtx else cost - x[1]
+            cost, upperbound = self._get_cost(edge)
+            return x[0] - cost if upperbound else cost - x[1]
 
         def grad(self, edge, _: Arr) -> Arr:
             """[summary]
@@ -55,9 +53,8 @@ class OptScalingOracle:
             Returns:
                 [type]: [description]
             """
-            utx, vtx = edge
-            assert utx != vtx
-            return np.array([1.0, 0.0] if utx < vtx else [0.0, -1.0])
+            _, upperbound = self._get_cost(edge)
+            return np.array([1.0, 0.0] if upperbound else [0.0, -1.0])
 
     def __init__(self, gra, utx, get_cost):
         """Construct a new optscaling oracle object
