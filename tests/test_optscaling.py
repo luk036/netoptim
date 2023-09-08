@@ -101,8 +101,8 @@ for utx, vtx in gra.edges():
     else:
         gra[utx][vtx]["upperbound"] = False
 
-cmax = max(cycle for _, _, cycle in gra.edges.data("cost"))
-cmin = min(cycle for _, _, cycle in gra.edges.data("cost"))
+cmax = max(cost for _, _, cost in gra.edges.data("cost"))
+cmin = min(cost for _, _, cost in gra.edges.data("cost"))
 
 
 def get_cost(edge):
