@@ -1,4 +1,5 @@
 from typing import Any, Optional, Tuple
+
 from digraphx.neg_cycle import NegCycleFinder
 
 Cut = Tuple[Any, float]

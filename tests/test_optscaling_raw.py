@@ -1,9 +1,12 @@
+from math import log
+
 import numpy as np
 from digraphx.lict import Lict
-from math import log
+
 # from digraphx.tiny_digraph import DiGraphAdapter
 from ellalgo.cutting_plane import cutting_plane_optim
 from ellalgo.ell import Ell
+
 from netoptim.optscaling_oracle import OptScalingOracle
 
 
