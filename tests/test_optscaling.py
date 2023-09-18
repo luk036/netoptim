@@ -95,18 +95,15 @@ gra = form_graph(T, pos, 1.6, seed=5)
 
 for utx, vtx in gra.edges():
     h = np.array(gra.nodes()[utx]["pos"]) - np.array(gra.nodes()[vtx]["pos"])
-    gra[utx][vtx]["cost"] = np.log(np.sqrt(h.dot(h)))
-    if utx < vtx:
-        gra[utx][vtx]["upperbound"] = True
-    else:
-        gra[utx][vtx]["upperbound"] = False
+    distance = np.log(np.sqrt(h.dot(h)))
+    gra[utx][vtx]["cost"] = (distance, distance)
 
-cmax = max(cost for _, _, cost in gra.edges.data("cost"))
-cmin = min(cost for _, _, cost in gra.edges.data("cost"))
+cmax = max(cost[0] for _, _, cost in gra.edges.data("cost"))
+cmin = min(cost[0] for _, _, cost in gra.edges.data("cost"))
 
 
 def get_cost(edge):
-    return edge["cost"], edge["upperbound"]
+    return edge["cost"]
 
 
 def test_optscaling():

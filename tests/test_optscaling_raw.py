@@ -23,12 +23,11 @@ def test_optscaling_raw():
     Returns:
         [type]: [description]
     """
-    # Python does not support multi-dict, so only symmetric matrics are allowed
     gra = Lict(
         [
-            {1: (log(7.0), True), 2: (log(5.0), True)},
-            {0: (log(7.0), False), 2: (log(3.0), True)},
-            {0: (log(5.0), False), 1: (log(3.0), False)},
+            {1: (log(7.0), log(8.0)), 2: (log(5.0), log(4.0))},
+            {0: (log(8.0), log(7.0)), 2: (log(3.0), log(2.0))},
+            {0: (log(4.0), log(5.0)), 1: (log(2.0), log(3.0))},
         ]
     )
     lst = [cost for item in gra.values() for (cost, _) in item.values()]

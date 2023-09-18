@@ -39,10 +39,10 @@ class OptScalingOracle:
             Returns:
                 float: function evaluation
             """
-            cost, upperbound = self._get_cost(edge)
-            return x[0] - cost if upperbound else cost - x[1]
+            aij, aji = self._get_cost(edge)
+            return min(x[0] - aji, aij - x[1])
 
-        def grad(self, edge, _: Arr) -> Arr:
+        def grad(self, edge, x: Arr) -> Arr:
             """[summary]
 
             Arguments:
@@ -52,8 +52,10 @@ class OptScalingOracle:
             Returns:
                 [type]: [description]
             """
-            _, upperbound = self._get_cost(edge)
-            return np.array([1.0, 0.0] if upperbound else [0.0, -1.0])
+            aij, aji = self._get_cost(edge)
+            if x[0] - aji < aij - x[1]:
+                return np.array([1.0, 0.0])
+            return np.array([0.0, -1.0])
 
     def __init__(self, gra, utx, get_cost):
         """Construct a new optscaling oracle object
