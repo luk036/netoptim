@@ -32,7 +32,7 @@ class NetworkOracle:
         self._gra = gra
         self._potential = u
         self._h = h
-        self._S = NegCycleFinder(gra)
+        self._ncf = NegCycleFinder(gra)
 
     def update(self, t):
         """[summary]
@@ -63,7 +63,7 @@ class NetworkOracle:
             """
             return self._h.eval(edge, x)
 
-        for cycle in self._S.howard(self._potential, get_weight):
+        for cycle in self._ncf.howard(self._potential, get_weight):
             f = -sum(self._h.eval(edge, x) for edge in cycle)
             g = -sum(self._h.grad(edge, x) for edge in cycle)
             # TODO: choose the minumum cycle
