@@ -18,6 +18,13 @@
 
 A longer description of your project goes here...
 
+## Dependencies
+
+- [luk036/ellalgo](https://github.com/luk036/ellalgo)
+- [luk036/mywheel](https://github.com/luk036/mywheel)
+- [luk036/digraphx](https://github.com/luk036/digraphx)
+- networkx
+- numpy
 
 <!-- pyscaffold-notes -->
 
