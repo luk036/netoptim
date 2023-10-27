@@ -1,11 +1,11 @@
 from math import log
 
 import numpy as np
-from mywheel.lict import Lict
 
 # from digraphx.tiny_digraph import DiGraphAdapter
 from ellalgo.cutting_plane import cutting_plane_optim
 from ellalgo.ell import Ell
+from mywheel.lict import Lict
 
 from netoptim.optscaling_oracle import OptScalingOracle
 
@@ -27,16 +27,38 @@ def test_optscaling_raw():
          [ 0, 10, 20, 14,  0],
          [25, 19, 13,  0,  0],
          [18, 12,  0,  0, 24],
-         [11,  0,  0, 23, 17]]
+         [11, 21,  0, 23, 17]]
     """
 
     gra = Lict(
         [
-            {2: (log(22.0), log(25.0)), 3: (log(16.0), log(18.0)), 4: (log(15.0), log(11.0))},
-            {1: (log(10.0), log(10.0)), 2: (log(20.0), log(19.0)), 3: (log(14.0), log(12.0))},
-            {0: (log(25.0), log(22.0)), 1: (log(19.0), log(20.0)), 2: (log(13.0), log(13.0))},
-            {0: (log(18.0), log(16.0)), 1: (log(12.0), log(14.0)), 4: (log(24.0), log(23.0))},
-            {0: (log(11.0), log(15.0)), 3: (log(23.0), log(24.0)), 4: (log(17.0), log(17.0))},
+            {
+                2: (log(22.0), log(25.0)),
+                3: (log(16.0), log(18.0)),
+                4: (log(15.0), log(11.0)),
+            },
+            {
+                1: (log(10.0), log(10.0)),
+                2: (log(20.0), log(19.0)),
+                3: (log(14.0), log(12.0)),
+                #4: (-1e100, log(21.0)),
+            },
+            {
+                0: (log(25.0), log(22.0)),
+                1: (log(19.0), log(20.0)),
+                2: (log(13.0), log(13.0)),
+            },
+            {
+                0: (log(18.0), log(16.0)),
+                1: (log(12.0), log(14.0)),
+                4: (log(24.0), log(23.0)),
+            },
+            {
+                0: (log(11.0), log(15.0)),
+                #1: (log(21.0), -1e100),
+                3: (log(23.0), log(24.0)),
+                4: (log(17.0), log(17.0)),
+            },
         ]
     )
     lst = [cost for item in gra.values() for (cost, _) in item.values()]
