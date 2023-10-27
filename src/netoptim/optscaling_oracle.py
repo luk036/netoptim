@@ -78,12 +78,12 @@ class OptScalingOracle:
         See also:
             cutting_plane_optim
         """
-        s = x[0] - x[1]
-        g = np.array([1.0, -1.0])
-        if (fj := s - t) >= 0.0:
-            return (g, fj), None
-
         if cut := self._network.assess_feas(x):
             return cut, None
+
+        s = x[0] - x[1]
+        g = np.array([1.0, -1.0])
+        if (fj := s - t) > 0.0:
+            return (g, fj), None
 
         return (g, 0.0), s
