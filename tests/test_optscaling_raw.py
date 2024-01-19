@@ -1,4 +1,4 @@
-from math import log, exp
+from math import exp, log
 
 import numpy as np
 
@@ -107,8 +107,7 @@ def test_optscaling_raw2():
             {
                 0: (log(25.0), log(22.0)),
             },
-            {
-            },
+            {},
             {
                 1: (log(28.0), -100),
             },
