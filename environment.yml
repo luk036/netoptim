@@ -1,4 +1,4 @@
-name: primal-dual-approx-py
+name: netoptim
 channels:
   - conda-forge
 dependencies:
