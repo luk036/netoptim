@@ -11,9 +11,9 @@ class NetworkOracle:
     The `NetworkOracle` class represents an oracle for solving a parametric network problem, where the
     goal is to find values for variables `x` and `u` that satisfy certain constraints.
 
-    find    x, u
-    s.t.    u[j] − u[i] ≤ h(edge, x)
-            ∀ edge(i, j) ∈ E
+    |   find    x, u
+    |   s.t.    u[j] − u[i] ≤ h(edge, x)
+    |           ∀ edge(i, j) ∈ E
     """
 
     def __init__(self, gra, u, h):

@@ -13,10 +13,10 @@ class OptScalingOracle:
 
     This example is taken from[Orlin and Rothblum, 1985]
 
-        min     π/ψ
-        s.t.    ψ ≤ u[i] * |aij| * u[j]^{−1} ≤ π,
-                ∀ aij != 0,
-                π, ψ, utx, positive
+    |    min     π/ψ
+    |    s.t.    ψ ≤ u[i] * |aij| * u[j]^{−1} ≤ π,
+    |            ∀ aij != 0,
+    |            π, ψ, utx, positive
     """
 
     class Ratio:
@@ -66,15 +66,16 @@ class OptScalingOracle:
         self._network = NetworkOracle(gra, utx, self.Ratio(gra, get_cost))
 
     def assess_optim(self, x: Arr, t: float) -> Tuple[Cut, Optional[float]]:
-        """Make object callable for cutting_plane_optim()
-
+        """
+        Make object callable for cutting_plane_optim()
+        
         Arguments:
             x (Arr): (π, ψ) in log scale
             t (float): the best-so-far optimal value
-
+        
         Returns:
-            Tuple[Cut, float]
-
+            Tuple[Cut, Optional[float]]
+        
         See also:
             cutting_plane_optim
         """
