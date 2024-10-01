@@ -68,14 +68,14 @@ class OptScalingOracle:
     def assess_optim(self, x: Arr, t: float) -> Tuple[Cut, Optional[float]]:
         """
         Make object callable for cutting_plane_optim()
-        
+
         Arguments:
             x (Arr): (π, ψ) in log scale
             t (float): the best-so-far optimal value
-        
+
         Returns:
             Tuple[Cut, Optional[float]]
-        
+
         See also:
             cutting_plane_optim
         """
