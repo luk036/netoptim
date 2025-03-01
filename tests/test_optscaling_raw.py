@@ -5,7 +5,7 @@ import numpy as np
 # from digraphx.tiny_digraph import DiGraphAdapter
 from ellalgo.cutting_plane import cutting_plane_optim
 from ellalgo.ell import Ell
-from mywheel.lict import Lict
+from mywheel.map_adapter import MapAdapter
 
 from netoptim.optscaling_oracle import OptScalingOracle
 
@@ -30,7 +30,7 @@ def test_optscaling_raw():
          [11, 21,  0, 23, 17]]
     """
 
-    gra = Lict(
+    gra = MapAdapter(
         [
             {
                 2: (log(22.0), log(125.0)),
@@ -96,7 +96,7 @@ def test_optscaling_raw2():
          [ 0, 28,  0,  0,  0]]
     """
 
-    gra = Lict(
+    gra = MapAdapter(
         [
             {
                 2: (log(22.0), log(25.0)),
