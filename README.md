@@ -12,7 +12,7 @@
 
 [![Project generated with PyScaffold](https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold)](https://pyscaffold.org/)
 [![Documentation Status](https://readthedocs.org/projects/netoptim/badge/?version=latest)](https://netoptim.readthedocs.io/en/latest/?badge=latest)
-[![codecov](https://codecov.io/gh/luk036/netoptim/branch/main/graph/badge.svg?token=U7PKg0lceH)](https://codecov.io/gh/luk036/netoptim)
+[![codecov](https://codecov.io/gh/luk036/netoptim/graph/badge.svg?token=BqErpMZbCK)](https://codecov.io/gh/luk036/netoptim)
 
 # 🖧 netoptim
 
