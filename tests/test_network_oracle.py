@@ -2,6 +2,7 @@ import pytest
 import networkx as nx
 from netoptim.network_oracle import NetworkOracle
 
+
 class MockOracle:
     def __init__(self):
         self.values = {}
@@ -17,6 +18,7 @@ class MockOracle:
     def update(self, t):
         self.t = t
 
+
 def test_network_oracle_update():
     G = nx.DiGraph()
     G.add_edges_from([(0, 1), (1, 2), (2, 0)])
@@ -26,6 +28,7 @@ def test_network_oracle_update():
     net_oracle = NetworkOracle(gra, u, oracle)
     net_oracle.update(1.0)
     assert oracle.t == 1.0
+
 
 def test_network_oracle_assess_feas_with_negative_cycle():
     G = nx.DiGraph()
@@ -42,6 +45,7 @@ def test_network_oracle_assess_feas_with_negative_cycle():
     g, f = cut
     assert f == 1.0
     assert g == -1.0
+
 
 def test_network_oracle_assess_feas_no_negative_cycle():
     G = nx.DiGraph()
