@@ -1,4 +1,4 @@
-from typing import Any, Iterator, Optional, Tuple
+from typing import Any, Optional, Tuple
 
 from digraphx.neg_cycle import NegCycleFinder
 
