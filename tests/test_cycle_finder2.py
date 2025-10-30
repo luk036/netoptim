@@ -73,10 +73,10 @@ def test_minimize_TCP2(finder_class, dist):
     def has_negative_cycle(TCP, dist):
         """Creates a test graph for timing tests."""
         digraph = {
-            "v0": {"v3": TCP - 6, "v2": 6},
+            "v0": {"v3": TCP - 6, "v2": TCP - 7},
             "v1": {"v2": TCP - 9, "v4": 3},
-            "v2": {"v0": TCP - 7, "v1": 6},
-            "v3": {"v4": TCP - 8, "v0": 6},
+            "v2": {"v0": 6, "v1": 6, "v3": TCP - 6},
+            "v3": {"v4": TCP - 8, "v0": 6, "v2": 6},
             "v4": {"v1": TCP - 3, "v3": 8},
         }
         finder = finder_class(digraph)
@@ -87,7 +87,7 @@ def test_minimize_TCP2(finder_class, dist):
     options.max_iters = MAX_ITERS
     options.tolerance = TOLERANCE
     opt, num_iter = run_bsearch(omega, (5.0, 10.0), options)
-    assert opt == approx(6.6)
+    assert opt == approx(6.5)
     assert num_iter <= 50
 
 
@@ -95,10 +95,10 @@ def test_minimize_TCP2(finder_class, dist):
 def test_maximize_slack(finder_class, dist):
     TCP = 7.5
     digraph = {
-        "v0": {"v3": TCP - 6, "v2": 6},
+        "v0": {"v3": TCP - 6, "v2": TCP - 7},
         "v1": {"v2": TCP - 9, "v4": 3},
-        "v2": {"v0": TCP - 7, "v1": 6},
-        "v3": {"v4": TCP - 8, "v0": 6},
+        "v2": {"v0": 6, "v1": 6, "v3": TCP - 6},
+        "v3": {"v4": TCP - 8, "v0": 6, "v2": 6},
         "v4": {"v1": TCP - 3, "v3": 8},
     }
 
@@ -111,7 +111,7 @@ def test_maximize_slack(finder_class, dist):
     options.max_iters = MAX_ITERS
     options.tolerance = TOLERANCE
     opt, num_iter = run_bsearch(omega, (0.0, 10.0), options)
-    assert opt == approx(0.9)
+    assert opt == approx(1.0)
     assert num_iter <= 50
 
 
@@ -119,10 +119,21 @@ def test_maximize_slack(finder_class, dist):
 def test_maximize_effective_slack(finder_class, dist):
     TCP = 7.5
     digraph = {
-        "v0": {"v3": {"cost": TCP - 6, "time": 3.1}, "v2": {"cost": 6, "time": 1.5}},
+        "v0": {
+            "v3": {"cost": TCP - 6, "time": 3.1},
+            "v2": {"cost": TCP - 7, "time": 1.5},
+        },
         "v1": {"v2": {"cost": TCP - 9, "time": 4.1}, "v4": {"cost": 3, "time": 1.0}},
-        "v2": {"v0": {"cost": TCP - 7, "time": 3.1}, "v1": {"cost": 6, "time": 2.5}},
-        "v3": {"v4": {"cost": TCP - 8, "time": 4.1}, "v0": {"cost": 6, "time": 2.5}},
+        "v2": {
+            "v0": {"cost": 6, "time": 3.1},
+            "v1": {"cost": 6, "time": 2.5},
+            "v3": {"cost": TCP - 6, "time": 3.1},
+        },
+        "v3": {
+            "v4": {"cost": TCP - 8, "time": 4.1},
+            "v0": {"cost": 6, "time": 2.5},
+            "v2": {"cost": 6, "time": 2.5},
+        },
         "v4": {"v1": {"cost": TCP - 3, "time": 1.1}, "v3": {"cost": 8, "time": 1.5}},
     }
 
@@ -135,5 +146,5 @@ def test_maximize_effective_slack(finder_class, dist):
     options.tolerance = TOLERANCE
     options.max_iters = MAX_ITERS
     opt, num_iter = run_bsearch(omega, (0.0, 10.0), options)
-    assert opt == approx(0.290322580645161)
+    assert opt == approx(0.32258064516129037)
     assert num_iter <= 50
