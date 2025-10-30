@@ -34,7 +34,9 @@ def run_lawler_even(finder, dist, beta):
 
 def run_lawler_prop(finder, dist, beta):
     if isinstance(finder, NegCycleFinderQ):
-        for _ in finder.howard_succ(dist, lambda edge: edge["cost"] - beta * edge["time"], lambda _, __: True):
+        for _ in finder.howard_succ(
+            dist, lambda edge: edge["cost"] - beta * edge["time"], lambda _, __: True
+        ):
             return True
     else:
         for _ in finder.howard(dist, lambda edge: edge["cost"] - beta * edge["time"]):
