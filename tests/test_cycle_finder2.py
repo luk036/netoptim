@@ -70,17 +70,28 @@ class MyBSOracle(OracleBS):
 
 @pytest.mark.parametrize("finder_class", finders)
 def test_minimize_TCP2(finder_class, dist):
+    digraph = {
+        "v0": {"v3": {"type": "s", "delay": 6}, "v2": {"type": "s", "delay": 7}},
+        "v1": {"v2": {"type": "s", "delay": 9}, "v4": {"type": "h", "delay": 3}},
+        "v2": {
+            "v0": {"type": "h", "delay": 6},
+            "v1": {"type": "h", "delay": 6},
+            "v3": {"type": "s", "delay": 6},
+        },
+        "v3": {
+            "v4": {"type": "s", "delay": 8},
+            "v0": {"type": "h", "delay": 6},
+            "v2": {"type": "h", "delay": 6},
+        },
+        "v4": {"v1": {"type": "s", "delay": 3}, "v3": {"type": "h", "delay": 8}},
+    }
+
     def has_negative_cycle(TCP, dist):
         """Creates a test graph for timing tests."""
-        digraph = {
-            "v0": {"v3": TCP - 6, "v2": TCP - 7},
-            "v1": {"v2": TCP - 9, "v4": 3},
-            "v2": {"v0": 6, "v1": 6, "v3": TCP - 6},
-            "v3": {"v4": TCP - 8, "v0": 6, "v2": 6},
-            "v4": {"v1": TCP - 3, "v3": 8},
-        }
         finder = finder_class(digraph)
-        return run_lawler(finder, dist, lambda edge: edge)
+        return run_lawler(
+            finder, dist, lambda e: TCP - e["delay"] if e["type"] == "s" else e["delay"]
+        )
 
     omega = MyBSOracle(lambda g, d: not has_negative_cycle(g, d), dist)
     options = Options()

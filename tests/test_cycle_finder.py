@@ -12,12 +12,18 @@ TOLERANCE = 1e-14
 finders = [NegCycleFinder, NegCycleFinderQ]
 
 
-def run_lawler_TCP(finder, dist):
+def run_lawler_TCP(finder, dist, TCP):
     if isinstance(finder, NegCycleFinderQ):
-        for _ in finder.howard_succ(dist, lambda edge: edge, lambda _, __: True):
+        for _ in finder.howard_succ(
+            dist,
+            lambda e: TCP - e["delay"] if e["type"] == "s" else e["delay"],
+            lambda _, __: True,
+        ):
             return True
     else:
-        for _ in finder.howard(dist, lambda edge: edge):
+        for _ in finder.howard(
+            dist, lambda e: TCP - e["delay"] if e["type"] == "s" else e["delay"]
+        ):
             return True
     return False
 
@@ -47,16 +53,15 @@ def run_lawler_prop(finder, dist, beta):
 @pytest.mark.parametrize("finder_class", finders)
 def test_minimize_TCP(finder_class):
     dist = {"v1": 0, "v2": 0, "v3": 0}
+    digraph = {
+        "v1": {"v2": {"type": "s", "delay": 2}, "v3": {"type": "h", "delay": 1.5}},
+        "v2": {"v3": {"type": "s", "delay": 3}, "v1": {"type": "h", "delay": 2.0}},
+        "v3": {"v1": {"type": "s", "delay": 4}, "v2": {"type": "h", "delay": 3.0}},
+    }
 
     def has_negative_cycle(TCP, dist):
-        """Creates a test graph for timing tests."""
-        digraph = {
-            "v1": {"v2": TCP - 2, "v3": 1.5},
-            "v2": {"v3": TCP - 3, "v1": 2.0},
-            "v3": {"v1": TCP - 4, "v2": 3.0},
-        }
         finder = finder_class(digraph)
-        return run_lawler_TCP(finder, dist)
+        return run_lawler_TCP(finder, dist, TCP)
 
     class MyBSOracle(OracleBS):
         def assess_bs(self, gamma):
