@@ -1,24 +1,26 @@
+from typing import Any, Callable, Dict, Tuple
+
 import pytest
 from digraphx.neg_cycle import NegCycleFinder
 from digraphx.neg_cycle_q import NegCycleFinderQ
-from pytest import approx
 from ellalgo.cutting_plane import bsearch
-from ellalgo.ell_typing import OracleBS
 from ellalgo.ell_config import Options
+from ellalgo.ell_typing import OracleBS
 from icecream import ic
+from pytest import approx
 
 MAX_ITERS = 100
 TOLERANCE = 1e-7
 
-finders = [NegCycleFinder, NegCycleFinderQ]
+Finders = [NegCycleFinder, NegCycleFinderQ]
 
 
 @pytest.fixture
-def dist():
+def dist() -> Dict[str, int]:
     return {"v0": 0, "v1": 0, "v2": 0, "v3": 0, "v4": 0}
 
 
-def run_lawler(finder, dist, weight_fn):
+def run_lawler(finder, dist, weight_fn) -> bool:
     """
     Checks if a negative cycle exists in a graph using the Lawler-Howard algorithm.
 
@@ -39,7 +41,7 @@ def run_lawler(finder, dist, weight_fn):
     return False
 
 
-def run_bsearch(omega, interval, options):
+def run_bsearch(omega: OracleBS, interval: Tuple[float, float], options: Options) -> Tuple[float, int]:
     """
     Runs a binary search algorithm to find the optimal value.
 
@@ -57,20 +59,25 @@ def run_bsearch(omega, interval, options):
 
 
 class MyBSOracle(OracleBS):
-    def __init__(self, has_negative_cycle, dist, callback=None):
+    def __init__(
+        self,
+        has_negative_cycle: Callable[[float, Dict[str, int]], bool],
+        dist: Dict[str, int],
+        callback: Any = None,
+    ):
         self.has_negative_cycle = has_negative_cycle
         self.dist = dist
         self.callback = callback
 
-    def assess_bs(self, gamma):
+    def assess_bs(self, gamma: float) -> bool:
         if self.callback:
             self.callback(gamma)
         return self.has_negative_cycle(gamma, self.dist)
 
 
-@pytest.mark.parametrize("finder_class", finders)
+@pytest.mark.parametrize("finder_class", Finders)
 def test_minimize_TCP2(finder_class, dist):
-    digraph = {
+    Digraph: Dict[str, Dict[str, Dict[str, Any]]] = {
         "v0": {"v3": {"type": "s", "delay": 6}, "v2": {"type": "s", "delay": 7}},
         "v1": {"v2": {"type": "s", "delay": 9}, "v4": {"type": "h", "delay": 3}},
         "v2": {
@@ -86,9 +93,9 @@ def test_minimize_TCP2(finder_class, dist):
         "v4": {"v1": {"type": "s", "delay": 3}, "v3": {"type": "h", "delay": 8}},
     }
 
-    def has_negative_cycle(TCP, dist):
+    def has_negative_cycle(TCP: float, dist: Dict[str, int]) -> bool:
         """Creates a test graph for timing tests."""
-        finder = finder_class(digraph)
+        finder = finder_class(Digraph)
         return run_lawler(
             finder, dist, lambda e: TCP - e["delay"] if e["type"] == "s" else e["delay"]
         )
@@ -102,10 +109,10 @@ def test_minimize_TCP2(finder_class, dist):
     assert num_iter <= 50
 
 
-@pytest.mark.parametrize("finder_class", finders)
+@pytest.mark.parametrize("finder_class", Finders)
 def test_maximize_slack(finder_class, dist):
     TCP = 7.5
-    digraph = {
+    Digraph: Dict[str, Dict[str, float]] = {
         "v0": {"v3": TCP - 6, "v2": TCP - 7},
         "v1": {"v2": TCP - 9, "v4": 3},
         "v2": {"v0": 6, "v1": 6, "v3": TCP - 6},
@@ -113,8 +120,8 @@ def test_maximize_slack(finder_class, dist):
         "v4": {"v1": TCP - 3, "v3": 8},
     }
 
-    def has_negative_cycle_EVEN(beta, dist):
-        finder = finder_class(digraph)
+    def has_negative_cycle_EVEN(beta: float, dist: Dict[str, int]) -> bool:
+        finder = finder_class(Digraph)
         return run_lawler(finder, dist, lambda edge: edge - beta)
 
     omega = MyBSOracle(has_negative_cycle_EVEN, dist, callback=ic)
@@ -126,10 +133,10 @@ def test_maximize_slack(finder_class, dist):
     assert num_iter <= 50
 
 
-@pytest.mark.parametrize("finder_class", finders)
+@pytest.mark.parametrize("finder_class", Finders)
 def test_maximize_effective_slack(finder_class, dist):
     TCP = 7.5
-    digraph = {
+    Digraph: Dict[str, Dict[str, Dict[str, float]]] = {
         "v0": {
             "v3": {"cost": TCP - 6, "time": 3.1},
             "v2": {"cost": TCP - 7, "time": 1.5},
@@ -148,8 +155,8 @@ def test_maximize_effective_slack(finder_class, dist):
         "v4": {"v1": {"cost": TCP - 3, "time": 1.1}, "v3": {"cost": 8, "time": 1.5}},
     }
 
-    def has_negative_cycle_PROP(beta, dist):
-        finder = finder_class(digraph)
+    def has_negative_cycle_PROP(beta: float, dist: Dict[str, int]) -> bool:
+        finder = finder_class(Digraph)
         return run_lawler(finder, dist, lambda edge: edge["cost"] - beta * edge["time"])
 
     omega = MyBSOracle(has_negative_cycle_PROP, dist)

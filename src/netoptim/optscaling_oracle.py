@@ -1,6 +1,7 @@
 from typing import Optional, Tuple
 
 import numpy as np
+from ellalgo.ell_typing import OracleOptim
 
 from .network_oracle import NetworkOracle
 
@@ -8,7 +9,7 @@ Arr = np.ndarray
 Cut = Tuple[Arr, float]
 
 
-class OptScalingOracle:
+class OptScalingOracle(OracleOptim[Arr]):
     """Oracle for Optimal Matrix Scaling
 
     This example is taken from[Orlin and Rothblum, 1985]

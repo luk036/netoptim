@@ -1,4 +1,5 @@
 from math import log
+from typing import Any, Callable, Dict, List, Tuple, Union
 
 import networkx as nx
 import numpy as np
@@ -11,7 +12,7 @@ from mywheel.map_adapter import MapAdapter
 from netoptim.optscaling_oracle import OptScalingOracle
 
 
-def vdc(n, base=2):
+def vdc(n: int, base: int = 2) -> float:
     """[summary]
 
     Arguments:
@@ -31,7 +32,7 @@ def vdc(n, base=2):
     return vdc
 
 
-def vdcorput(n, base=2):
+def vdcorput(n: int, base: int = 2) -> List[float]:
     """[summary]
 
     Arguments:
@@ -46,7 +47,7 @@ def vdcorput(n, base=2):
     return [vdc(i, base) for i in range(n)]
 
 
-def form_graph(T, pos, eta, seed=None):
+def form_graph(T: float, pos: Any, eta: float, seed: Any = None) -> DiGraphAdapter:
     """Form N by N grid of nodes, connect nodes within eta.
         mu and eta are relative to 1/(N-1)
 
@@ -78,7 +79,7 @@ def form_graph(T, pos, eta, seed=None):
     return gra
 
 
-def create_random_graph():
+def create_random_graph() -> DiGraphAdapter:
     N = 75
     M = 20
     T = N + M
@@ -96,8 +97,8 @@ def create_random_graph():
     return gra
 
 
-def create_fixed_graph():
-    gra = MapAdapter(
+def create_fixed_graph() -> MapAdapter:
+    gra: MapAdapter = MapAdapter(
         [
             {
                 2: (log(22.0), log(125.0)),
@@ -131,12 +132,12 @@ def create_fixed_graph():
     return gra
 
 
-def get_cost(edge):
+def get_cost(edge: Union[Dict[str, Any], Tuple[float, float]]) -> Union[Dict[str, Any], Tuple[float, float]]:
     return edge["cost"] if isinstance(edge, dict) else edge
 
 
 @pytest.mark.parametrize("graph_creator", [create_random_graph, create_fixed_graph])
-def test_optscaling(graph_creator):
+def test_optscaling(graph_creator: Callable[[], Union[DiGraphAdapter, MapAdapter]]) -> None:
     gra = graph_creator()
     if isinstance(gra, DiGraphAdapter):
         cmax = max(cost[0] for _, _, cost in gra.edges.data("cost"))
@@ -148,7 +149,7 @@ def test_optscaling(graph_creator):
     xinit = np.array([cmax, cmin])
     t = cmax - cmin
     ellip = Ell(1.5 * t if isinstance(gra, DiGraphAdapter) else 200 * t, xinit)
-    dist = list(0 for _ in gra)
+    dist: List[float] = list(0 for _ in gra)
     omega = OptScalingOracle(gra, dist, get_cost)
     xbest, _, _ = cutting_plane_optim(omega, ellip, float("inf"))
     assert xbest is not None
