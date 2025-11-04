@@ -132,12 +132,16 @@ def create_fixed_graph() -> MapAdapter:
     return gra
 
 
-def get_cost(edge: Union[Dict[str, Any], Tuple[float, float]]) -> Union[Dict[str, Any], Tuple[float, float]]:
+def get_cost(
+    edge: Union[Dict[str, Any], Tuple[float, float]],
+) -> Union[Dict[str, Any], Tuple[float, float]]:
     return edge["cost"] if isinstance(edge, dict) else edge
 
 
 @pytest.mark.parametrize("graph_creator", [create_random_graph, create_fixed_graph])
-def test_optscaling(graph_creator: Callable[[], Union[DiGraphAdapter, MapAdapter]]) -> None:
+def test_optscaling(
+    graph_creator: Callable[[], Union[DiGraphAdapter, MapAdapter]],
+) -> None:
     gra = graph_creator()
     if isinstance(gra, DiGraphAdapter):
         cmax = max(cost[0] for _, _, cost in gra.edges.data("cost"))

@@ -41,7 +41,9 @@ def run_lawler(finder, dist, weight_fn) -> bool:
     return False
 
 
-def run_bsearch(omega: OracleBS, interval: Tuple[float, float], options: Options) -> Tuple[float, int]:
+def run_bsearch(
+    omega: OracleBS, interval: Tuple[float, float], options: Options
+) -> Tuple[float, int]:
     """
     Runs a binary search algorithm to find the optimal value.
 

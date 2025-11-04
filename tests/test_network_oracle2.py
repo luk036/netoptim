@@ -2,11 +2,13 @@ from typing import Any, Dict, List, Tuple
 
 import networkx as nx
 import numpy as np
-import pytest
 from netoptim.network_oracle import NetworkOracle
 
+
 class MyOracle:
-    def __init__(self, values: Dict[Tuple[Any, Any], float], grads: Dict[Tuple[Any, Any], float]):
+    def __init__(
+        self, values: Dict[Tuple[Any, Any], float], grads: Dict[Tuple[Any, Any], float]
+    ):
         self.values = values
         self.grads = grads
 
@@ -18,6 +20,7 @@ class MyOracle:
 
     def update(self, t: float) -> None:
         pass
+
 
 def test_network_oracle_with_real_oracle():
     G = nx.DiGraph()
@@ -35,6 +38,7 @@ def test_network_oracle_with_real_oracle():
     assert f == 1.0
     np.testing.assert_allclose(g, np.array([-1.0]))
 
+
 def test_network_oracle_no_negative_cycle_real_oracle():
     G = nx.DiGraph()
     G.add_edges_from([(0, 1), (1, 2), (2, 0)])
@@ -47,6 +51,7 @@ def test_network_oracle_no_negative_cycle_real_oracle():
     x = [0.0]
     cut = net_oracle.assess_feas(x)
     assert cut is None
+
 
 def test_network_oracle_more_complex_graph():
     G = nx.DiGraph()
@@ -63,6 +68,7 @@ def test_network_oracle_more_complex_graph():
     g, f = cut
     assert f == 2.5
     np.testing.assert_allclose(g, np.array([-1.0]))
+
 
 def test_network_oracle_gradient():
     G = nx.DiGraph()

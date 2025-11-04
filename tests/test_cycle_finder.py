@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import pytest
 from digraphx.neg_cycle import NegCycleFinder

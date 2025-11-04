@@ -63,6 +63,16 @@ class OptScalingOracle(OracleOptim[Arr]):
 
         Arguments:
             gra ([type]): [description]
+
+        Examples:
+            >>> from mywheel.map_adapter import MapAdapter
+            >>> gra = MapAdapter([[0, 1], [1, 0]])
+            >>> utx = [0.0, 0.0]
+            >>> def get_cost(edge):
+            ...     return 1.0, 1.0
+            >>> oracle = OptScalingOracle(gra, utx, get_cost)
+            >>> isinstance(oracle._network, NetworkOracle)
+            True
         """
         self._network = NetworkOracle(gra, utx, self.Ratio(gra, get_cost))
 
@@ -76,6 +86,24 @@ class OptScalingOracle(OracleOptim[Arr]):
 
         Returns:
             Tuple[Cut, Optional[float]]
+
+        Examples:
+            >>> from mywheel.map_adapter import MapAdapter
+            >>> gra = MapAdapter([{}, {0: (1.0, 1.0)}])
+            >>> utx = [0.0, 0.0]
+            >>> def get_cost(edge):
+            ...     return 1.0, 1.0
+            >>> oracle = OptScalingOracle(gra, utx, get_cost)
+            >>> x = np.array([0.0, 0.0])
+            >>> t = 0.0
+            >>> cut, t1 = oracle.assess_optim(x, t)
+            >>> cut[0]
+            array([ 1., -1.])
+            >>> cut[1]
+            0.0
+            >>> import numpy as np
+            >>> bool(np.isclose(t1, 0.0))
+            True
 
         See also:
             cutting_plane_optim
