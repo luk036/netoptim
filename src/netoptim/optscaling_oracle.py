@@ -76,7 +76,7 @@ class OptScalingOracle(OracleOptim[Arr]):
         """
         self._network = NetworkOracle(gra, utx, self.Ratio(gra, get_cost))
 
-    def assess_optim(self, x: Arr, t: float) -> Tuple[Cut, Optional[float]]:
+    def assess_optim(self, xc: Arr, gamma: float) -> Tuple[Cut, Optional[float]]:
         """
         Make object callable for cutting_plane_optim()
 
@@ -108,12 +108,12 @@ class OptScalingOracle(OracleOptim[Arr]):
         See also:
             cutting_plane_optim
         """
-        if cut := self._network.assess_feas(x):
+        if cut := self._network.assess_feas(xc):
             return cut, None
 
-        s = x[0] - x[1]
+        s = xc[0] - xc[1]
         g = np.array([1.0, -1.0])
-        if (fj := s - t) > 0.0:
+        if (fj := s - gamma) > 0.0:
             return (g, fj), None
 
         return (g, 0.0), s
