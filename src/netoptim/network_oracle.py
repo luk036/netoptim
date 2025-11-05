@@ -14,6 +14,21 @@ class NetworkOracle:
     |   find    x, u
     |   s.t.    u[j] − u[i] ≤ oracle(edge, x)
     |           ∀ edge(i, j) ∈ E
+
+    Examples:
+        >>> from unittest.mock import Mock
+        >>> gra = {
+        ...     "v1": {"v2": {"w": 3}, "v3": {"w": 4}},
+        ...     "v2": {"v1": {"w": -2}, "v3": {"w": 1}},
+        ...     "v3": {"v1": {"w": -3}, "v2": {"w": -2}},
+        ... }
+        >>> u = {"v1": 0, "v2": 0, "v3": 0}
+        >>> oracle = Mock()
+        >>> oracle.eval.side_effect = lambda e, x: e["w"] - x
+        >>> oracle.grad.side_effect = lambda e, x: -1
+        >>> network = NetworkOracle(gra, u, oracle)
+        >>> network.assess_feas(1)
+        (2, 3)
     """
 
     def __init__(self, gra, u, oracle):

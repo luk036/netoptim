@@ -105,10 +105,16 @@ class OptScalingOracle(OracleOptim[Arr]):
             >>> bool(np.isclose(t1, 0.0))
             True
 
+            >>> x = np.array([1.0, 0.0])
+            >>> t = 0.0
+            >>> cut, t1 = oracle.assess_optim(x, t)
+            >>> cut[0]
+            array([ 1., -1.])
+
         See also:
             cutting_plane_optim
         """
-        if cut := self._network.assess_feas(xc):
+        if (cut := self._network.assess_feas(xc)) is not None:
             return cut, None
 
         s = xc[0] - xc[1]
