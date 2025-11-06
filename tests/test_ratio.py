@@ -42,11 +42,11 @@ class MyOracle(OracleOptim[Arr]):
         if (fj := TCP - gamma * beta) > 0.0:
             return (np.array([1.0, -gamma]), fj), None
 
-        def calc_weight(e):
+        def get_weight(e):
             return TCP - e["delay"] - beta if e["type"] == "s" else e["delay"] - beta
 
-        for cycle in self.finder.howard(self.dist, calc_weight):
-            f = -sum(calc_weight(e) for e in cycle)
+        for cycle in self.finder.howard(self.dist, get_weight):
+            f = -sum(get_weight(e) for e in cycle)
             g = np.array(
                 [-sum(1.0 if e["type"] == "s" else 0.0 for e in cycle), len(cycle)]
             )
@@ -79,5 +79,4 @@ def test_minimize_ratio():
     omega = MyOracle(digraph, dist)
     xbest, ratio, _ = cutting_plane_optim(omega, ellip, float("inf"))
     assert xbest is not None
-    assert ratio is not None
     assert ratio == approx(3.040717067415985)
