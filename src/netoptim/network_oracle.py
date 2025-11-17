@@ -11,6 +11,12 @@ class NetworkOracle:
     The `NetworkOracle` class represents an oracle for solving a parametric network problem, where the
     goal is to find values for variables `x` and `u` that satisfy certain constraints.
 
+    .. svgbob::
+
+        (u_i) ------ w(i,j) ------> (u_j)
+
+        u_j - u_i <= w(i,j)
+
     |   find    x, u
     |   s.t.    u[j] − u[i] ≤ oracle(edge, x)
     |           ∀ edge(i, j) ∈ E
