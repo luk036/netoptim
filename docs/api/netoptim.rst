@@ -20,14 +20,6 @@ netoptim.optscaling\_oracle module
    :undoc-members:
    :show-inheritance:
 
-netoptim.skeleton module
-------------------------
-
-.. automodule:: netoptim.skeleton
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 
