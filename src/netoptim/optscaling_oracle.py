@@ -16,14 +16,12 @@ class OptScalingOracle(OracleOptim[Arr]):
 
     .. svgbob::
 
-        (u_i) <------ a_ji ------ (u_j)
-              ------> a_ij ------>
-
-        ψ <= u_i * a_ij * u_j^-1 <= π
+        (u_i) <------ w_ji ------ (u_j)
+              ------> w_ij ------
 
     |    min     π/ψ
-    |    s.t.    ψ ≤ u[i] * |aij| * u[j]^{−1} ≤ π,
-    |            ∀ aij != 0,
+    |    s.t.    ψ ≤ u[i] * ``|a_ij|`` * u[j]^{−1} ≤ π,
+    |            ∀ (i,j) ∈ E,
     |            π, ψ, utx, positive
     """
 
