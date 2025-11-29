@@ -14,7 +14,7 @@ TOLERANCE = 1e-14
 Finders = [NegCycleFinder, NegCycleFinderQ]
 
 
-def run_lawler_TCP(finder, dist, TCP) -> bool:
+def run_lawler_TCP(finder: Any, dist: Dict[str, int], TCP: float) -> bool:
     if isinstance(finder, NegCycleFinderQ):
         for _ in finder.howard_succ(
             dist,
@@ -53,7 +53,7 @@ def run_lawler_TCP(finder, dist, TCP) -> bool:
 
 
 @pytest.mark.parametrize("finder_class", Finders)
-def test_minimize_TCP(finder_class):
+def test_minimize_TCP(finder_class: Any):
     dist: Dict[str, int] = {"v1": 0, "v2": 0, "v3": 0}
     Digraph: Dict[str, Dict[str, Dict[str, Any]]] = {
         "v1": {"v2": {"type": "s", "delay": 7}, "v3": {"type": "h", "delay": 2}},

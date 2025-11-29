@@ -1,7 +1,6 @@
 from typing import Any, Dict, List, Tuple
 
 import networkx as nx
-import pytest
 
 from netoptim.network_oracle import NetworkOracle
 

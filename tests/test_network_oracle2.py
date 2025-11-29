@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Tuple
 
 import networkx as nx
 import numpy as np
+
 from netoptim.network_oracle import NetworkOracle
 
 

@@ -14,7 +14,7 @@ TOLERANCE = 1e-14
 Finders = [NegCycleFinder, NegCycleFinderQ]
 
 
-def run_lawler_TCP(finder, dist, TCP) -> bool:
+def run_lawler_TCP(finder: Any, dist: Dict[str, int], TCP: float) -> bool:
     if isinstance(finder, NegCycleFinderQ):
         for _ in finder.howard_succ(
             dist,
@@ -30,7 +30,7 @@ def run_lawler_TCP(finder, dist, TCP) -> bool:
     return False
 
 
-def run_lawler_even(finder, dist, beta) -> bool:
+def run_lawler_even(finder: Any, dist: Dict[str, int], beta: float) -> bool:
     if isinstance(finder, NegCycleFinderQ):
         for _ in finder.howard_succ(dist, lambda edge: edge - beta, lambda _, __: True):
             return True
@@ -40,7 +40,7 @@ def run_lawler_even(finder, dist, beta) -> bool:
     return False
 
 
-def run_lawler_prop(finder, dist, beta) -> bool:
+def run_lawler_prop(finder: Any, dist: Dict[str, int], beta: float) -> bool:
     if isinstance(finder, NegCycleFinderQ):
         for _ in finder.howard_succ(
             dist, lambda edge: edge["cost"] - beta * edge["time"], lambda _, __: True
@@ -53,7 +53,7 @@ def run_lawler_prop(finder, dist, beta) -> bool:
 
 
 @pytest.mark.parametrize("finder_class", Finders)
-def test_minimize_TCP(finder_class):
+def test_minimize_TCP(finder_class: Any):
     dist: Dict[str, int] = {"v1": 0, "v2": 0, "v3": 0}
     Digraph: Dict[str, Dict[str, Dict[str, Any]]] = {
         "v1": {"v2": {"type": "s", "delay": 2}, "v3": {"type": "h", "delay": 1.5}},
@@ -79,7 +79,7 @@ def test_minimize_TCP(finder_class):
 
 
 @pytest.mark.parametrize("finder_class", Finders)
-def test_maximize_slack(finder_class):
+def test_maximize_slack(finder_class: Any):
     dist: Dict[str, int] = {"v1": 0, "v2": 0, "v3": 0}
     TCP = 4.5
     Digraph: Dict[str, Dict[str, float]] = {
@@ -106,7 +106,7 @@ def test_maximize_slack(finder_class):
 
 
 @pytest.mark.parametrize("finder_class", Finders)
-def test_maximize_effective_slack(finder_class):
+def test_maximize_effective_slack(finder_class: Any):
     dist: Dict[str, int] = {"v1": 0, "v2": 0, "v3": 0}
     TCP = 4.5
     Digraph: Dict[str, Dict[str, Dict[str, float]]] = {

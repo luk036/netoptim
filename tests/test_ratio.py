@@ -1,12 +1,11 @@
-from typing import Any, Dict, Tuple, Optional
+from typing import Any, Dict, Optional, Tuple
 
+import numpy as np
 from digraphx.neg_cycle import NegCycleFinder
-from pytest import approx
-
 from ellalgo.cutting_plane import cutting_plane_optim
 from ellalgo.ell import Ell
 from ellalgo.ell_typing import OracleOptim
-import numpy as np
+from pytest import approx
 
 Arr = np.ndarray
 Cut = Tuple[Arr, float]
@@ -55,7 +54,7 @@ class MyOracle(OracleOptim[Arr]):
         return (np.array([1.0, -1.0]), 0.0), TCP / beta
 
 
-def test_minimize_ratio():
+def test_minimize_ratio() -> None:
     """Test the minimization of the ratio."""
     digraph: Digraph = {
         "v0": {"v3": {"type": "s", "delay": 6}, "v2": {"type": "s", "delay": 7}},

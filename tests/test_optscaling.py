@@ -16,13 +16,13 @@ def vdc(n: int, base: int = 2) -> float:
     """[summary]
 
     Arguments:
-        n ([type]): [description]
+        n (int): [description]
 
     Keyword Arguments:
         base (int): [description] (default: {2})
 
     Returns:
-        [type]: [description]
+        float: [description]
     """
     vdc, denom = 0.0, 1.0
     while n:
@@ -36,13 +36,13 @@ def vdcorput(n: int, base: int = 2) -> List[float]:
     """[summary]
 
     Arguments:
-        n ([type]): [description]
+        n (int): [description]
 
     Keyword Arguments:
         base (int): [description] (default: {2})
 
     Returns:
-        [type]: [description]
+        List[float]: [description]
     """
     return [vdc(i, base) for i in range(n)]
 
@@ -51,16 +51,14 @@ def form_graph(T: float, pos: Any, eta: float, seed: Any = None) -> DiGraphAdapt
     """Form N by N grid of nodes, connect nodes within eta.
         mu and eta are relative to 1/(N-1)
 
-    Arguments:
-        t (float): [description]
-        pos ([type]): [description]
-        eta ([type]): [description]
-
-    Keyword Arguments:
-        seed ([type]): [description] (default: {None})
+    Args:
+        T (float): Total number of nodes.
+        pos (Any): Node positions.
+        eta (float): Threshold for connecting nodes.
+        seed (Any, optional): Seed for random number generator. Defaults to None.
 
     Returns:
-        [type]: [description]
+        DiGraphAdapter: The generated graph.
     """
     if seed:
         np.random.seed(seed)
