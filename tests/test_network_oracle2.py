@@ -23,7 +23,7 @@ class MyOracle:
         pass
 
 
-def test_network_oracle_with_real_oracle():
+def test_network_oracle_with_real_oracle() -> None:
     G = nx.DiGraph()
     G.add_edges_from([(0, 1), (1, 2), (2, 0)])
     gra = {u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()}
@@ -40,7 +40,7 @@ def test_network_oracle_with_real_oracle():
     np.testing.assert_allclose(g, np.array([-1.0]))
 
 
-def test_network_oracle_no_negative_cycle_real_oracle():
+def test_network_oracle_no_negative_cycle_real_oracle() -> None:
     G = nx.DiGraph()
     G.add_edges_from([(0, 1), (1, 2), (2, 0)])
     gra = {u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()}
@@ -54,7 +54,7 @@ def test_network_oracle_no_negative_cycle_real_oracle():
     assert cut is None
 
 
-def test_network_oracle_more_complex_graph():
+def test_network_oracle_more_complex_graph() -> None:
     G = nx.DiGraph()
     G.add_edges_from([(0, 1), (1, 2), (2, 3), (3, 0), (0, 2)])
     gra = {u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()}
@@ -71,7 +71,7 @@ def test_network_oracle_more_complex_graph():
     np.testing.assert_allclose(g, np.array([-1.0]))
 
 
-def test_network_oracle_gradient():
+def test_network_oracle_gradient() -> None:
     G = nx.DiGraph()
     G.add_edges_from([(0, 1), (1, 2), (2, 0)])
     gra = {u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()}

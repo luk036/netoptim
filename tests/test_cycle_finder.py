@@ -53,7 +53,7 @@ def run_lawler_prop(finder: Any, dist: Dict[str, int], beta: float) -> bool:
 
 
 @pytest.mark.parametrize("finder_class", Finders)
-def test_minimize_TCP(finder_class: Any):
+def test_minimize_TCP(finder_class: Any) -> None:
     dist: Dict[str, int] = {"v1": 0, "v2": 0, "v3": 0}
     Digraph: Dict[str, Dict[str, Dict[str, Any]]] = {
         "v1": {"v2": {"type": "s", "delay": 2}, "v3": {"type": "h", "delay": 1.5}},
@@ -79,7 +79,7 @@ def test_minimize_TCP(finder_class: Any):
 
 
 @pytest.mark.parametrize("finder_class", Finders)
-def test_maximize_slack(finder_class: Any):
+def test_maximize_slack(finder_class: Any) -> None:
     dist: Dict[str, int] = {"v1": 0, "v2": 0, "v3": 0}
     TCP = 4.5
     Digraph: Dict[str, Dict[str, float]] = {
@@ -106,7 +106,7 @@ def test_maximize_slack(finder_class: Any):
 
 
 @pytest.mark.parametrize("finder_class", Finders)
-def test_maximize_effective_slack(finder_class: Any):
+def test_maximize_effective_slack(finder_class: Any) -> None:
     dist: Dict[str, int] = {"v1": 0, "v2": 0, "v3": 0}
     TCP = 4.5
     Digraph: Dict[str, Dict[str, Dict[str, float]]] = {

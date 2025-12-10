@@ -80,7 +80,7 @@ class MyBSOracle(OracleBS):
 
 
 @pytest.mark.parametrize("finder_class", Finders)
-def test_minimize_TCP2(finder_class: Any, dist: Dict[str, int]):
+def test_minimize_TCP2(finder_class: Any, dist: Dict[str, int]) -> None:
     Digraph: Dict[str, Dict[str, Dict[str, Any]]] = {
         "v0": {"v3": {"type": "s", "delay": 6}, "v2": {"type": "s", "delay": 7}},
         "v1": {"v2": {"type": "s", "delay": 9}, "v4": {"type": "h", "delay": 3}},
@@ -114,7 +114,7 @@ def test_minimize_TCP2(finder_class: Any, dist: Dict[str, int]):
 
 
 @pytest.mark.parametrize("finder_class", Finders)
-def test_maximize_slack(finder_class: Any, dist: Dict[str, int]):
+def test_maximize_slack(finder_class: Any, dist: Dict[str, int]) -> None:
     TCP = 7.5
     Digraph: Dict[str, Dict[str, float]] = {
         "v0": {"v3": TCP - 6, "v2": TCP - 7},
@@ -138,7 +138,7 @@ def test_maximize_slack(finder_class: Any, dist: Dict[str, int]):
 
 
 @pytest.mark.parametrize("finder_class", Finders)
-def test_maximize_effective_slack(finder_class: Any, dist: Dict[str, int]):
+def test_maximize_effective_slack(finder_class: Any, dist: Dict[str, int]) -> None:
     TCP = 7.5
     Digraph: Dict[str, Dict[str, Dict[str, float]]] = {
         "v0": {
