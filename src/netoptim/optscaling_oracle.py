@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import numpy as np
 from ellalgo.ell_typing import OracleOptim
@@ -26,11 +26,12 @@ class OptScalingOracle(OracleOptim[Arr]):
     """
 
     class Ratio:
-        def __init__(self, gra, get_cost):
+        def __init__(self, gra: Any, get_cost: Any) -> None:
             """[summary]
 
             Arguments:
-                gra ([type]): [description]
+                gra (Any): [description]
+                get_cost (Any): [description]
             """
             self._gra = gra
             self._get_cost = get_cost
@@ -63,11 +64,13 @@ class OptScalingOracle(OracleOptim[Arr]):
                 return np.array([1.0, 0.0])
             return np.array([0.0, -1.0])
 
-    def __init__(self, gra, utx, get_cost):
+    def __init__(self, gra: Any, utx: Any, get_cost: Any) -> None:
         """Construct a new optscaling oracle object
 
         Arguments:
-            gra ([type]): [description]
+            gra (Any): [description]
+            utx (Any): [description]
+            get_cost (Any): [description]
 
         Examples:
             >>> from mywheel.map_adapter import MapAdapter

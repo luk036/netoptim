@@ -1,8 +1,9 @@
-from typing import Any, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from digraphx.neg_cycle import NegCycleFinder
 
 Cut = Tuple[Any, float]
+Graph = Dict[Any, Dict[Any, Dict[str, Any]]]
 
 
 class NetworkOracle:
@@ -37,7 +38,7 @@ class NetworkOracle:
         (2, 3)
     """
 
-    def __init__(self, gra, u, oracle):
+    def __init__(self, gra: Graph, u: Dict[Any, float], oracle: Any) -> None:
         """
         The function initializes an object with a directed graph, a list or dictionary, and a function for
         evaluation and gradient.
@@ -55,7 +56,7 @@ class NetworkOracle:
         self._oracle = oracle
         self._ncf = NegCycleFinder(gra)
 
-    def update(self, t):
+    def update(self, t: float) -> None:
         """[summary]
 
         Arguments:
@@ -63,11 +64,11 @@ class NetworkOracle:
         """
         self._oracle.update(t)
 
-    def assess_feas(self, x) -> Optional[Cut]:
+    def assess_feas(self, x: float) -> Optional[Cut]:
         """Make object callable for cutting_plane_feas()
 
         Arguments:
-            x ([type]): [description]
+            x (float): [description]
 
         Returns:
             Optional[Cut]: [description]
