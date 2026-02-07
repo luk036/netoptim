@@ -14,9 +14,9 @@
 [![Documentation Status](https://readthedocs.org/projects/netoptim/badge/?version=latest)](https://netoptim.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/luk036/netoptim/graph/badge.svg?token=BqErpMZbCK)](https://codecov.io/gh/luk036/netoptim)
 
-# 🖧 netoptim
+# 🌊 netoptim
 
-> Network Optimization Python Code
+> Network Flow Optimization Python Code
 
 A longer description of your project goes here...
 
