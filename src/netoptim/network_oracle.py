@@ -38,7 +38,7 @@ class NetworkOracle:
         (2, 3)
     """
 
-    def __init__(self, gra: Graph, u: Dict[Any, float], oracle: Any) -> None:
+    def __init__(self, gra: Graph, u: Dict[Any, int], oracle: Any) -> None:
         """
         The function initializes an object with a directed graph, a list or dictionary, and a function for
         evaluation and gradient.
@@ -64,11 +64,11 @@ class NetworkOracle:
         """
         self._oracle.update(t)
 
-    def assess_feas(self, x: float) -> Optional[Cut]:
+    def assess_feas(self, x: Any) -> Optional[Cut]:
         """Make object callable for cutting_plane_feas()
 
         Arguments:
-            x (float): [description]
+            x (Any): [description]
 
         Returns:
             Optional[Cut]: [description]
