@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 import networkx as nx
 import numpy as np
@@ -26,8 +26,10 @@ class MyOracle:
 def test_network_oracle_with_real_oracle() -> None:
     G = nx.DiGraph()
     G.add_edges_from([(0, 1), (1, 2), (2, 0)])
-    gra = {u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()}
-    u = [0.0, 0.0, 0.0]
+    gra: Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]] = {
+        u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()
+    }
+    u: Dict[Any, int] = {0: 0, 1: 0, 2: 0}
     values = {(0, 1): 1.0, (1, 2): 1.0, (2, 0): -3.0}
     grads = {(0, 1): 1.0, (1, 2): 1.0, (2, 0): -1.0}
     oracle = MyOracle(values, grads)
@@ -43,8 +45,10 @@ def test_network_oracle_with_real_oracle() -> None:
 def test_network_oracle_no_negative_cycle_real_oracle() -> None:
     G = nx.DiGraph()
     G.add_edges_from([(0, 1), (1, 2), (2, 0)])
-    gra = {u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()}
-    u = [0.0, 0.0, 0.0]
+    gra: Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]] = {
+        u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()
+    }
+    u: Dict[Any, int] = {0: 0, 1: 0, 2: 0}
     values = {(0, 1): 1.0, (1, 2): 1.0, (2, 0): 1.0}
     grads = {(0, 1): 1.0, (1, 2): 1.0, (2, 0): 1.0}
     oracle = MyOracle(values, grads)
@@ -57,8 +61,10 @@ def test_network_oracle_no_negative_cycle_real_oracle() -> None:
 def test_network_oracle_more_complex_graph() -> None:
     G = nx.DiGraph()
     G.add_edges_from([(0, 1), (1, 2), (2, 3), (3, 0), (0, 2)])
-    gra = {u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()}
-    u = [0.0, 0.0, 0.0, 0.0]
+    gra: Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]] = {
+        u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()
+    }
+    u: Dict[Any, int] = {0: 0, 1: 0, 2: 0, 3: 0}
     values = {(0, 1): 1.0, (1, 2): 1.0, (2, 3): 1.0, (3, 0): -4.0, (0, 2): 0.5}
     grads = {(0, 1): 1.0, (1, 2): 1.0, (2, 3): 1.0, (3, 0): -1.0, (0, 2): 1.0}
     oracle = MyOracle(values, grads)
@@ -74,8 +80,10 @@ def test_network_oracle_more_complex_graph() -> None:
 def test_network_oracle_gradient() -> None:
     G = nx.DiGraph()
     G.add_edges_from([(0, 1), (1, 2), (2, 0)])
-    gra = {u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()}
-    u = [0.0, 0.0, 0.0]
+    gra: Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]] = {
+        u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()
+    }
+    u: Dict[Any, int] = {0: 0, 1: 0, 2: 0}
     values = {(0, 1): 1.0, (1, 2): 1.0, (2, 0): -3.0}
     grads = {(0, 1): 2.0, (1, 2): 3.0, (2, 0): -4.0}
     oracle = MyOracle(values, grads)

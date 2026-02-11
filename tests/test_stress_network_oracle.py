@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 import networkx as nx
 
@@ -33,10 +33,10 @@ def test_network_oracle_stress_no_negative_cycle() -> None:
     """Test with a large graph and no negative cycles."""
     num_nodes = 1000
     G = create_large_graph(num_nodes)
-    gra: Dict[Any, Dict[Any, Any]] = {
+    gra: Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]] = {
         u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()
     }
-    u: List[float] = [0.0] * num_nodes
+    u: Dict[Any, int] = {i: 0 for i in range(num_nodes)}
     oracle = MockOracle()
     for e in G.edges():
         oracle.values[e] = 1.0
@@ -52,10 +52,10 @@ def test_network_oracle_stress_with_negative_cycle() -> None:
     """Test with a large graph and a negative cycle."""
     num_nodes = 1000
     G = create_large_graph(num_nodes)
-    gra: Dict[Any, Dict[Any, Any]] = {
+    gra: Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]] = {
         u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()
     }
-    u: List[float] = [0.0] * num_nodes
+    u: Dict[Any, int] = {i: 0 for i in range(num_nodes)}
     oracle = MockOracle()
     for e in G.edges():
         oracle.values[e] = 1.0

@@ -1,9 +1,9 @@
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, Union
 
 from digraphx.neg_cycle import NegCycleFinder
 
 Cut = Tuple[Any, float]
-Graph = Dict[Any, Dict[Any, Dict[str, Any]]]
+Graph = Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]]
 
 
 class NetworkOracle:
