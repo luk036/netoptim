@@ -89,8 +89,8 @@ class OptScalingOracle(OracleOptim[Arr]):
         Make object callable for cutting_plane_optim()
 
         Arguments:
-            x (Arr): (π, ψ) in log scale
-            t (float): the best-so-far optimal value
+            xc (Arr): (π, ψ) in log scale
+            gamma (float): the best-so-far optimal value
 
         Returns:
             Tuple[Cut, Optional[float]]
