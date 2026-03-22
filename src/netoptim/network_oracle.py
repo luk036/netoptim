@@ -3,7 +3,20 @@ from typing import Any, Dict, Optional, Tuple, Union
 from digraphx.neg_cycle import NegCycleFinder
 
 Cut = Tuple[Any, float]
+"""A cutting plane represented as a tuple of (gradient, intercept).
+
+The gradient is typically a vector representing the subgradient of the
+objective function, and the intercept is the constant term in the
+linear cut.
+"""
+
 Graph = Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]]
+"""A directed graph represented as an adjacency dictionary.
+
+The outer dict maps each node to a dict of its neighbors.
+Each neighbor maps to either a dict of edge attributes (e.g., {'w': weight})
+or a tuple of (source, target) edge information.
+"""
 
 
 class NetworkOracle:
@@ -57,31 +70,40 @@ class NetworkOracle:
         self._ncf = NegCycleFinder(gra)
 
     def update(self, t: float) -> None:
-        """[summary]
+        """Update the oracle with the best-so-far optimal value.
 
-        Arguments:
-            t (float): the best-so-far optimal value
+        This method notifies the underlying oracle about the current best
+        feasible solution value, which may be used to refine cutting planes.
+
+        Args:
+            t: The best-so-far optimal value to update the oracle with.
         """
         self._oracle.update(t)
 
     def assess_feas(self, x: Any) -> Optional[Cut]:
-        """Make object callable for cutting_plane_feas()
+        """Assess feasibility and generate a cutting plane if infeasible.
 
-        Arguments:
-            x (Any): [description]
+        This method implements the feasibility oracle for the parametric
+        network problem. It searches for negative cycles in the graph
+        using Howard's algorithm. If a negative cycle exists, it returns
+        a cutting plane (gradient, intercept) to cut off the infeasible point.
+
+        Args:
+            x: The current iterate value to assess for feasibility.
 
         Returns:
-            Optional[Cut]: [description]
+            A Cut tuple (gradient, intercept) if the point is infeasible
+            (negative cycle exists), or None if feasible.
         """
 
         def get_weight(edge):
-            """[summary]
+            """Compute the weight of an edge given the current iterate.
 
-            Arguments:
-                edge ([type]): [description]
+            Args:
+                edge: The edge (i, j) to compute weight for.
 
             Returns:
-                Iterator: [description]
+                The oracle evaluation value for the edge at iterate x.
             """
             return self._oracle.eval(edge, x)
 

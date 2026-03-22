@@ -6,7 +6,14 @@ from ellalgo.ell_typing import OracleOptim
 from .network_oracle import NetworkOracle
 
 Arr = np.ndarray
+"""A NumPy array type alias for array operations in the optimization."""
+
 Cut = Tuple[Arr, float]
+"""A cutting plane represented as a tuple of (gradient array, intercept).
+
+The gradient is a NumPy array representing the subgradient, and the
+intercept is a scalar constant term.
+"""
 
 
 class OptScalingOracle(OracleOptim[Arr]):
@@ -26,38 +33,52 @@ class OptScalingOracle(OracleOptim[Arr]):
     """
 
     class Ratio:
-        def __init__(self, gra: Any, get_cost: Any) -> None:
-            """[summary]
+        """Inner class for computing ratio constraints in matrix scaling.
 
-            Arguments:
-                gra (Any): [description]
-                get_cost (Any): [description]
+        This class evaluates the constraint ψ ≤ u[i] * |a_ij| * u[j]^{-1} ≤ π
+        by computing the minimum of two differences in logarithmic scale.
+        """
+
+        def __init__(self, gra: Any, get_cost: Any) -> None:
+            """Initialize the Ratio evaluator.
+
+            Args:
+                gra: The graph structure representing the matrix.
+                get_cost: A callable that returns the pair (a_ij, a_ji) of
+                    absolute matrix entries for a given edge.
             """
             self._gra = gra
             self._get_cost = get_cost
 
         def eval(self, edge, x: Arr) -> float:
-            """[summary]
+            """Evaluate the ratio constraint for an edge.
 
-            Arguments:
-                edge ([type]): [description]
-                x (Arr): (π, ψ) in log scale
+            Computes min(π - a_ji, a_ij - ψ) where x = (π, ψ) in log scale.
+            A positive result indicates the constraint is satisfied.
+
+            Args:
+                edge: The edge (i, j) to evaluate.
+                x: The current iterate (π, ψ) in logarithmic scale.
 
             Returns:
-                float: function evaluation
+                The minimum of the two ratio differences.
             """
             aij, aji = self._get_cost(edge)
             return min(x[0] - aji, aij - x[1])
 
         def grad(self, edge, x: Arr) -> Arr:
-            """[summary]
+            """Compute the subgradient of the ratio constraint.
 
-            Arguments:
-                edge ([type]): [description]
-                x (Arr): (π, ψ) in log scale
+            Returns a subgradient vector indicating which bound is active:
+            - [1.0, 0.0] if the upper bound (π) is active
+            - [0.0, -1.0] if the lower bound (ψ) is active
+
+            Args:
+                edge: The edge (i, j) to evaluate.
+                x: The current iterate (π, ψ) in logarithmic scale.
 
             Returns:
-                [type]: [description]
+                A 2-element NumPy array representing the subgradient.
             """
             aij, aji = self._get_cost(edge)
             if x[0] - aji < aij - x[1]:
