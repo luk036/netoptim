@@ -53,16 +53,15 @@ class NetworkOracle:
 
     def __init__(self, gra: Graph, u: Dict[Any, int], oracle: Any) -> None:
         """
-        The function initializes an object with a directed graph, a list or dictionary, and a function for
-        evaluation and gradient.
+        Initialize the network oracle with a graph, node potentials, and an edge oracle.
 
-        :param gra: The parameter `gra` is a directed graph represented by a tuple `(Node, E)`. `Node`
-        represents the set of nodes in the graph, and `E` represents the set of edges in the graph
-        :param u: The `u` parameter is either a list or a dictionary. It represents the initial values
-        of the variables in the optimization problem. The specific meaning of these variables depends on the
-        context of the optimization problem being solved
-        :param oracle: The parameter `oracle` is a function that is used for evaluation and gradient calculations. It
-        takes in some input and returns the evaluation value and gradient of that input
+        :param gra: The directed graph represented as an adjacency dictionary
+            mapping each node to its neighbors and edge attributes.
+        :param u: The initial node potentials, a dictionary mapping each node
+            to its starting potential value.
+        :param oracle: The oracle object that provides `eval(edge, x)` and
+            `grad(edge, x)` methods for evaluating edge weights and their
+            subgradients at a given iterate x.
         """
         self._gra = gra
         self._potential = u

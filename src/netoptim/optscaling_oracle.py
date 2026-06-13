@@ -86,12 +86,13 @@ class OptScalingOracle(OracleOptim[Arr]):
             return np.array([0.0, -1.0])
 
     def __init__(self, gra: Any, utx: Any, get_cost: Any) -> None:
-        """Construct a new optscaling oracle object
+        """Construct a new OptScalingOracle instance.
 
-        Arguments:
-            gra (Any): [description]
-            utx (Any): [description]
-            get_cost (Any): [description]
+        Args:
+            gra: The graph structure representing the matrix to be scaled.
+            utx: Initial node potentials (one per node), typically zeros.
+            get_cost: A callable ``get_cost(edge) -> (a_ij, a_ji)`` that
+                returns the pair of absolute matrix entries for an edge.
 
         Examples:
             >>> from mywheel.map_adapter import MapAdapter
@@ -106,15 +107,20 @@ class OptScalingOracle(OracleOptim[Arr]):
         self._network = NetworkOracle(gra, utx, self.Ratio(gra, get_cost))
 
     def assess_optim(self, xc: Arr, gamma: float) -> Tuple[Cut, Optional[float]]:
-        """
-        Make object callable for cutting_plane_optim()
+        """Assess optimality and return a cutting plane if suboptimal.
 
-        Arguments:
-            xc (Arr): (π, ψ) in log scale
-            gamma (float): the best-so-far optimal value
+        Implements the oracle interface required by ``cutting_plane_optim()``.
+        First checks feasibility via the network oracle; if feasible, checks
+        whether the current objective value can be improved.
+
+        Args:
+            xc: The current iterate (π, ψ) in logarithmic scale.
+            gamma: The best-so-far optimal value.
 
         Returns:
-            Tuple[Cut, Optional[float]]
+            A tuple ``(cut, value)`` where ``cut`` is a ``(gradient, intercept)``
+            pair and ``value`` is either the objective value (if optimal) or
+            ``None`` (if a cutting plane was generated).
 
         Examples:
             >>> from mywheel.map_adapter import MapAdapter

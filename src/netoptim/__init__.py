@@ -1,3 +1,9 @@
+"""Network Flow Optimization Package.
+
+Provides tools for solving parametric network flow problems
+using cutting-plane methods and ellipsoid algorithms.
+"""
+
 from importlib.metadata import PackageNotFoundError, version  # pragma: no cover
 
 try:
