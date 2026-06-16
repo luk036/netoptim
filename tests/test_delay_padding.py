@@ -61,7 +61,7 @@ def test_minimize_TCP(finder_class: Any) -> None:
         "v3": {"v1": {"type": "s", "delay": 3}},
     }
 
-    def has_negative_cycle(TCP, dist) -> bool:
+    def has_negative_cycle(TCP: float, dist: Dict[str, int]) -> bool:
         finder = finder_class(Digraph)
         return run_lawler_TCP(finder, dist, TCP)
 

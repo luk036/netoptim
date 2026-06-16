@@ -41,7 +41,7 @@ class MyOracle(OracleOptim[Arr]):
         if (fj := TCP - gamma * beta) > 0.0:
             return (np.array([1.0, -gamma]), fj), None
 
-        def get_weight(e):
+        def get_weight(e: Dict[str, Any]) -> float:
             return TCP - e["delay"] - beta if e["type"] == "s" else e["delay"] - beta
 
         for cycle in self.finder.howard(self.dist, get_weight):

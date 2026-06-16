@@ -95,7 +95,7 @@ class NetworkOracle:
             (negative cycle exists), or None if feasible.
         """
 
-        def get_weight(edge):
+        def get_weight(edge: Any) -> float:
             """Compute the weight of an edge given the current iterate.
 
             Args:

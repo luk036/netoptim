@@ -50,7 +50,7 @@ class OptScalingOracle(OracleOptim[Arr]):
             self._gra = gra
             self._get_cost = get_cost
 
-        def eval(self, edge, x: Arr) -> float:
+        def eval(self, edge: Any, x: Arr) -> float:
             """Evaluate the ratio constraint for an edge.
 
             Computes min(π - a_ji, a_ij - ψ) where x = (π, ψ) in log scale.
@@ -66,7 +66,7 @@ class OptScalingOracle(OracleOptim[Arr]):
             aij, aji = self._get_cost(edge)
             return min(x[0] - aji, aij - x[1])
 
-        def grad(self, edge, x: Arr) -> Arr:
+        def grad(self, edge: Any, x: Arr) -> Arr:
             """Compute the subgradient of the ratio constraint.
 
             Returns a subgradient vector indicating which bound is active:

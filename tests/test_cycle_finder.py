@@ -61,7 +61,7 @@ def test_minimize_TCP(finder_class: Any) -> None:
         "v3": {"v1": {"type": "s", "delay": 4}, "v2": {"type": "h", "delay": 3.0}},
     }
 
-    def has_negative_cycle(TCP, dist) -> bool:
+    def has_negative_cycle(TCP: float, dist: Dict[str, int]) -> bool:
         finder = finder_class(Digraph)
         return run_lawler_TCP(finder, dist, TCP)
 
@@ -88,7 +88,7 @@ def test_maximize_slack(finder_class: Any) -> None:
         "v3": {"v1": TCP - 4, "v2": 3.0},
     }
 
-    def has_negative_cycle_EVEN(beta, dist) -> bool:
+    def has_negative_cycle_EVEN(beta: float, dist: Dict[str, int]) -> bool:
         finder = finder_class(Digraph)
         return run_lawler_even(finder, dist, beta)
 
@@ -115,7 +115,7 @@ def test_maximize_effective_slack(finder_class: Any) -> None:
         "v3": {"v1": {"cost": TCP - 4, "time": 5.1}, "v2": {"cost": 3.0, "time": 1.5}},
     }
 
-    def has_negative_cycle_PROP(beta, dist) -> bool:
+    def has_negative_cycle_PROP(beta: float, dist: Dict[str, int]) -> bool:
         finder = finder_class(Digraph)
         return run_lawler_prop(finder, dist, beta)
 
