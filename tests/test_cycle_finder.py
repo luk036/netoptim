@@ -14,7 +14,7 @@ TOLERANCE = 1e-14
 Finders = [NegCycleFinder, NegCycleFinderQ]
 
 
-def run_lawler_TCP(finder: Any, dist: Dict[str, int], TCP: float) -> bool:
+def run_lawler_TCP(finder: Any, dist: Dict[str, float], TCP: float) -> bool:
     if isinstance(finder, NegCycleFinderQ):
         for _ in finder.howard_succ(
             dist,
@@ -30,7 +30,7 @@ def run_lawler_TCP(finder: Any, dist: Dict[str, int], TCP: float) -> bool:
     return False
 
 
-def run_lawler_even(finder: Any, dist: Dict[str, int], beta: float) -> bool:
+def run_lawler_even(finder: Any, dist: Dict[str, float], beta: float) -> bool:
     if isinstance(finder, NegCycleFinderQ):
         for _ in finder.howard_succ(dist, lambda edge: edge - beta, lambda _, __: True):
             return True
@@ -40,7 +40,7 @@ def run_lawler_even(finder: Any, dist: Dict[str, int], beta: float) -> bool:
     return False
 
 
-def run_lawler_prop(finder: Any, dist: Dict[str, int], beta: float) -> bool:
+def run_lawler_prop(finder: Any, dist: Dict[str, float], beta: float) -> bool:
     if isinstance(finder, NegCycleFinderQ):
         for _ in finder.howard_succ(
             dist, lambda edge: edge["cost"] - beta * edge["time"], lambda _, __: True
@@ -54,14 +54,14 @@ def run_lawler_prop(finder: Any, dist: Dict[str, int], beta: float) -> bool:
 
 @pytest.mark.parametrize("finder_class", Finders)
 def test_minimize_TCP(finder_class: Any) -> None:
-    dist: Dict[str, int] = {"v1": 0, "v2": 0, "v3": 0}
+    dist: Dict[str, float] = {"v1": 0.0, "v2": 0.0, "v3": 0.0}
     Digraph: Dict[str, Dict[str, Dict[str, Any]]] = {
         "v1": {"v2": {"type": "s", "delay": 2}, "v3": {"type": "h", "delay": 1.5}},
         "v2": {"v3": {"type": "s", "delay": 3}, "v1": {"type": "h", "delay": 2.0}},
         "v3": {"v1": {"type": "s", "delay": 4}, "v2": {"type": "h", "delay": 3.0}},
     }
 
-    def has_negative_cycle(TCP: float, dist: Dict[str, int]) -> bool:
+    def has_negative_cycle(TCP: float, dist: Dict[str, float]) -> bool:
         finder = finder_class(Digraph)
         return run_lawler_TCP(finder, dist, TCP)
 
@@ -80,7 +80,7 @@ def test_minimize_TCP(finder_class: Any) -> None:
 
 @pytest.mark.parametrize("finder_class", Finders)
 def test_maximize_slack(finder_class: Any) -> None:
-    dist: Dict[str, int] = {"v1": 0, "v2": 0, "v3": 0}
+    dist: Dict[str, float] = {"v1": 0.0, "v2": 0.0, "v3": 0.0}
     TCP = 4.5
     Digraph: Dict[str, Dict[str, float]] = {
         "v1": {"v2": TCP - 2, "v3": 1.5},
@@ -88,7 +88,7 @@ def test_maximize_slack(finder_class: Any) -> None:
         "v3": {"v1": TCP - 4, "v2": 3.0},
     }
 
-    def has_negative_cycle_EVEN(beta: float, dist: Dict[str, int]) -> bool:
+    def has_negative_cycle_EVEN(beta: float, dist: Dict[str, float]) -> bool:
         finder = finder_class(Digraph)
         return run_lawler_even(finder, dist, beta)
 
@@ -107,7 +107,7 @@ def test_maximize_slack(finder_class: Any) -> None:
 
 @pytest.mark.parametrize("finder_class", Finders)
 def test_maximize_effective_slack(finder_class: Any) -> None:
-    dist: Dict[str, int] = {"v1": 0, "v2": 0, "v3": 0}
+    dist: Dict[str, float] = {"v1": 0.0, "v2": 0.0, "v3": 0.0}
     TCP = 4.5
     Digraph: Dict[str, Dict[str, Dict[str, float]]] = {
         "v1": {"v2": {"cost": TCP - 2, "time": 3.1}, "v3": {"cost": 1.5, "time": 0.7}},
@@ -115,7 +115,7 @@ def test_maximize_effective_slack(finder_class: Any) -> None:
         "v3": {"v1": {"cost": TCP - 4, "time": 5.1}, "v2": {"cost": 3.0, "time": 1.5}},
     }
 
-    def has_negative_cycle_PROP(beta: float, dist: Dict[str, int]) -> bool:
+    def has_negative_cycle_PROP(beta: float, dist: Dict[str, float]) -> bool:
         finder = finder_class(Digraph)
         return run_lawler_prop(finder, dist, beta)
 

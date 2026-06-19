@@ -15,14 +15,14 @@ Digraph = Dict[str, Dict[str, Dict[str, Any]]]
 class MyOracle(OracleOptim[Arr]):
     """Oracle for the ratio test problem."""
 
-    def __init__(self, digraph: Digraph, dist: Dict[str, int]):
+    def __init__(self, digraph: Digraph, dist: Dict[str, float]):
         """Initialize the oracle.
 
         Args:
             digraph (Digraph): The directed graph.
-            dist (Dict[str, int]): The distance dictionary.
+            dist (Dict[str, float]): The distance dictionary.
         """
-        self.finder = NegCycleFinder(digraph)
+        self.finder: NegCycleFinder[str, Dict[str, Any], float] = NegCycleFinder(digraph)
         self.dist = dist
 
     def assess_optim(self, xc: Arr, gamma: float) -> Tuple[Cut, Optional[float]]:
@@ -74,7 +74,7 @@ def test_minimize_ratio() -> None:
 
     xinit = np.array([7.5, 1.0])
     ellip = Ell(100.0, xinit)
-    dist = {"v0": 0, "v1": 0, "v2": 0, "v3": 0, "v4": 0}
+    dist: Dict[str, float] = {"v0": 0.0, "v1": 0.0, "v2": 0.0, "v3": 0.0, "v4": 0.0}
     omega = MyOracle(digraph, dist)
     xbest, ratio, _ = cutting_plane_optim(omega, ellip, float("inf"))
     assert xbest is not None

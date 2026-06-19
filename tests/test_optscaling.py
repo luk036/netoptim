@@ -151,7 +151,7 @@ def test_optscaling(
     xinit = np.array([cmax, cmin])
     t = cmax - cmin
     ellip = Ell(1.5 * t if isinstance(gra, DiGraphAdapter) else 200 * t, xinit)
-    dist: List[float] = list(0 for _ in gra)
+    dist: List[float] = [0.0 for _ in gra]
     omega = OptScalingOracle(gra, dist, get_cost)
     xbest, _, _ = cutting_plane_optim(omega, ellip, float("inf"))
     assert xbest is not None
