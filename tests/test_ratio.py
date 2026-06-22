@@ -22,7 +22,9 @@ class MyOracle(OracleOptim[Arr]):
             digraph (Digraph): The directed graph.
             dist (Dict[str, float]): The distance dictionary.
         """
-        self.finder: NegCycleFinder[str, Dict[str, Any], float] = NegCycleFinder(digraph)
+        self.finder: NegCycleFinder[str, Dict[str, Any], float] = NegCycleFinder(
+            digraph
+        )
         self.dist = dist
 
     def assess_optim(self, xc: Arr, gamma: float) -> Tuple[Cut, Optional[float]]:
