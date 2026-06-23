@@ -42,7 +42,7 @@ class NetworkOracle:
         ...     "v2": {"v1": {"w": -2}, "v3": {"w": 1}},
         ...     "v3": {"v1": {"w": -3}, "v2": {"w": -2}},
         ... }
-        >>> u = {"v1": 0, "v2": 0, "v3": 0}
+        >>> u = {"v1": 0.0, "v2": 0.0, "v3": 0.0}
         >>> oracle = Mock()
         >>> oracle.eval.side_effect = lambda e, x: e["w"] - x
         >>> oracle.grad.side_effect = lambda e, x: -1
@@ -51,7 +51,7 @@ class NetworkOracle:
         (2, 3)
     """
 
-    def __init__(self, gra: Graph, u: Dict[Any, int], oracle: Any) -> None:
+    def __init__(self, gra: Graph, u: Dict[Any, float], oracle: Any) -> None:
         """
         Initialize the network oracle with a graph, node potentials, and an edge oracle.
 
@@ -66,7 +66,7 @@ class NetworkOracle:
         self._gra = gra
         self._potential = u
         self._oracle = oracle
-        self._ncf = NegCycleFinder(gra)
+        self._ncf: NegCycleFinder[Any, Any, float] = NegCycleFinder(gra)
 
     def update(self, t: float) -> None:
         """Update the oracle with the best-so-far optimal value.

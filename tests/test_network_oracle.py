@@ -27,7 +27,7 @@ def test_network_oracle_update() -> None:
     gra: Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]] = {
         u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()
     }
-    u: Dict[Any, int] = {0: 0, 1: 0, 2: 0}
+    u: Dict[Any, float] = {0: 0.0, 1: 0.0, 2: 0.0}
     oracle = MockOracle()
     net_oracle = NetworkOracle(gra, u, oracle)
     net_oracle.update(1.0)
@@ -40,7 +40,7 @@ def test_network_oracle_assess_feas_with_negative_cycle() -> None:
     gra: Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]] = {
         u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()
     }
-    u: Dict[Any, int] = {0: 0, 1: 0, 2: 0}
+    u: Dict[Any, float] = {0: 0.0, 1: 0.0, 2: 0.0}
     oracle = MockOracle()
     oracle.values = {(0, 1): 1.0, (1, 2): 1.0, (2, 0): -3.0}
     oracle.grads = {(0, 1): 1.0, (1, 2): 1.0, (2, 0): -1.0}
@@ -59,7 +59,7 @@ def test_network_oracle_assess_feas_no_negative_cycle() -> None:
     gra: Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]] = {
         u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()
     }
-    u: Dict[Any, int] = {0: 0, 1: 0, 2: 0}
+    u: Dict[Any, float] = {0: 0.0, 1: 0.0, 2: 0.0}
     oracle = MockOracle()
     oracle.values = {(0, 1): 1.0, (1, 2): 1.0, (2, 0): 1.0}
     net_oracle = NetworkOracle(gra, u, oracle)

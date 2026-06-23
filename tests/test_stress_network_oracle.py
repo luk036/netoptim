@@ -36,7 +36,7 @@ def test_network_oracle_stress_no_negative_cycle() -> None:
     gra: Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]] = {
         u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()
     }
-    u: Dict[Any, int] = {i: 0 for i in range(num_nodes)}
+    u: Dict[Any, float] = {i: 0.0 for i in range(num_nodes)}
     oracle = MockOracle()
     for e in G.edges():
         oracle.values[e] = 1.0
@@ -55,7 +55,7 @@ def test_network_oracle_stress_with_negative_cycle() -> None:
     gra: Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]] = {
         u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()
     }
-    u: Dict[Any, int] = {i: 0 for i in range(num_nodes)}
+    u: Dict[Any, float] = {i: 0.0 for i in range(num_nodes)}
     oracle = MockOracle()
     for e in G.edges():
         oracle.values[e] = 1.0

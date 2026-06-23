@@ -29,7 +29,7 @@ def test_network_oracle_with_real_oracle() -> None:
     gra: Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]] = {
         u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()
     }
-    u: Dict[Any, int] = {0: 0, 1: 0, 2: 0}
+    u: Dict[Any, float] = {0: 0.0, 1: 0.0, 2: 0.0}
     values = {(0, 1): 1.0, (1, 2): 1.0, (2, 0): -3.0}
     grads = {(0, 1): 1.0, (1, 2): 1.0, (2, 0): -1.0}
     oracle = MyOracle(values, grads)
@@ -48,7 +48,7 @@ def test_network_oracle_no_negative_cycle_real_oracle() -> None:
     gra: Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]] = {
         u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()
     }
-    u: Dict[Any, int] = {0: 0, 1: 0, 2: 0}
+    u: Dict[Any, float] = {0: 0.0, 1: 0.0, 2: 0.0}
     values = {(0, 1): 1.0, (1, 2): 1.0, (2, 0): 1.0}
     grads = {(0, 1): 1.0, (1, 2): 1.0, (2, 0): 1.0}
     oracle = MyOracle(values, grads)
@@ -64,7 +64,7 @@ def test_network_oracle_more_complex_graph() -> None:
     gra: Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]] = {
         u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()
     }
-    u: Dict[Any, int] = {0: 0, 1: 0, 2: 0, 3: 0}
+    u: Dict[Any, float] = {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0}
     values = {(0, 1): 1.0, (1, 2): 1.0, (2, 3): 1.0, (3, 0): -4.0, (0, 2): 0.5}
     grads = {(0, 1): 1.0, (1, 2): 1.0, (2, 3): 1.0, (3, 0): -1.0, (0, 2): 1.0}
     oracle = MyOracle(values, grads)
@@ -83,7 +83,7 @@ def test_network_oracle_gradient() -> None:
     gra: Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]] = {
         u: {v: (u, v) for v in G.neighbors(u)} for u in G.nodes()
     }
-    u: Dict[Any, int] = {0: 0, 1: 0, 2: 0}
+    u: Dict[Any, float] = {0: 0.0, 1: 0.0, 2: 0.0}
     values = {(0, 1): 1.0, (1, 2): 1.0, (2, 0): -3.0}
     grads = {(0, 1): 2.0, (1, 2): 3.0, (2, 0): -4.0}
     oracle = MyOracle(values, grads)
