@@ -59,19 +59,19 @@ class MyOracle(OracleOptim[Arr]):
 def test_minimize_ratio() -> None:
     """Test the minimization of the ratio."""
     digraph: Digraph = {
-        "v0": {"v3": {"type": "s", "delay": 6}, "v2": {"type": "s", "delay": 7}},
-        "v1": {"v2": {"type": "s", "delay": 9}, "v4": {"type": "h", "delay": 3}},
+        "v0": {"v3": {"type": "s", "delay": 6.0}, "v2": {"type": "s", "delay": 7.0}},
+        "v1": {"v2": {"type": "s", "delay": 9.0}, "v4": {"type": "h", "delay": 3.0}},
         "v2": {
-            "v0": {"type": "h", "delay": 6},
-            "v1": {"type": "h", "delay": 6},
-            "v3": {"type": "s", "delay": 6},
+            "v0": {"type": "h", "delay": 6.0},
+            "v1": {"type": "h", "delay": 6.0},
+            "v3": {"type": "s", "delay": 6.0},
         },
         "v3": {
-            "v4": {"type": "s", "delay": 8},
-            "v0": {"type": "h", "delay": 6},
-            "v2": {"type": "h", "delay": 6},
+            "v4": {"type": "s", "delay": 8.0},
+            "v0": {"type": "h", "delay": 6.0},
+            "v2": {"type": "h", "delay": 6.0},
         },
-        "v4": {"v1": {"type": "s", "delay": 3}, "v3": {"type": "h", "delay": 8}},
+        "v4": {"v1": {"type": "s", "delay": 3.0}, "v3": {"type": "h", "delay": 8.0}},
     }
 
     xinit = np.array([7.5, 1.0])

@@ -106,7 +106,7 @@ def test_optscaling_stress() -> None:
     xinit = np.array([cmax, cmin])
     t = cmax - cmin
     ellip = Ell(1.5 * t, xinit)
-    dist: List[float] = list(0 for _ in gra)
+    dist: List[float] = list(0.0 for _ in gra)
     omega = OptScalingOracle(gra, dist, get_cost)
     xbest, _, _ = cutting_plane_optim(omega, ellip, float("inf"))
     assert xbest is not None

@@ -82,19 +82,19 @@ class MyBSOracle(OracleBS):
 @pytest.mark.parametrize("finder_class", Finders)
 def test_minimize_TCP2(finder_class: Any, dist: Dict[str, float]) -> None:
     Digraph: Dict[str, Dict[str, Dict[str, Any]]] = {
-        "v0": {"v3": {"type": "s", "delay": 6}, "v2": {"type": "s", "delay": 7}},
-        "v1": {"v2": {"type": "s", "delay": 9}, "v4": {"type": "h", "delay": 3}},
+        "v0": {"v3": {"type": "s", "delay": 6.0}, "v2": {"type": "s", "delay": 7.0}},
+        "v1": {"v2": {"type": "s", "delay": 9.0}, "v4": {"type": "h", "delay": 3.0}},
         "v2": {
-            "v0": {"type": "h", "delay": 6},
-            "v1": {"type": "h", "delay": 6},
-            "v3": {"type": "s", "delay": 6},
+            "v0": {"type": "h", "delay": 6.0},
+            "v1": {"type": "h", "delay": 6.0},
+            "v3": {"type": "s", "delay": 6.0},
         },
         "v3": {
-            "v4": {"type": "s", "delay": 8},
-            "v0": {"type": "h", "delay": 6},
-            "v2": {"type": "h", "delay": 6},
+            "v4": {"type": "s", "delay": 8.0},
+            "v0": {"type": "h", "delay": 6.0},
+            "v2": {"type": "h", "delay": 6.0},
         },
-        "v4": {"v1": {"type": "s", "delay": 3}, "v3": {"type": "h", "delay": 8}},
+        "v4": {"v1": {"type": "s", "delay": 3.0}, "v3": {"type": "h", "delay": 8.0}},
     }
 
     def has_negative_cycle(TCP: float, dist: Dict[str, float]) -> bool:
@@ -117,11 +117,11 @@ def test_minimize_TCP2(finder_class: Any, dist: Dict[str, float]) -> None:
 def test_maximize_slack(finder_class: Any, dist: Dict[str, float]) -> None:
     TCP = 7.5
     Digraph: Dict[str, Dict[str, float]] = {
-        "v0": {"v3": TCP - 6, "v2": TCP - 7},
-        "v1": {"v2": TCP - 9, "v4": 3},
-        "v2": {"v0": 6, "v1": 6, "v3": TCP - 6},
-        "v3": {"v4": TCP - 8, "v0": 6, "v2": 6},
-        "v4": {"v1": TCP - 3, "v3": 8},
+        "v0": {"v3": TCP - 6.0, "v2": TCP - 7.0},
+        "v1": {"v2": TCP - 9.0, "v4": 3.0},
+        "v2": {"v0": 6.0, "v1": 6.0, "v3": TCP - 6.0},
+        "v3": {"v4": TCP - 8.0, "v0": 6.0, "v2": 6.0},
+        "v4": {"v1": TCP - 3.0, "v3": 8.0},
     }
 
     def has_negative_cycle_EVEN(beta: float, dist: Dict[str, float]) -> bool:
@@ -142,21 +142,21 @@ def test_maximize_effective_slack(finder_class: Any, dist: Dict[str, float]) -> 
     TCP = 7.5
     Digraph: Dict[str, Dict[str, Dict[str, float]]] = {
         "v0": {
-            "v3": {"cost": TCP - 6, "time": 3.1},
-            "v2": {"cost": TCP - 7, "time": 1.5},
+            "v3": {"cost": TCP - 6.0, "time": 3.1},
+            "v2": {"cost": TCP - 7.0, "time": 1.5},
         },
-        "v1": {"v2": {"cost": TCP - 9, "time": 4.1}, "v4": {"cost": 3, "time": 1.0}},
+        "v1": {"v2": {"cost": TCP - 9.0, "time": 4.1}, "v4": {"cost": 3.0, "time": 1.0}},
         "v2": {
-            "v0": {"cost": 6, "time": 3.1},
-            "v1": {"cost": 6, "time": 2.5},
-            "v3": {"cost": TCP - 6, "time": 3.1},
+            "v0": {"cost": 6.0, "time": 3.1},
+            "v1": {"cost": 6.0, "time": 2.5},
+            "v3": {"cost": TCP - 6.0, "time": 3.1},
         },
         "v3": {
-            "v4": {"cost": TCP - 8, "time": 4.1},
-            "v0": {"cost": 6, "time": 2.5},
-            "v2": {"cost": 6, "time": 2.5},
+            "v4": {"cost": TCP - 8.0, "time": 4.1},
+            "v0": {"cost": 6.0, "time": 2.5},
+            "v2": {"cost": 6.0, "time": 2.5},
         },
-        "v4": {"v1": {"cost": TCP - 3, "time": 1.1}, "v3": {"cost": 8, "time": 1.5}},
+        "v4": {"v1": {"cost": TCP - 3.0, "time": 1.1}, "v3": {"cost": 8.0, "time": 1.5}},
     }
 
     def has_negative_cycle_PROP(beta: float, dist: Dict[str, float]) -> bool:

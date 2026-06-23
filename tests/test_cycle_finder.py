@@ -56,9 +56,9 @@ def run_lawler_prop(finder: Any, dist: Dict[str, float], beta: float) -> bool:
 def test_minimize_TCP(finder_class: Any) -> None:
     dist: Dict[str, float] = {"v1": 0.0, "v2": 0.0, "v3": 0.0}
     Digraph: Dict[str, Dict[str, Dict[str, Any]]] = {
-        "v1": {"v2": {"type": "s", "delay": 2}, "v3": {"type": "h", "delay": 1.5}},
-        "v2": {"v3": {"type": "s", "delay": 3}, "v1": {"type": "h", "delay": 2.0}},
-        "v3": {"v1": {"type": "s", "delay": 4}, "v2": {"type": "h", "delay": 3.0}},
+        "v1": {"v2": {"type": "s", "delay": 2.0}, "v3": {"type": "h", "delay": 1.5}},
+        "v2": {"v3": {"type": "s", "delay": 3.0}, "v1": {"type": "h", "delay": 2.0}},
+        "v3": {"v1": {"type": "s", "delay": 4.0}, "v2": {"type": "h", "delay": 3.0}},
     }
 
     def has_negative_cycle(TCP: float, dist: Dict[str, float]) -> bool:
@@ -83,9 +83,9 @@ def test_maximize_slack(finder_class: Any) -> None:
     dist: Dict[str, float] = {"v1": 0.0, "v2": 0.0, "v3": 0.0}
     TCP = 4.5
     Digraph: Dict[str, Dict[str, float]] = {
-        "v1": {"v2": TCP - 2, "v3": 1.5},
-        "v2": {"v3": TCP - 3, "v1": 2.0},
-        "v3": {"v1": TCP - 4, "v2": 3.0},
+        "v1": {"v2": TCP - 2.0, "v3": 1.5},
+        "v2": {"v3": TCP - 3.0, "v1": 2.0},
+        "v3": {"v1": TCP - 4.0, "v2": 3.0},
     }
 
     def has_negative_cycle_EVEN(beta: float, dist: Dict[str, float]) -> bool:
@@ -110,9 +110,9 @@ def test_maximize_effective_slack(finder_class: Any) -> None:
     dist: Dict[str, float] = {"v1": 0.0, "v2": 0.0, "v3": 0.0}
     TCP = 4.5
     Digraph: Dict[str, Dict[str, Dict[str, float]]] = {
-        "v1": {"v2": {"cost": TCP - 2, "time": 3.1}, "v3": {"cost": 1.5, "time": 0.7}},
-        "v2": {"v3": {"cost": TCP - 3, "time": 4.1}, "v1": {"cost": 2.0, "time": 2.2}},
-        "v3": {"v1": {"cost": TCP - 4, "time": 5.1}, "v2": {"cost": 3.0, "time": 1.5}},
+        "v1": {"v2": {"cost": TCP - 2.0, "time": 3.1}, "v3": {"cost": 1.5, "time": 0.7}},
+        "v2": {"v3": {"cost": TCP - 3.0, "time": 4.1}, "v1": {"cost": 2.0, "time": 2.2}},
+        "v3": {"v1": {"cost": TCP - 4.0, "time": 5.1}, "v2": {"cost": 3.0, "time": 1.5}},
     }
 
     def has_negative_cycle_PROP(beta: float, dist: Dict[str, float]) -> bool:
