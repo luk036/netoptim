@@ -16,13 +16,20 @@ gra = {
 g = nx.DiGraph()
 for u, neighbors in gra.items():
     for v, attr in neighbors.items():
-        g.add_edge(u, v, w=attr['w'])
+        g.add_edge(u, v, w=attr["w"])
 
 plt.figure(figsize=(7, 5))
 pos = nx.spring_layout(g, seed=42)
-nx.draw(g, pos, with_labels=True, node_color='lightblue',
-        node_size=800, arrowsize=25, font_weight='bold')
+nx.draw(
+    g,
+    pos,
+    with_labels=True,
+    node_color="lightblue",
+    node_size=800,
+    arrowsize=25,
+    font_weight="bold",
+)
 edge_labels = {(u, v): f"w={d['w']}" for u, v, d in g.edges(data=True)}
 nx.draw_networkx_edge_labels(g, pos, edge_labels=edge_labels)
-plt.title('Parametric Network Oracle Graph')
+plt.title("Parametric Network Oracle Graph")
 plt.grid(True, alpha=0.3)

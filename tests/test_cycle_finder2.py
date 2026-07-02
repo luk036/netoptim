@@ -145,7 +145,10 @@ def test_maximize_effective_slack(finder_class: Any, dist: Dict[str, float]) -> 
             "v3": {"cost": TCP - 6.0, "time": 3.1},
             "v2": {"cost": TCP - 7.0, "time": 1.5},
         },
-        "v1": {"v2": {"cost": TCP - 9.0, "time": 4.1}, "v4": {"cost": 3.0, "time": 1.0}},
+        "v1": {
+            "v2": {"cost": TCP - 9.0, "time": 4.1},
+            "v4": {"cost": 3.0, "time": 1.0},
+        },
         "v2": {
             "v0": {"cost": 6.0, "time": 3.1},
             "v1": {"cost": 6.0, "time": 2.5},
@@ -156,7 +159,10 @@ def test_maximize_effective_slack(finder_class: Any, dist: Dict[str, float]) -> 
             "v0": {"cost": 6.0, "time": 2.5},
             "v2": {"cost": 6.0, "time": 2.5},
         },
-        "v4": {"v1": {"cost": TCP - 3.0, "time": 1.1}, "v3": {"cost": 8.0, "time": 1.5}},
+        "v4": {
+            "v1": {"cost": TCP - 3.0, "time": 1.1},
+            "v3": {"cost": 8.0, "time": 1.5},
+        },
     }
 
     def has_negative_cycle_PROP(beta: float, dist: Dict[str, float]) -> bool:

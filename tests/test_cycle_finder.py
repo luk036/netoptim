@@ -110,9 +110,18 @@ def test_maximize_effective_slack(finder_class: Any) -> None:
     dist: Dict[str, float] = {"v1": 0.0, "v2": 0.0, "v3": 0.0}
     TCP = 4.5
     Digraph: Dict[str, Dict[str, Dict[str, float]]] = {
-        "v1": {"v2": {"cost": TCP - 2.0, "time": 3.1}, "v3": {"cost": 1.5, "time": 0.7}},
-        "v2": {"v3": {"cost": TCP - 3.0, "time": 4.1}, "v1": {"cost": 2.0, "time": 2.2}},
-        "v3": {"v1": {"cost": TCP - 4.0, "time": 5.1}, "v2": {"cost": 3.0, "time": 1.5}},
+        "v1": {
+            "v2": {"cost": TCP - 2.0, "time": 3.1},
+            "v3": {"cost": 1.5, "time": 0.7},
+        },
+        "v2": {
+            "v3": {"cost": TCP - 3.0, "time": 4.1},
+            "v1": {"cost": 2.0, "time": 2.2},
+        },
+        "v3": {
+            "v1": {"cost": TCP - 4.0, "time": 5.1},
+            "v2": {"cost": 3.0, "time": 1.5},
+        },
     }
 
     def has_negative_cycle_PROP(beta: float, dist: Dict[str, float]) -> bool:
