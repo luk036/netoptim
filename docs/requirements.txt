@@ -8,3 +8,4 @@ myst-parser[linkify]
 numpy
 sphinx>=3.2.1
 sphinxcontrib-svgbob
+matplotlib
