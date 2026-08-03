@@ -96,14 +96,8 @@ class NetworkOracle:
         """
 
         def get_weight(edge: Any) -> float:
-            """Compute the weight of an edge given the current iterate.
 
-            Args:
-                edge: The edge (i, j) to compute weight for.
 
-            Returns:
-                The oracle evaluation value for the edge at iterate x.
-            """
             return self._oracle.eval(edge, x)
 
         for cycle in self._ncf.howard(self._potential, get_weight):
