@@ -2,13 +2,7 @@ from typing import Any, Dict, Optional, Tuple, Union
 
 from digraphx.neg_cycle import NegCycleFinder
 
-Cut = Tuple[Any, float]
-"""A cutting plane represented as a tuple of (gradient, intercept).
-
-The gradient is typically a vector representing the subgradient of the
-objective function, and the intercept is the constant term in the
-linear cut.
-"""
+from ._typing import Cut, EdgeOracle
 
 Graph = Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]]
 """A directed graph represented as an adjacency dictionary.
@@ -51,7 +45,7 @@ class NetworkOracle:
         (2, 3)
     """
 
-    def __init__(self, gra: Graph, u: Dict[Any, float], oracle: Any) -> None:
+    def __init__(self, gra: Graph, u: Dict[Any, float], oracle: EdgeOracle) -> None:
         """
         Initialize the network oracle with a graph, node potentials, and an edge oracle.
 

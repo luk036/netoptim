@@ -3,17 +3,11 @@ from typing import Any, Optional, Tuple
 import numpy as np
 from ellalgo.ell_typing import OracleOptim
 
+from ._typing import Cut
 from .network_oracle import NetworkOracle
 
 Arr = np.ndarray
 """A NumPy array type alias for array operations in the optimization."""
-
-Cut = Tuple[Arr, float]
-"""A cutting plane represented as a tuple of (gradient array, intercept).
-
-The gradient is a NumPy array representing the subgradient, and the
-intercept is a scalar constant term.
-"""
 
 
 class OptScalingOracle(OracleOptim[Arr]):
@@ -84,6 +78,10 @@ class OptScalingOracle(OracleOptim[Arr]):
             if x[0] - aji < aij - x[1]:
                 return np.array([1.0, 0.0])
             return np.array([0.0, -1.0])
+
+        def update(self, t: Any) -> None:
+            """No-op hook: matrix scaling has no best-so-far parameter."""
+            pass
 
     def __init__(self, gra: Any, utx: Any, get_cost: Any) -> None:
         """Construct a new OptScalingOracle instance.
