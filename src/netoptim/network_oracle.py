@@ -1,6 +1,7 @@
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 from digraphx.neg_cycle import NegCycleFinder
+from ellalgo.ell_typing import OracleFeas
 
 from ._typing import Cut, EdgeOracle
 
@@ -13,7 +14,14 @@ or a tuple of (source, target) edge information.
 """
 
 
-class NetworkOracle:
+def _bound_eval(oracle: EdgeOracle, x: Any) -> Callable[[Any], float]:
+    def weight(edge: Any) -> float:
+        return oracle.eval(edge, x)
+
+    return weight
+
+
+class NetworkOracle(OracleFeas[Any]):
     """Oracle for Parametric Network Problem:
 
     The `NetworkOracle` class represents an oracle for solving a parametric network problem, where the
@@ -89,14 +97,17 @@ class NetworkOracle:
             (negative cycle exists), or None if feasible.
         """
 
-        def get_weight(edge: Any) -> float:
-
-
-            return self._oracle.eval(edge, x)
+        oracle = self._oracle
+        # type-level check so unittest.mock.Mock auto-attributes are not mistaken
+        # for the optional hook
+        if hasattr(type(oracle), "make_weight_fn"):
+            get_weight = getattr(oracle, "make_weight_fn")(x)
+        else:
+            get_weight = _bound_eval(oracle, x)
 
         for cycle in self._ncf.howard(self._potential, get_weight):
-            f = -sum(self._oracle.eval(edge, x) for edge in cycle)
-            g = -sum(self._oracle.grad(edge, x) for edge in cycle)
+            f = -sum(get_weight(edge) for edge in cycle)
+            g = -sum(oracle.grad(edge, x) for edge in cycle)
             # TODO: choose the minumum cycle
             return g, f  # use the first cycle only
 

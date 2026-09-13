@@ -12,6 +12,11 @@ class EdgeOracle(Protocol):
 
     Implementations provide ``eval`` and ``grad`` for a single edge at a given
     iterate ``x``; ``update`` is an optional hook.
+
+    An implementation MAY also provide ``make_weight_fn(x)``, a factory that
+    returns a callable ``edge -> weight`` with the iterate's scalars bound once.
+    :class:`~netoptim.network_oracle.NetworkOracle` uses it when present to
+    avoid re-indexing ``x`` on every edge in the hot loop.
     """
 
     def eval(self, edge: Any, x: Any) -> Any: ...

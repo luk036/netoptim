@@ -1,4 +1,4 @@
-from typing import Any, Optional, Tuple
+from typing import Any, Callable, Optional, Tuple
 
 import numpy as np
 from ellalgo.ell_typing import OracleOptim
@@ -59,6 +59,31 @@ class OptScalingOracle(OracleOptim[Arr]):
             """
             aij, aji = self._get_cost(edge)
             return min(x[0] - aji, aij - x[1])
+
+        def make_weight_fn(self, x: Arr) -> Callable[[Any], float]:
+            """Return a weight evaluator with the iterate's scalars bound once.
+
+            :class:`~netoptim.network_oracle.NetworkOracle` calls this once per
+            assessment so the per-edge hot loop avoids repeatedly indexing the
+            NumPy iterate ``x``.
+
+            Args:
+                x: The current iterate (π, ψ) in logarithmic scale.
+
+            Returns:
+                A callable mapping an edge to its ratio weight.
+            """
+            x0 = float(x[0])
+            x1 = float(x[1])
+            get_cost = self._get_cost
+
+            def weight(edge: Any) -> float:
+                aij, aji = get_cost(edge)
+                d0 = x0 - aji
+                d1 = aij - x1
+                return d0 if d0 < d1 else d1
+
+            return weight
 
         def grad(self, edge: Any, x: Arr) -> Arr:
             """Compute the subgradient of the ratio constraint.

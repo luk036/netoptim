@@ -17,19 +17,40 @@ finally:
 
 from typing import Any, Optional, Tuple
 
-from ellalgo.cutting_plane import cutting_plane_optim
+from ellalgo.cutting_plane import cutting_plane_feas, cutting_plane_optim
 from ellalgo.ell import Ell
+from ellalgo.ell_config import Options
 
-from ._typing import Cut
 from .network_oracle import NetworkOracle
 from .optscaling_oracle import OptScalingOracle
 
-__all__ = ["NetworkOracle", "OptScalingOracle", "solve_network_feas", "solve_opt_scaling"]
+DEFAULT_TOLERANCE = 1e-8
+"""Default convergence tolerance used by the solver facades.
+
+Looser than :class:`ellalgo.ell_config.Options`' built-in ``1e-20``, which is
+far below machine precision relative to typical objective magnitudes and only
+inflates the iteration count. Pass an explicit ``Options`` to override.
+"""
+
+__all__ = [
+    "NetworkOracle",
+    "OptScalingOracle",
+    "solve_network_feas",
+    "solve_opt_scaling",
+]
+
+
+def _default_options() -> Options:
+    options = Options()
+    options.tolerance = DEFAULT_TOLERANCE
+    return options
 
 
 def solve_network_feas(
-    oracle: NetworkOracle, space: Ell, x0: Any
-) -> Tuple[Optional[Any], float, int]:
+    oracle: NetworkOracle,
+    space: Ell,
+    options: Optional[Options] = None,
+) -> Tuple[Optional[Any], int]:
     """Solve a parametric network feasibility problem.
 
     Facade that drives a :class:`NetworkOracle` through the ellipsoid
@@ -37,18 +58,22 @@ def solve_network_feas(
 
     Args:
         oracle: A feasibility oracle (typically a :class:`NetworkOracle`).
-        space: The ellipsoid search space.
-        x0: Initial iterate for the cutting-plane search.
+        space: The ellipsoid search space, whose center is the starting iterate.
+        options: Algorithm control parameters. Defaults to an :class:`Options`
+            with :data:`DEFAULT_TOLERANCE`.
 
     Returns:
-        ``(x_best, value, num_iters)`` as returned by
-        :func:`ellalgo.cutting_plane.cutting_plane_optim`.
+        ``(x_best, num_iters)`` as returned by
+        :func:`ellalgo.cutting_plane.cutting_plane_feas`.
     """
-    return cutting_plane_optim(oracle, space, x0)
+    return cutting_plane_feas(oracle, space, options or _default_options())
 
 
 def solve_opt_scaling(
-    oracle: OptScalingOracle, space: Ell, gamma: float
+    oracle: OptScalingOracle,
+    space: Ell,
+    gamma: float,
+    options: Optional[Options] = None,
 ) -> Tuple[Optional[Any], float, int]:
     """Solve an optimal-matrix-scaling problem.
 
@@ -59,9 +84,11 @@ def solve_opt_scaling(
         oracle: An optimality oracle (typically a :class:`OptScalingOracle`).
         space: The ellipsoid search space.
         gamma: Initial best-so-far objective value.
+        options: Algorithm control parameters. Defaults to an :class:`Options`
+            with :data:`DEFAULT_TOLERANCE`.
 
     Returns:
         ``(x_best, value, num_iters)`` as returned by
         :func:`ellalgo.cutting_plane.cutting_plane_optim`.
     """
-    return cutting_plane_optim(oracle, space, gamma)
+    return cutting_plane_optim(oracle, space, gamma, options or _default_options())

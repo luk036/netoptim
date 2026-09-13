@@ -7,8 +7,10 @@ import pytest
 from digraphx.tiny_digraph import DiGraphAdapter
 from ellalgo.cutting_plane import cutting_plane_optim
 from ellalgo.ell import Ell
+from ellalgo.ell_config import Options
 from mywheel.map_adapter import MapAdapter
 
+from netoptim import DEFAULT_TOLERANCE, solve_opt_scaling
 from netoptim.optscaling_oracle import OptScalingOracle
 
 
@@ -155,3 +157,47 @@ def test_optscaling(
     omega = OptScalingOracle(gra, dist, get_cost)
     xbest, _, _ = cutting_plane_optim(omega, ellip, float("inf"))
     assert xbest is not None
+
+
+def test_ratio_make_weight_fn_matches_eval() -> None:
+    gra = create_fixed_graph()
+    ratio = OptScalingOracle.Ratio(gra, get_cost)
+    x = np.array([1.25, -0.5])
+    weight = ratio.make_weight_fn(x)
+    checked = 0
+    for utx in gra:
+        for _, edge in gra[utx].items():
+            assert weight(edge) == ratio.eval(edge, x)
+            checked += 1
+    assert checked > 0
+
+
+def _build_fixed_problem() -> Tuple[OptScalingOracle, Ell]:
+    gra = create_fixed_graph()
+    cmax = log(125.0)
+    cmin = log(10.0)
+    t = cmax - cmin
+    ellip = Ell(200 * t, np.array([cmax, cmin]))
+    dist: List[float] = [0.0 for _ in gra]
+    return OptScalingOracle(gra, dist, get_cost), ellip
+
+
+def test_solve_opt_scaling_default_tolerance_matches_tight() -> None:
+    assert DEFAULT_TOLERANCE == 1e-8
+
+    omega_default, ellip_default = _build_fixed_problem()
+    x_default, gamma_default, niter_default = solve_opt_scaling(
+        omega_default, ellip_default, float("inf")
+    )
+
+    tight = Options()
+    tight.tolerance = 1e-20
+    omega_tight, ellip_tight = _build_fixed_problem()
+    x_tight, gamma_tight, niter_tight = solve_opt_scaling(
+        omega_tight, ellip_tight, float("inf"), tight
+    )
+
+    assert x_default is not None and x_tight is not None
+    assert np.isclose(gamma_default, gamma_tight, atol=1e-3)
+    assert np.allclose(x_default, x_tight, atol=1e-3)
+    assert niter_default <= niter_tight
