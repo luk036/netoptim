@@ -183,7 +183,7 @@ def _build_fixed_problem() -> Tuple[OptScalingOracle, Ell]:
 
 
 def test_solve_opt_scaling_default_tolerance_matches_tight() -> None:
-    assert DEFAULT_TOLERANCE == 1e-8
+    assert DEFAULT_TOLERANCE == 1e-10
 
     omega_default, ellip_default = _build_fixed_problem()
     x_default, gamma_default, niter_default = solve_opt_scaling(
@@ -201,3 +201,15 @@ def test_solve_opt_scaling_default_tolerance_matches_tight() -> None:
     assert np.isclose(gamma_default, gamma_tight, atol=1e-3)
     assert np.allclose(x_default, x_tight, atol=1e-3)
     assert niter_default <= niter_tight
+
+
+def test_solve_opt_scaling_defaults_gamma_to_infinity() -> None:
+    omega_default, ellip_default = _build_fixed_problem()
+    x_default, gamma_default, _ = solve_opt_scaling(omega_default, ellip_default)
+
+    omega_inf, ellip_inf = _build_fixed_problem()
+    x_inf, gamma_inf, _ = solve_opt_scaling(omega_inf, ellip_inf, float("inf"))
+
+    assert gamma_default == gamma_inf
+    assert x_default is not None and x_inf is not None
+    assert np.allclose(x_default, x_inf)

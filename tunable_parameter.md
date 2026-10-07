@@ -7,7 +7,7 @@ project, together with its default value and source location.
 
 `netoptim` has **no `Options` / config dataclass of its own**. It reuses
 **`ellalgo.ell_config.Options`** and adds one module-level override constant,
-`DEFAULT_TOLERANCE = 1e-8`, which its two solver facades apply. The genuine
+`DEFAULT_TOLERANCE = 1e-10`, which its two solver facades apply. The genuine
 tuning surface is therefore small and split between netoptim's own constant and
 the inherited ellalgo `Options`.
 
@@ -17,16 +17,16 @@ the inherited ellalgo `Options`.
 
 | Parameter | Default | Location | Notes |
 | --- | --- | --- | --- |
-| `DEFAULT_TOLERANCE` | `1e-8` | `src/netoptim/__init__.py:27` | Module constant. Deliberately looser than ellalgo's built-in `1e-20` (rationale documented in the docstring). |
-| `options` (facade arg) | `None` → `Options` with `tolerance=1e-8` | `src/netoptim/__init__.py:49-53`, `:72-77` | Both facades fall back to `_default_options()` when `options is None`. |
-| `gamma` (facade arg) | required (no default) | `src/netoptim/__init__.py:75` | Initial best-so-far objective; callers pass `float("inf")`. |
+| `DEFAULT_TOLERANCE` | `1e-10` | `src/netoptim/__init__.py:27` | Module constant. Chosen for ~`1e-5` objective error at modest iteration cost; ellalgo's built-in `1e-20` is unreachable at double precision. |
+| `options` (facade arg) | `None` → `Options` with `tolerance=1e-10` | `src/netoptim/__init__.py:49-53`, `:72-77` | Both facades fall back to `_default_options()` when `options is None`. |
+| `gamma` (facade arg) | `float("inf")` | `src/netoptim/__init__.py:75` | Initial best-so-far objective; defaults to no incumbent. |
 
 ### Solver facades
 
 | Function | Signature | Location |
 | --- | --- | --- |
 | `solve_network_feas` | `(oracle, space, options=None)` | `src/netoptim/__init__.py:49-53` |
-| `solve_opt_scaling` | `(oracle, space, gamma, options=None)` | `src/netoptim/__init__.py:72-77` |
+| `solve_opt_scaling` | `(oracle, space, gamma=float("inf"), options=None)` | `src/netoptim/__init__.py:72-77` |
 
 Both delegate to ellalgo's `cutting_plane_feas` / `cutting_plane_optim`.
 
@@ -39,7 +39,7 @@ Because netoptim wraps ellalgo, the effective defaults are:
 | Field | ellalgo default | netoptim effective default |
 | --- | --- | --- |
 | `max_iters` | `2000` | `2000` (unchanged) |
-| `tolerance` | `1e-20` | `1e-8` (overridden by `DEFAULT_TOLERANCE`) |
+| `tolerance` | `1e-20` | `1e-10` (set by `DEFAULT_TOLERANCE`) |
 | `verbose` | `False` | `False` (declared but unused) |
 
 The search space is also inherited: `Ell(kappa, x_center)` from ellalgo
@@ -69,7 +69,7 @@ The injectable strategy contract is the `EdgeOracle` protocol
 | `tests/test_cycle_finder.py:11-12` | `MAX_ITERS`, `TOLERANCE` | `2000`, `1e-14` |
 | `tests/test_delay_padding.py:11-12` | `MAX_ITERS`, `TOLERANCE` | `2000`, `1e-14` |
 | `tests/test_cycle_finder2.py:12-13` | `MAX_ITERS`, `TOLERANCE` | `100`, `1e-7` |
-| `tests/test_optscaling.py:186,193-194` | `DEFAULT_TOLERANCE`; tight `tolerance` | asserts `1e-8`; tight `1e-20` |
+| `tests/test_optscaling.py:186,193-194` | `DEFAULT_TOLERANCE`; tight `tolerance` | asserts `1e-10`; tight `1e-20` |
 | `tests/test_optscaling.py:83-91` | `N`, `M`, `eta`, `seed`, `xbase`, `ybase` | `75`, `20`, `1.6`, `5`, `2`, `3` |
 | `tests/test_stress_optscaling.py:78-86` | `N`, `M`, `eta`, `seed`, `xbase`, `ybase` | `200`, `50`, `1.6`, `5`, `2`, `3` |
 | `tests/test_optscaling.py:155`, `tests/test_stress_optscaling.py:108` | `Ell` kappa | `1.5 * t` (or `200 * t` for the fixed graph) |
@@ -86,12 +86,12 @@ The injectable strategy contract is the `EdgeOracle` protocol
 
 | Tunable | Default | Location |
 | --- | --- | --- |
-| `DEFAULT_TOLERANCE` | `1e-8` | `src/netoptim/__init__.py:27` |
-| `solve_network_feas(..., options)` | `None` → tolerance `1e-8` | `src/netoptim/__init__.py:52` |
-| `solve_opt_scaling(..., gamma)` | required | `src/netoptim/__init__.py:75` |
-| `solve_opt_scaling(..., options)` | `None` → tolerance `1e-8` | `src/netoptim/__init__.py:76` |
+| `DEFAULT_TOLERANCE` | `1e-10` | `src/netoptim/__init__.py:27` |
+| `solve_network_feas(..., options)` | `None` → tolerance `1e-10` | `src/netoptim/__init__.py:52` |
+| `solve_opt_scaling(..., gamma)` | `float("inf")` | `src/netoptim/__init__.py:75` |
+| `solve_opt_scaling(..., options)` | `None` → tolerance `1e-10` | `src/netoptim/__init__.py:76` |
 | `Options.max_iters` (inherited) | `2000` | `ellalgo/ell_config.py` |
-| `Options.tolerance` (inherited) | `1e-20`, overridden to `1e-8` | `ellalgo/ell_config.py` |
+| `Options.tolerance` (inherited) | `1e-20`, overridden to `1e-10` | `ellalgo/ell_config.py` |
 | `Options.verbose` (inherited) | `False` (unused) | `ellalgo/ell_config.py` |
 | Injected `EdgeOracle` strategy (`eval` / `grad` / `update`, optional `make_weight_fn`) | required | `src/netoptim/_typing.py:10-27` |
 | `Ell(kappa, x_center)` (inherited search space) | required | `ellalgo/ell_base.py` |
