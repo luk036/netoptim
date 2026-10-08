@@ -38,8 +38,7 @@
 3. Multi-parameter problems and the ellipsoid method
 4. Delay padding
 5. Yield-driven scheduling under process variations
-6. Multi-corner and multi-mode robustness
-7. Algorithms, clock-tree synthesis, open problems
+6. Algorithms, clock-tree synthesis, open problems
 
 # Preliminaries
 
@@ -96,7 +95,7 @@
 
 ::: {.column width="45%"}
 ```{=latex}
-\resizebox{\linewidth}{!}{\input{../figures/tcgraph.tikz}}
+\centering\resizebox{0.8\linewidth}{!}{\input{../figures/tcgraph.tikz}}
 ```
 :::
 
@@ -352,28 +351,6 @@ Type (d): $p_s \ge p_h$
   $T_{\mathrm{CP}} - T_{\mathrm{setup}} - T_{\mathrm{skew}} \ge Q_D(\beta)$
 - Monotone $Q$ $\Rightarrow$ a single scalar $\beta$; the graph machinery **survives**
 
-# Robust Scheduling
-
-## Multi-corner and the ping-pong effect
-
-- Require timing for **all** corners $k$:
-  $$y \le d^{(k)},\quad A u = y,\quad \forall k$$
-  which is the single-corner problem with $y \le \min_k d^{(k)}$
-- Fixing corners one by one can create violations in another:
-  the non-convergent **ping-pong** effect
-- Padding across corners is **not** a pure network flow (shared $p$)
-
-## Dual decomposition and multi-mode
-
-- Relax $y_k = y_{\mathrm{shared}}$ with multipliers $\lambda_k$
-- Per-corner **min-cost potential** sub-problems, solved in parallel
-- Updates:
-  $$y_{\mathrm{shared}} \leftarrow \frac{1}{K}\sum_{k=1}^{K} y_k,
-    \qquad \lambda_k \leftarrow \lambda_k + \rho\,(y_k - y_{\mathrm{shared}})$$
-- Reported: about **6%** period reduction vs. a single worst-case corner
-- **Multi-mode + ADB:** each mode has its own arrival times --- the hard part is
-  the clock tree and the ADB **range**
-
 # Algorithms and Clock Trees
 
 ## Algorithms at a glance
@@ -401,7 +378,7 @@ Type (d): $p_s \ge p_h$
 
 ## Open problems and limitations
 
-- **Open:** minimum ADB range; criticality under modes; physical cost of skew;
+- **Open:** physical cost of skew;
   discrete (MILP) padding; correlation-aware yield; hierarchical / CDC / gated
   designs; independent evaluation on modern benchmarks
 - **Limitations (this survey):** no new experiments
@@ -418,7 +395,7 @@ Type (d): $p_s \ge p_h$
 - Min period, max slack, max yield all reduce to a **parametric
   shortest-path** problem
 - Fast combinatorial solvers; the critical cycle is directly actionable
-- Extends to delay padding, multi-corner/multi-mode, heavy-tailed (GEV)
+- Extends to delay padding, heavy-tailed (GEV)
   statistics, and multi-parameter scaling via the **ellipsoid method**
 
 ## Q&A 🎤
