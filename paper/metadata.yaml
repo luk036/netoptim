@@ -1,28 +1,20 @@
 ---
-title: "Clock Skew Scheduling: Formulations, Algorithms, and Robust Extensions"
+title: "Clock Skew Scheduling: Formulations and Algorithms"
 subtitle: "A Survey Drawn from Course Lecture Notes on Algorithms for DFM and Network Optimization"
 author:
   - "Wai-Shing Luk"
 institute: "Fudan University"
 date: "\\today"
 abstract: |
-  Clock skew scheduling (CSS) is the problem of deliberately assigning the arrival
-  times of clock signals at sequential elements so that every setup- and
-  hold-time constraint is satisfied, while a secondary objective---the shortest
-  feasible clock period, the largest timing slack, or the highest parametric
-  yield---is optimized. This article presents a self-contained survey organized
-  around one unifying idea: the timing constraints of a synchronous circuit form
-  a system of difference constraints whose feasibility is equivalent to the
-  absence of a negative cycle in a timing constraint graph (TCG). We develop the
-  network-potential formulation, show that clock-period minimization, slack
-  maximization, and yield-driven scheduling all reduce to parametric
-  shortest-path problems (minimum mean cycle and minimum cost-to-time ratio
-  cycle), and review the algorithmic toolkit---Bellman--Ford, Lawler's binary
-  search, Howard's policy iteration, Karp's minimum mean cycle, and the ellipsoid
-  method for multi-parameter problems. We then extend the model with delay
-  padding, multi-corner and multi-mode robustness,
-  dual decomposition, and heavy-tailed (generalized extreme value) delay
-  distributions, and close with clock-tree co-optimization and open problems.
+  Clock skew scheduling (CSS) assigns clock arrival times so that every setup-
+  and hold-time constraint is met while a secondary objective is optimized. This
+  survey rests on one idea: the timing constraints of a synchronous circuit form a
+  system of difference constraints, feasible when the timing constraint graph has
+  no negative cycle. Period minimization, slack maximization, and yield-driven
+  scheduling reduce to parametric potential problems solved by Bellman--Ford,
+  Lawler, Howard, Karp, and the ellipsoid method. We extend the core with delay
+  padding, statistical methods, GEV delay models, and clock-tree co-optimization,
+  closing with idealizations, common misconceptions, and open problems.
 keywords:
   - clock skew scheduling
   - useful skew
