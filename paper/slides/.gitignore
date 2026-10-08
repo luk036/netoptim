@@ -1,0 +1,9 @@
+# Build artifacts (regenerable via `make`)
+slides.tex
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb

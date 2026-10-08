@@ -1,0 +1,42 @@
+---
+title: "Clock Skew Scheduling: Formulations, Algorithms, and Robust Extensions"
+subtitle: "A Survey Drawn from Course Lecture Notes on Algorithms for DFM and Network Optimization"
+author:
+  - "Wai-Shing Luk"
+institute: "Fudan University"
+date: "\\today"
+abstract: |
+  Clock skew scheduling (CSS) is the problem of deliberately assigning the arrival
+  times of clock signals at sequential elements so that every setup- and
+  hold-time constraint is satisfied, while a secondary objective---the shortest
+  feasible clock period, the largest timing slack, or the highest parametric
+  yield---is optimized. This article presents a self-contained survey organized
+  around one unifying idea: the timing constraints of a synchronous circuit form
+  a system of difference constraints whose feasibility is equivalent to the
+  absence of a negative cycle in a timing constraint graph (TCG). We develop the
+  network-potential formulation, show that clock-period minimization, slack
+  maximization, and yield-driven scheduling all reduce to parametric
+  shortest-path problems (minimum mean cycle and minimum cost-to-time ratio
+  cycle), and review the algorithmic toolkit---Bellman--Ford, Lawler's binary
+  search, Howard's policy iteration, Karp's minimum mean cycle, and the ellipsoid
+  method for multi-parameter problems. We then extend the model with delay
+  padding, multi-corner and multi-mode robustness,
+  dual decomposition, and heavy-tailed (generalized extreme value) delay
+  distributions, and close with clock-tree co-optimization and open problems.
+keywords:
+  - clock skew scheduling
+  - useful skew
+  - timing constraint graph
+  - negative cycle
+  - minimum mean cycle
+  - minimum cost-to-time ratio
+  - delay padding
+  - process variations
+  - statistical static timing analysis
+  - generalized extreme value distribution
+lang: en
+classoption: twocolumn
+link-citations: true
+bibliography: refs.bib
+reference-section-title: References
+...

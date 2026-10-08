@@ -1,0 +1,8 @@
+# Build artifacts (regenerable via `make`)
+clock_skew_scheduling.tex
+clock_skew_scheduling.html
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk

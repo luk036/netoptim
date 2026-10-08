@@ -1,0 +1,14 @@
+---
+institute: Fudan University
+date: \today
+link-citations: true
+colorlinks: true
+header-includes:
+  - '\usepackage{tikz}'
+  - '\usetikzlibrary{arrows,arrows.meta,positioning,calc,shapes,shapes.geometric,trees,fit,backgrounds}'
+  - '\usepackage{amsmath,amssymb}'
+  - '\usepackage{booktabs}'
+  - '\usepackage{subcaption}'
+  - '\usepackage[ruled,vlined,linesnumbered]{algorithm2e}'
+  - '\SetKwInOut{Input}{Input}\SetKwInOut{Output}{Output}'
+...
