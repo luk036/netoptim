@@ -180,3 +180,6 @@ MANIFEST
 # Cache dirs
 .ruff_cache/
 .benchmarks/
+
+# Downloaded reference papers -- not redistributable, see refs/README.md
+refs/*.pdf
