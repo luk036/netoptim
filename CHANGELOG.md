@@ -1,5 +1,34 @@
 # Changelog
 
+## Version 0.4 (2026-10-09)
+
+### Features
+- **Oracle facades + `EdgeOracle` protocol**: Added `_typing.py` (`EdgeOracle` Protocol + `Cut` alias), re-exported the oracles from `__init__.py`, and added `solve_network_feas` / `solve_opt_scaling` facades. `OptScalingOracle.Ratio` gained its missing `update()` no-op. (#9137d2f)
+- **Tighter default optimizer settings**: `DEFAULT_TOLERANCE` tightened to `1e-10` (was `1e-8`; measured ~1e-5 vs ~1e-4 objective error for ~10–15 extra iterations), and `solve_opt_scaling`'s `gamma` now defaults to `float('inf')`. (#1d36ef0)
+
+### Performance
+- **Oracle hot path + Options forwarding**: Forward `Options` through the facades (default `1e-8` vs ellalgo's `1e-20`: 51→27 iterations on the stress graph); added an optional `EdgeOracle.make_weight_fn` hook with `Ratio` binding `x[0]`/`x[1]` once per assessment to avoid NumPy scalar indexing in the per-edge loop. Measured ~300 ms → ~90 ms (3.4×) on the 250-node / 1844-edge optscaling stress graph with identical gamma. (#505fab2)
+
+### Bug Fixes
+- **`solve_network_feas` facade**: It called `cutting_plane_optim` (needs `assess_optim`) and raised `AttributeError`; now calls `cutting_plane_feas` and drops the unused `x0` argument. `NetworkOracle` now nominally subclasses `OracleFeas`, making mypy clean. (#505fab2)
+- **`Ratio.update()` latent `AttributeError`**: Added the missing no-op. (#9137d2f)
+- **mypy config**: Removed the duplicate `ignore_missing_imports` entry. (#8aa12b1)
+- **RTD docs build**: Added matplotlib to `docs/requirements.txt`. (#be689e8)
+
+### Testing & Code Quality
+- **Oracle tests**: Added tests for the `make_weight_fn` hook, Options forwarding, and the feasibility facade. (#505fab2)
+
+### Code Cleanup
+- **Removed AI slop**: Stripped docstring/comment boilerplate and expanded the `EdgeOracle` protocol stubs to multi-line. (#94f68b0, #d62cc66)
+
+### Documentation
+- **Clock-skew scheduling survey paper + slides**: Added a 16-page two-column Pandoc survey (`paper/clock_skew_scheduling.md`) and a 30-minute Beamer deck (41 frames) with a vendored IEEE CSL, TikZ figures, offline build Makefiles, and reference-availability notes. (#1f0df97, #59b61e2, #ab91ef7, #1fc930c, #25981dd)
+- **Tunable parameter reference**: Added `tunable_parameter.md`. (#7afef62)
+- **AGENTS.md**: Added agent guidelines. (#6e36a7f)
+
+### Build & CI
+- **Updated GitHub Actions**: `checkout`→v4, `setup-python`→v5, `codecov-action`→v4; removed the stale `.bak` workflow files. (#6016c29, #5351aa8)
+
 ## Version 0.3 (2026-07-16)
 
 ### Documentation
