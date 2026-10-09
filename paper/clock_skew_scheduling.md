@@ -29,8 +29,7 @@ margin, or---under process variations---a higher parametric yield.
 
 The value of a skew schedule is easily underestimated, because a schedule is a
 *plan* rather than a physical artifact and it is therefore tempting to dismiss it
-as an academic exercise. The practical considerations below, drawn from the
-author's lecture [@luk2026lecture], argue otherwise.
+as an academic exercise. The practical considerations below argue otherwise.
 
 **The flow order must respect skew scheduling.** Scheduling requires accurate
 clock and data delays, which presuppose that global and clock-tree routing have
@@ -116,6 +115,9 @@ negative-cycle feasibility certificate.
 Section\ \ref{sec:period} treats clock-period minimization and slack maximization
 as parametric shortest-path problems, and extends them to multiple parameters
 via the ellipsoid method.
+Section\ \ref{sec:cvxnet} generalizes the parametric formulation to convex and
+quasi-convex network problems, covering min-cost flow, cycle cancellation, line
+search, linear-fractional and statistical costs, and the barrier method.
 Section\ \ref{sec:padding} covers delay padding and its physical configurations.
 Section\ \ref{sec:yield} addresses yield-driven scheduling under process
 variations, including the EVEN, PROP, C-PROP, and FP-PROP methods.
@@ -123,8 +125,7 @@ Section\ \ref{sec:gev} extends the model to non-Gaussian, heavy-tailed delay
 distributions via the generalized extreme value (GEV) distribution.
 Section\ \ref{sec:algorithms} compares the underlying algorithms and their
 complexities. Section\ \ref{sec:cts} links the schedule to clock-tree synthesis,
-and Section\ \ref{sec:discussion} lists open problems. The presentation follows
-the author's course lecture notes [@luk2026lecture].
+and Section\ \ref{sec:discussion} lists open problems.
 
 This article is a *survey*: it organizes and explains known formulations and
 algorithms rather than reporting new experiments, and the quantitative speedups
@@ -522,6 +523,224 @@ node merges a critical cycle; deeper subtrees are less critical.}\label{fig:hier
 \end{figure}
 ```
 
+# Convex and Quasi-Convex Network Problems {#sec:cvxnet}
+
+## From a scalar parameter to a quasi-convex objective
+
+Sections\ \ref{sec:period} and\ \ref{sec:multiparam} reduced every scheduling
+variant to a parametric potential problem---\eqref{eq:ppp} and
+\eqref{eq:multiparam}---in which the right-hand side $d(\beta)$ of a *scalar*
+parameter is monotone. Monotonicity, however, is a convenience rather than a
+requirement: the negative-cycle test that decides feasibility of
+$y \le d(z)$, $A u = y$ works for any right-hand side $d$. The convex-optimization
+viewpoint therefore enlarges the admissible objectives from monotone functions of
+a scalar to *convex* and *quasi-convex* functions of a vector $z$, and it supplies
+the separation oracle---a negative cycle---through which the enlarged problems are
+solved.
+
+The bridge from a quasi-convex objective to a convex feasibility test is the
+*level-set* (sublevel-set) characterization. A function $f$ is quasi-convex
+exactly when every sublevel set $\{z : f(z) \le \gamma\}$ is convex; equivalently,
+when there is a family of functions $\Phi_\gamma$ such that
+
+- $\Phi_\gamma(z)$ is convex in $z$ for every fixed $\gamma$,
+- $\Phi_\gamma(z)$ is non-increasing in $\gamma$ for every fixed $z$, and
+- $f(z) \le \gamma$ if and only if $\Phi_\gamma(z) \le 0$.
+
+For a ratio of a convex function to a positive concave function,
+$f(z) = p(z)/q(z)$ with $p$ convex, $q$ concave, $p \ge 0$, and $q > 0$, the
+choice
+
+$$ \Phi_\gamma(z) = p(z) - \gamma\,q(z) $$
+
+has all three properties: it is convex in $z$ for each fixed $\gamma$, and its
+$0$-sublevel set is exactly the $\gamma$-sublevel set of $f$. Linear-fractional
+functions, distance ratios, and the minimum cost-to-time ratio cycle of
+Section\ \ref{sec:period} are all of this form.
+
+Minimizing a quasi-convex $f$ therefore reduces to a sequence of convex
+feasibility problems parametrized by $\gamma$,
+
+```{=latex}
+\begin{equation}\label{eq:quasi}
+  \begin{array}{ll}
+    \text{find} & z, \\
+    \text{subject to} & \Phi_\gamma(z) \le 0, \\
+    & y \le d(z), \quad A u = y,
+  \end{array}
+\end{equation}
+```
+
+in which the subproblem is feasible if and only if $\gamma \ge f^\star$ and
+infeasible otherwise; a bisection on $\gamma$ converges to the optimum. Each
+subproblem is convex and its separation oracle is the negative-cycle test applied
+to the graph weighted by $d$: one violated constraint per iteration suffices,
+which is exactly the lazy-evaluation principle of Section\ \ref{sec:multiparam}
+lifted from a scalar parameter to a vector.
+
+A useful special case is *monotone min-max*,
+
+$$ \min_{y}\Bigl\{\max_{ij} f_{ij}(y_{ij}) : A u = y\Bigr\}, $$
+
+with each $f_{ij}$ non-decreasing. Introducing a scalar $\beta$ and inverting the
+$f_{ij}$ reconstitutes a monotone parametric potential problem,
+
+$$ \max\bigl\{\beta : y_{ij} \le f_{ij}^{-1}(\beta)\ \ \forall (i,j),\ \ A u = y\bigr\}, $$
+
+because each inverse is non-decreasing in $\beta$. The max-min yield formulation
+of Section\ \ref{sec:yield} is precisely of this type, with $f_{ij}$ the quantile
+function of a path-delay distribution; the framework below is what makes its
+probabilistic and nonlinear variants solvable by the same negative-cycle
+machinery.
+
+## Min-cost flow and cycle cancellation
+
+The same primitive drives *min-cost flow*. The linear problem is
+
+```{=latex}
+\begin{equation}\label{eq:mcf}
+  \begin{array}{ll}
+    \text{minimize} & d^{\mathsf{T}} x + p \\
+    \text{subject to} & c^{-} \le x \le c^{+}, \\
+    & A^{\mathsf{T}} x = b, \quad b(V) = 0,
+  \end{array}
+\end{equation}
+```
+
+where $x$ is an arc-flow vector, $A^{\mathsf{T}}$ the incidence matrix of $G$,
+$c^{-}$ and $c^{+}$ (possibly infinite) capacity bounds, and $b$ a balanced
+supply vector. Its classical algorithms fall into two families. *Augmenting-path*
+methods start from an infeasible flow and inject the smallest possible amount
+along an augmenting path, preserving infeasibility until no flow remains to
+inject. *Cycle-cancelling* methods [@lawler1976combinatorial; @ahuja1993network]
+start from a feasible flow $x_0$ and repeatedly set
+$x_1 = x_0 + \alpha\,\Delta x$, where $\Delta x$ is the indicator of a negative
+cycle of the residual graph and $\alpha > 0$.
+
+The second family is a descent method in disguise. Because $\Delta x$ is a
+circulation, $A^{\mathsf{T}} \Delta x = 0$, a negative cycle with respect to the
+cost $d$ satisfies $d^{\mathsf{T}} \Delta x < 0$, so moving along it decreases the
+cost. The step is limited by the residual capacities,
+
+$$ \alpha_1 = \min_{ij}\{c^{+}_{ij} - x^{0}_{ij} : \Delta x_{ij} > 0\}, \qquad
+   \alpha_2 = \min_{ij}\{x^{0}_{ij} - c^{-}_{ij} : \Delta x_{ij} < 0\}, $$
+
+with $\alpha_{\mathrm{lin}} = \min\{\alpha_1, \alpha_2\}$; if
+$\alpha_{\mathrm{lin}} = +\infty$ the problem is unbounded. Choosing a *minimum
+mean* negative cycle rather than an arbitrary one accelerates convergence.
+Cycle cancellation is thus the network specialization of a generic descent
+method: choose a descent direction, choose a step size, update, and repeat.
+
+This is the structure the clock-skew solvers exploit. The feasible-potential
+problem $\underline{w} \le A u \le \overline{w}$ is dual to a min-cost flow of the
+form \eqref{eq:mcf}, and the negative cycle returned by Howard's algorithm
+(Section\ \ref{sec:period}) is simultaneously the infeasibility certificate and
+the descent direction. Delay padding (Section\ \ref{sec:padding}) is the primal
+min-cost-flow instance, whose dual variable $x$ measures how the padding budget is
+spent.
+
+## Convex costs and line search
+
+When the cost is a convex nonlinear function $f(x)$,
+
+```{=latex}
+\begin{equation}\label{eq:cvxmcf}
+  \begin{array}{ll}
+    \text{minimize} & f(x) \\
+    \text{subject to} & 0 \le x \le c, \\
+    & A^{\mathsf{T}} x = b, \quad b(V) = 0,
+  \end{array}
+\end{equation}
+```
+
+the same descent applies with the arc cost replaced by the gradient: choose
+$\Delta x$ as a negative cycle of the residual graph for the cost
+$\nabla f(x)$, so that $\nabla f(x)^{\mathsf{T}} \Delta x < 0$. The step is now
+limited by capacities *and* by the line search,
+
+$$ \alpha_{\mathrm{cvx}} = \min\{\alpha_{\mathrm{lin}}, t\}, $$
+
+where $t$ is either an exact step,
+$t = \operatorname*{arg\,min}_{t>0} f(x + t\,\Delta x)$, or a backtracking step
+with parameters $\alpha \in (0,1/2)$ and $\beta \in (0,1)$ that shrinks $t$ while
+
+$$ f(x + t\,\Delta x) > f(x) + \alpha\,t\,\nabla f(x)^{\mathsf{T}} \Delta x . $$
+
+The linear problem \eqref{eq:mcf} is the special case in which $t = +\infty$ and
+only the capacity bound is active. This convex cycle-cancelling descent is the
+method implemented by general-purpose network-optimization libraries such as
+LEMON.
+
+## Linear-fractional and statistical costs
+
+Two quasi-convex costs arise repeatedly in timing. The *linear-fractional*
+min-cost flow,
+
+$$ \min\Bigl\{ \frac{e^{\mathsf{T}} x + f}{g^{\mathsf{T}} x + h} :
+   0 \le x \le c,\ A^{\mathsf{T}} x = b,\ b(V) = 0 \Bigr\}, $$
+
+is recast, with $p(x) = e^{\mathsf{T}} x + f$ and
+$q(x) = g^{\mathsf{T}} x + h$, as the family
+
+$$ \min\bigl\{ \gamma : (e - \gamma g)^{\mathsf{T}} x + (f - \gamma h) \le 0,\
+   0 \le x \le c,\ A^{\mathsf{T}} x = b \bigr\}, $$
+
+solved by bisection on $\gamma$ with descent directions of cost $e - \gamma g$.
+This is the minimum cost-to-time ratio problem of Section\ \ref{sec:period}
+expressed as a flow: the affine parametric weight $d(\beta) = m - s\beta$ there is
+the affine cost $e - \gamma g$ here.
+
+The *statistical* problem
+
+$$ \min\Bigl\{ \Pr\bigl(\mathbf{d}^{\mathsf{T}} x > \alpha\bigr) :
+   0 \le x \le c,\ A^{\mathsf{T}} x = b,\ b(V) = 0 \Bigr\} $$
+
+treats $\mathbf{d}$ as a random vector with mean $d$ and covariance $\Sigma$, so
+that $\mathbf{d}^{\mathsf{T}} x$ has mean $d^{\mathsf{T}} x$ and variance
+$x^{\mathsf{T}} \Sigma x$. The chance constraint is quasi-convex and is recast as
+
+$$ \min\bigl\{ \gamma : d^{\mathsf{T}} x + F^{-1}(1-\gamma)\,\|\Sigma^{1/2} x\|_2
+   \le \alpha,\ 0 \le x \le c,\ A^{\mathsf{T}} x = b \bigr\}, $$
+
+a second-order-cone (convex quadratic) constraint in $x$ whose gradient is
+
+$$ d + F^{-1}(1-\gamma)\,(\|\Sigma^{1/2} x\|_2)^{-1}\,\Sigma x . $$
+
+This is the network analogue of the per-edge statistical constraints of
+Section\ \ref{sec:yield}: the covariance enters through the cone term, while the
+quantile $F^{-1}(1-\gamma)$ plays the role of the yield parameter.
+
+## Additional constraints and the barrier method
+
+A constraint that is not a network constraint---for instance
+$s^{\mathsf{T}} x \le \gamma$ for a fixed vector $s$---breaks the network
+structure: the feasible set is no longer a network polytope, and \eqref{eq:cvxmcf}
+becomes a general convex program. Such a constraint is handled by a logarithmic
+*barrier* [@boyd2004convex],
+
+$$ \phi(x) = -\log(\gamma - s^{\mathsf{T}} x), \qquad
+   \nabla\phi(x) = \frac{s}{\gamma - s^{\mathsf{T}} x}, $$
+
+giving the approximation
+
+```{=latex}
+\begin{equation}\label{eq:barrier}
+  \begin{array}{ll}
+    \text{minimize} & f(x) + \tfrac{1}{t}\,\phi(x) \\
+    \text{subject to} & 0 \le x \le c, \quad A^{\mathsf{T}} x = b, \quad b(V) = 0,
+  \end{array}
+\end{equation}
+```
+
+whose optimum tends to that of the original problem as $t \to \infty$. The
+*barrier method* alternates a *centering* step---minimizing $t f + \phi$, by
+Newton's method in general---with an update $t \leftarrow \mu t$, $\mu > 1$, and
+stops when $1/t < \varepsilon$. The network-flow insight is that the centering
+step can itself be taken with a negative cycle: in place of the Newton direction
+one may use a negative cycle of the residual graph weighted by
+$\nabla(t f + \phi)$. The barrier method thus decomposes a constrained convex
+network program into a sequence of unconstrained cycle-cancellation steps.
+
 # Delay Padding {#sec:padding}
 
 ## Motivation and formulation
@@ -633,8 +852,7 @@ manufactured samples that are correct [@neves1996optimal; @kourtev1999clock;
 \includegraphics[width=0.62\linewidth]{figures/fig07.png}
 \caption{After period minimization, many skews sit on the boundary of their
 feasible skew regions; the narrow margins that remain are what process variations
-consume, which motivates yield-driven scheduling (illustration from the
-lecture).}\label{fig:uncertainty}
+consume, which motivates yield-driven scheduling.}\label{fig:uncertainty}
 \end{figure}
 ```
 
@@ -693,7 +911,7 @@ schedule must bound the *probability* of violation rather than its worst case
 \resizebox{0.6\linewidth}{!}{\input{figures/tcgraph9.tikz}}
 \caption{A statistical timing constraint graph: after SSTA each edge carries a
 pair $(\mu, \sigma)$---mean and standard deviation---instead of a single
-deterministic weight (illustration from the lecture).}\label{fig:stattcg}
+deterministic weight.}\label{fig:stattcg}
 \end{figure}
 ```
 
@@ -734,7 +952,7 @@ differ.
 \caption{The iterative EVEN (minimum-balancing) process on a small timing
 constraint graph: identify the most critical cycle, distribute its slack evenly,
 freeze the arrival times, contract the cycle to a super-vertex, and repeat until a
-single vertex remains (illustration from the lecture).}\label{fig:even}
+single vertex remains.}\label{fig:even}
 \end{figure*}
 ```
 
@@ -773,7 +991,7 @@ paths from the scheduling problem [@tsai2005yield].
 \includegraphics[width=0.6\linewidth]{figures/fig18.png}
 \caption{A false path: although a structural path exists, no input pattern
 sensitizes it, so it carries no signal and must be excluded from the timing
-constraints (illustration from the lecture).}\label{fig:falsepath}
+constraints.}\label{fig:falsepath}
 \end{figure}
 ```
 
@@ -796,8 +1014,7 @@ desired behavior.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.5\linewidth]{figures/fig21.png}
-\caption{The optimum of the minimum cost-to-time ratio cycle for a C-PROP example
-(illustration from the lecture).}\label{fig:cprop}
+\caption{The optimum of the minimum cost-to-time ratio cycle for a C-PROP example.}\label{fig:cprop}
 \end{figure}
 ```
 
@@ -818,8 +1035,7 @@ contraction tree, $T_i^{\mathrm{final}} = \sum_v T_v$ (Figure\ \ref{fig:tree}).
 \resizebox{0.85\linewidth}{!}{\input{figures/contraction_tree.tikz}}
 \caption{The contraction tree: each super-vertex merges a critical cycle, and the
 final arrival time of a register is the sum of the frozen arrival times along its
-root path---for example, $T_1^{\mathrm{final}} = T_1 + T_7 + T_9$
-(illustration from the lecture).}\label{fig:tree}
+root path---for example, $T_1^{\mathrm{final}} = T_1 + T_7 + T_9$.}\label{fig:tree}
 \end{figure}
 ```
 
@@ -884,8 +1100,7 @@ the schedules produced by the methods above.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.78\linewidth]{figures/fig23.png}
-\caption{A comparison of the yield-driven scheduling methods on a common example
-(illustration from the lecture).}\label{fig:comparison}
+\caption{A comparison of the yield-driven scheduling methods on a common example.}\label{fig:comparison}
 \end{figure}
 ```
 
@@ -925,10 +1140,62 @@ yield-driven scheduling methods.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.8\linewidth]{figures/fig20.png}
-\caption{Experimental results for the yield-driven scheduling methods
-(illustration from the lecture).}\label{fig:results}
+\caption{Experimental results for the yield-driven scheduling methods.}\label{fig:results}
 \end{figure}
 ```
+
+## Co-optimization of clock period and yield
+
+When the clock period and the yield are optimized jointly, the objective is the
+ratio
+
+$$ \min \frac{T_{\mathrm{CP}}}{\beta} \quad\text{subject to}\quad
+   y_{ij} \le T_{\mathrm{CP}} - F_{ij}^{-1}(\beta)\ \ (i,j) \in E_s, \quad
+   y_{ji} \le F_{ij}^{-1}(1-\beta)\ \ (j,i) \in E_h, \quad
+   T_{\mathrm{CP}} \ge 0,\ \ 0 \le \beta \le 1 . $$
+
+The setup bound shrinks linearly with the period and grows with the yield, while
+the hold bound grows with the yield; both involve the quantile $F_{ij}^{-1}$,
+which is not concave over the whole interval $[0,1]$. In practice only high-yield
+operation is of interest---say $\beta \ge 0.8$---and on that range the problem is
+convex. Introducing the epigraph variable $\gamma$ linearizes the ratio,
+
+$$ \min\ \gamma \quad\text{subject to}\quad
+   T_{\mathrm{CP}} - \gamma\beta \le 0,\quad
+   y_{ij} \le T_{\mathrm{CP}} - F_{ij}^{-1}(\beta),\quad
+   y_{ji} \le F_{ij}^{-1}(1-\beta),\quad
+   T_{\mathrm{CP}} \ge 0,\ \ 0.8 \le \beta \le 1, $$
+
+a convex network problem solved by binary search or the ellipsoid method, in the
+manner of Section\ \ref{sec:cvxnet}.
+
+## Yield-driven delay padding and its dual
+
+The padding formulation of Section\ \ref{sec:padding} and the yield formulation of
+the present section can be merged into a single program that trades yield against
+the cost of inserted delay. With a padding vector $p \ge 0$, a weight $\gamma$ on
+the yield, and per-edge Gaussian delays $\mathbf{d}_{ij}$ of mean $d_{ij}$ and
+variance $s_{ij}$, the problem is
+
+$$ \max\ \gamma\beta - c^{\mathsf{T}} p \quad\text{subject to}\quad
+   \beta \le \Pr\{y_{ij} \le \mathbf{d}_{ij} + p_{ij}\},\quad A u = y,\quad
+   p \ge 0, $$
+
+which is equivalent to the linear program
+
+$$ \max\ \gamma\beta - c^{\mathsf{T}} p \quad\text{subject to}\quad
+   y \le d - \beta s + p,\quad A u = y,\quad p \ge 0 . $$
+
+Its dual is a min-cost flow with one additional constraint,
+
+$$ \min\ d^{\mathsf{T}} x \quad\text{subject to}\quad
+   0 \le x \le c,\quad A^{\mathsf{T}} x = b,\quad b(V) = 0,\quad
+   s^{\mathsf{T}} x \le \gamma, $$
+
+in which the non-network constraint $s^{\mathsf{T}} x \le \gamma$ is exactly the
+one handled by the barrier method \eqref{eq:barrier}. Sections\ \ref{sec:padding}
+and \ref{sec:yield} are therefore primal and dual views of a single problem,
+which is why they share the same negative-cycle core.
 
 # Non-Gaussian and Heavy-Tailed Delay Models {#sec:gev}
 
