@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 0.5 (2026-10-12)
+
+### Features
+- **`ClockScheduleOracle`**: Shipped the two-parameter (clock period, yield) separation oracle as a public API (`netoptim.css_oracle`), promoted from the inline test oracle and re-exported from the package root.
+
+### Bug Fixes
+- **`NetworkOracle.assess_feas` most-critical cycle**: Replaced the "first negative cycle" shortcut (and its `TODO`) with selection of the minimum-mean (most critical) cycle among Howard's output.
+
+### Testing & Code Quality
+- **Deduplicated CSS tests**: `tests/test_ratio.py` now drives the shipped `ClockScheduleOracle`; removed `test_cycle_finder.py`, `test_cycle_finder2.py`, and `test_delay_padding.py`, whose CSS-oracle logic and golden values now live in `digraphx`'s canonical `tests/test_css.py`. Dropped the now-unused `icecream` test dependency.
+
 ## Version 0.4 (2026-10-09)
 
 ### Features
