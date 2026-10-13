@@ -105,10 +105,12 @@ class NetworkOracle(OracleFeas[Any]):
         else:
             get_weight = _bound_eval(oracle, x)
 
+        best: Optional[Cut] = None
+        best_ratio = float("inf")
         for cycle in self._ncf.howard(self._potential, get_weight):
-            f = -sum(get_weight(edge) for edge in cycle)
-            g = -sum(oracle.grad(edge, x) for edge in cycle)
-            # TODO: choose the minumum cycle
-            return g, f  # use the first cycle only
-
-        return None
+            weight_sum = sum(get_weight(edge) for edge in cycle)
+            ratio = weight_sum / len(cycle)
+            if ratio < best_ratio:
+                best_ratio = ratio
+                best = (-sum(oracle.grad(edge, x) for edge in cycle), -weight_sum)
+        return best
