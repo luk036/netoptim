@@ -1,64 +1,15 @@
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict
 
 import numpy as np
-from digraphx.neg_cycle import NegCycleFinder
 from ellalgo.cutting_plane import cutting_plane_optim
 from ellalgo.ell import Ell
-from ellalgo.ell_typing import OracleOptim
 from pytest import approx
 
-Arr = np.ndarray
-Cut = Tuple[Arr, float]
-Digraph = Dict[str, Dict[str, Dict[str, Any]]]
-
-
-class MyOracle(OracleOptim[Arr]):
-    """Oracle for the ratio test problem."""
-
-    def __init__(self, digraph: Digraph, dist: Dict[str, float]):
-        """Initialize the oracle.
-
-        Args:
-            digraph (Digraph): The directed graph.
-            dist (Dict[str, float]): The distance dictionary.
-        """
-        self.finder: NegCycleFinder[str, Dict[str, Any], float] = NegCycleFinder(
-            digraph
-        )
-        self.dist = dist
-
-    def assess_optim(self, xc: Arr, gamma: float) -> Tuple[Cut, Optional[float]]:
-        """Assess the optimality of the solution.
-
-        Args:
-            xc (Arr): The solution to assess.
-            gamma (float): The current best solution.
-
-        Returns:
-            Tuple[Cut, Optional[float]]: A tuple containing the cut and the objective value.
-        """
-        TCP, beta = xc
-        if TCP < 0.0:
-            return (np.array([-1.0, 0.0]), -TCP), None
-        if (fj := TCP - gamma * beta) > 0.0:
-            return (np.array([1.0, -gamma]), fj), None
-
-        def get_weight(e: Dict[str, Any]) -> float:
-            return TCP - e["delay"] - beta if e["type"] == "s" else e["delay"] - beta
-
-        for cycle in self.finder.howard(self.dist, get_weight):
-            f = -sum(get_weight(e) for e in cycle)
-            g = np.array(
-                [-sum(1.0 if e["type"] == "s" else 0.0 for e in cycle), len(cycle)]
-            )
-            return (g, f), None  # use the first cycle only
-
-        return (np.array([1.0, -1.0]), 0.0), TCP / beta
+from netoptim.css_oracle import ClockScheduleOracle
 
 
 def test_minimize_ratio() -> None:
-    """Test the minimization of the ratio."""
-    digraph: Digraph = {
+    digraph: Dict[str, Dict[str, Dict[str, Any]]] = {
         "v0": {"v3": {"type": "s", "delay": 6.0}, "v2": {"type": "s", "delay": 7.0}},
         "v1": {"v2": {"type": "s", "delay": 9.0}, "v4": {"type": "h", "delay": 3.0}},
         "v2": {
@@ -76,8 +27,8 @@ def test_minimize_ratio() -> None:
 
     xinit = np.array([7.5, 1.0])
     ellip = Ell(100.0, xinit)
-    dist: Dict[str, float] = {"v0": 0.0, "v1": 0.0, "v2": 0.0, "v3": 0.0, "v4": 0.0}
-    omega = MyOracle(digraph, dist)
+    dist: Dict[str, float] = {v: 0.0 for v in digraph}
+    omega = ClockScheduleOracle(digraph, dist)
     xbest, ratio, _ = cutting_plane_optim(omega, ellip, float("inf"))
     assert xbest is not None
     assert ratio == approx(3.040717067415985)

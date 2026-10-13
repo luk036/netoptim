@@ -21,6 +21,7 @@ from ellalgo.cutting_plane import cutting_plane_feas, cutting_plane_optim
 from ellalgo.ell import Ell
 from ellalgo.ell_config import Options
 
+from .css_oracle import ClockScheduleOracle
 from .network_oracle import NetworkOracle
 from .optscaling_oracle import OptScalingOracle
 
@@ -36,6 +37,7 @@ explicit ``Options`` to override.
 """
 
 __all__ = [
+    "ClockScheduleOracle",
     "NetworkOracle",
     "OptScalingOracle",
     "solve_network_feas",
