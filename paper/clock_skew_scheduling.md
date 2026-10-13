@@ -489,16 +489,13 @@ $$ \beta_{k+1} = \beta_k - \frac{1}{p+1}\,
 where $A_k$ defines the current ellipsoid and $g_k$ is the separating gradient;
 deep, central, and parallel-cut refinements accelerate convergence in practice.
 
-This is exactly the architecture implemented by the `netoptim` package, whose
-`NetworkOracle` wraps Howard's negative-cycle finder and, on detecting a negative
-cycle, returns a cutting plane---its gradient is the negative sum of the edge
-sub-gradients and its intercept the negative sum of the edge weights---which is
-consumed by the ellipsoid and cutting-plane routines of `ellalgo`. The resulting
-solver handles both linear and nonlinear convex multi-parameter clock skew
-scheduling; empirically it is reported to be up to an order of magnitude faster
-than a general linear-programming solver on the linear problem, and several
-hundred times faster than a general convex-programming solver on the nonlinear
-problem [@zhou2015multiparameter].
+This is exactly the architecture realized by the companion libraries `digraphx`
+and `netoptim` (Section\ \ref{sec:implementation}). The resulting solver handles
+both linear and nonlinear convex multi-parameter clock skew scheduling;
+empirically it is reported to be up to an order of magnitude faster than a
+general linear-programming solver on the linear problem, and several hundred
+times faster than a general convex-programming solver on the nonlinear problem
+[@zhou2015multiparameter].
 
 ## Slack maximization
 
@@ -1481,6 +1478,42 @@ critical cycle, which is directly actionable, and a feasible schedule comes with
 a criticality hierarchy that guides clock-tree synthesis. Third, *extensibility*:
 delay padding and the yield-driven variants are all obtained by
 modifying the graph rather than the algorithm.
+
+## Reference implementation {#sec:implementation}
+
+The framework of this survey is realized by two small companion libraries,
+released as sibling packages in Python, C++, and Rust [@digraphx2026;
+@netoptim2026], sharing one structure so that the algorithmic core stays
+portable. The code is not a contribution of this article---the survey's claims
+remain as stated in Section\ \ref{sec:scope}---but it makes the reductions
+concrete and reproducible.
+
+The combinatorial core lives in `digraphx`. It provides Howard's policy
+iteration, the minimum cost-to-time ratio cycle, and the parametric potential
+solver of Sections\ \ref{sec:period} and\ \ref{sec:algorithms}. A single
+clock-skew-scheduling entry point takes the objective as a pair of `(cost, time)`
+columns, so the four rows of the family table (Table\ \ref{tbl:family}) are thin
+adapters over one code path; the minimum-period row is handled by a
+negated-column transform that turns its maximum-cycle-ratio problem into the
+same minimum-ratio problem. Because the parameter is external to the graph, one
+routine serves both the exact combinatorial solvers and the ellipsoid oracle.
+
+The separation oracles live in `netoptim`. `NetworkOracle` wraps the
+negative-cycle finder and, on detecting a negative cycle, returns the cutting
+plane of Section\ \ref{sec:multiparam}; `OptScalingOracle` and
+`ClockScheduleOracle` package the matrix-scaling and two-parameter (period,
+yield) problems as further instances of the same oracle contract. The `ellalgo`
+libraries supply the ellipsoid and cutting-plane drivers that consume these
+planes.
+
+Two implementation points deserve recording, because both are easy to get wrong
+and both concern the certificate rather than the arithmetic. First, the oracle
+must emit a *valid* separating plane: Howard's per-edge verification can surface
+a cycle whose total weight is not actually negative, so the oracle retains the
+most-violated cycle it finds and cuts only when that cycle is genuinely
+negative. Second, the actionable output is the *most critical* cycle, so the
+feasibility oracle selects the minimum-mean negative cycle rather than the first
+one returned---the certificate discussed in Section\ \ref{sec:potential}.
 
 ## Scope and limitations {#sec:scope}
 

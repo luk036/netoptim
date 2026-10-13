@@ -209,6 +209,7 @@ for each edge (p,q):
 - **Ellipsoid method:** multi-dimensional bisection; needs only separation
 - Scalar bisection $\to$ **Newton / ellipsoid** when $p > 1$
 - Realized by `netoptim`'s `NetworkOracle` + `ellalgo`
+  (companion `digraphx` core; Python $\cdot$ C++ $\cdot$ Rust)
 :::
 
 ::: {.column width="46%"}
@@ -364,6 +365,18 @@ Type (d): $p_s \ge p_h$
 | Young--Tarjan--Orlin | parametric shortest path | $O(nm + n^2 \log n)$ |
 
 - All share one primitive: **detect and cancel negative cycles**
+
+## Reference implementation 💻
+
+- Companion libraries `digraphx` + `netoptim`, sibling packages in
+  **Python, C++, and Rust**
+- `digraphx` --- combinatorial core: Howard, minimum cost-to-time ratio,
+  parametric solver; **one CSS entry point** for Min CP / EVEN / PROP / C-PROP
+- `netoptim` --- oracles: `NetworkOracle` (feasibility) and
+  `ClockScheduleOracle` (period $\times$ yield), driven by `ellalgo`
+- The oracle returns the **most critical** cycle $\Rightarrow$ a valid,
+  actionable cut
+- One algorithm, three languages --- useful skew as a **portable** core
 
 ## From schedule to clock tree
 
