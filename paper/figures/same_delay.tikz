@@ -1,9 +1,22 @@
-\begin{tikzpicture}[scale=0.3]
-\def \radius {6cm}
-\node[draw, circle, fill=cyan!20] at ({0}:\radius) (n1) {$u_j$};
-\node[draw, circle, fill=cyan!20] at ({180}:\radius) (n2) {$u_i$};
-\node[draw, circle, fill=red!20] at (0,0) (n3) {$u_k$};
-\path[->, >=latex] (n3) edge  node[above]{0} (n2);
-\path[->, >=latex] (n3) edge [bend left=35] node[above]{CP-4} (n1);
-\path[->, >=latex] (n1) edge [bend left=35] node[above]{1.5} (n3);
+\begin{tikzpicture}[
+  >=latex,
+  tcgv1/.style = {circle, draw=green!45!black, fill=green!20,
+    line width=1pt, minimum size=8mm, inner sep=1pt, font=\small},
+  tcgv2/.style = {circle, draw=blue!60!black, fill=blue!10,
+    line width=1pt, minimum size=8mm, inner sep=1pt, font=\small},
+  tcgins/.style = {circle, draw=red!65!black, fill=red!20,
+    line width=1pt, minimum size=8mm, inner sep=1pt, font=\small},
+  sedge/.style = {->, >=latex, semithick},
+  lbl/.style = {fill=gray!15, inner sep=1.5pt, rounded corners=1pt,
+    font=\scriptsize}
+]
+  \node[tcgv1]  (ui) at (0,0) {$u_i$};
+  \node[tcgv2]  (uj) at (4,0) {$u_j$};
+  \node[tcgins] (uk) at (2,0) {$u_k$};
+
+  \draw[sedge] (uk) -- node[lbl, above] {$0$} (ui);
+  \draw[sedge] (uk) to[bend left=28]
+    node[lbl, above] {$\mathrm{CP}-4$} (uj);
+  \draw[sedge] (uj) to[bend left=28]
+    node[lbl, below] {$1.5$} (uk);
 \end{tikzpicture}
