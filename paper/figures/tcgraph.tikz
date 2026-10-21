@@ -1,15 +1,33 @@
-\begin{tikzpicture}
-\def \radius {2cm}
-\node[draw, circle, fill=cyan!20] at ({30}:\radius) (n1) {FF3};
-\node[draw, circle, fill=cyan!20] at ({150}:\radius) (n2) {FF1};
-\node[draw, circle, fill=cyan!20] at ({270}:\radius) (n3) {FF2};
+\begin{tikzpicture}[
+  >=latex,
+  tcgv1/.style = {circle, draw=green!45!black, fill=green!20,
+    line width=1pt, minimum size=8mm, inner sep=1pt, font=\small},
+  tcgv2/.style = {circle, draw=blue!60!black, fill=blue!10,
+    line width=1pt, minimum size=8mm, inner sep=1pt, font=\small},
+  tcgv3/.style = {circle, draw=orange!70!black, fill=orange!15,
+    line width=1pt, minimum size=8mm, inner sep=1pt, font=\small},
+  sedge/.style = {->, >=latex, semithick},
+  dedge/.style = {->, >=latex, dotted, semithick},
+  lbl/.style = {fill=gray!15, inner sep=1.5pt, rounded corners=1pt,
+    font=\scriptsize}
+]
+  \node[tcgv1] (v1) at (0,0) {$v_1$};
+  \node[tcgv2] (v2) at (2.9,0.45) {$v_2$};
+  \node[tcgv3] (v3) at (5.8,0) {$v_3$};
 
-\path[->, >=latex] (n2) edge [bend left=45] node[above]{CP-4} (n1);
-\path[->, >=latex] (n3) edge [bend left=45] node[left]{CP-2} (n2);
-\path[->, >=latex] (n1) edge [bend left=45] node[right]{CP-3} (n3);
+  % setup constraints: s-edges (solid)
+  \draw[sedge] (v1) to[bend left=22]
+    node[lbl, above] {$T_{\mathrm{CP}}-2$} (v2);
+  \draw[sedge] (v2) to[bend left=22]
+    node[lbl, above] {$T_{\mathrm{CP}}-3$} (v3);
+  \draw[sedge] (v3) to[bend left=28]
+    node[lbl, below] {$T_{\mathrm{CP}}-4$} (v1);
 
-\path[dashed, ->, >=latex] (n1) edge [bend left=15] node[above]{1.5} (n2);
-\path[dashed, ->, >=latex] (n2) edge [bend left=15] node[left]{2} (n3);
-\path[dashed, ->, >=latex] (n3) edge [bend left=15] node[right]{3} (n1);
-
+  % hold constraints: h-edges (dotted)
+  \draw[dedge] (v1) to[bend right=8]
+    node[lbl, above] {$2$} (v2);
+  \draw[dedge] (v2) to[bend right=8]
+    node[lbl, above] {$3$} (v3);
+  \draw[dedge] (v3) to[bend left=8]
+    node[lbl, above] {$1.5$} (v1);
 \end{tikzpicture}
