@@ -255,7 +255,7 @@ remedy is a circuit-level change---delay padding or logic restructuring
   \caption{Its timing constraint graph.}
 \end{subfigure}
 \caption{A circuit and its timing constraint graph. Solid arcs are setup
-constraints ($s$-edges); dashed arcs are hold constraints ($h$-edges). The
+constraints ($s$-edges); dotted arcs are hold constraints ($h$-edges). The
 weights are $T_{\mathrm{CP}}-4$ and $1.5$, etc.}\label{fig:circuit}
 \end{figure*}
 ```
@@ -905,7 +905,7 @@ schedule must bound the *probability* of violation rather than its worst case
 ```{=latex}
 \begin{figure}[htbp]
 \centering
-\resizebox{0.6\linewidth}{!}{\input{figures/tcgraph9.tikz}}
+\resizebox{0.85\linewidth}{!}{\input{figures/tcgraph9.tikz}}
 \caption{A statistical timing constraint graph: after SSTA each edge carries a
 pair $(\mu, \sigma)$---mean and standard deviation---instead of a single
 deterministic weight.}\label{fig:stattcg}
@@ -938,14 +938,15 @@ differ.
 ```{=latex}
 \begin{figure*}[htbp]
 \centering
-\begin{subfigure}[b]{0.23\textwidth}\centering\resizebox{\linewidth}{!}{\input{figures/tcgraph2.tikz}}\caption{Identify the critical cycle.}\end{subfigure}\hfill
-\begin{subfigure}[b]{0.23\textwidth}\centering\resizebox{\linewidth}{!}{\input{figures/tcgraph3.tikz}}\caption{Assign the arrival times.}\end{subfigure}\hfill
-\begin{subfigure}[b]{0.23\textwidth}\centering\resizebox{\linewidth}{!}{\input{figures/tcgraph4.tikz}}\caption{Freeze the skews.}\end{subfigure}\hfill
-\begin{subfigure}[b]{0.23\textwidth}\centering\resizebox{\linewidth}{!}{\input{figures/tcgraph5.tikz}}\caption{Contract to a super-vertex.}\end{subfigure}
+\begin{subfigure}[b]{0.31\textwidth}\centering\scalebox{0.9}{\input{figures/tcgraph2.tikz}}\caption{Identify the critical cycle.}\end{subfigure}\hfill
+\begin{subfigure}[b]{0.31\textwidth}\centering\scalebox{0.9}{\input{figures/tcgraph3.tikz}}\caption{Assign the arrival times.}\end{subfigure}\hfill
+\begin{subfigure}[b]{0.31\textwidth}\centering\scalebox{0.9}{\input{figures/tcgraph4.tikz}}\caption{Freeze the skews.}\end{subfigure}
 \par\bigskip
-\begin{subfigure}[b]{0.23\textwidth}\centering\resizebox{\linewidth}{!}{\input{figures/tcgraph6.tikz}}\caption{Re-solve the residual graph.}\end{subfigure}\hfill
-\begin{subfigure}[b]{0.23\textwidth}\centering\resizebox{\linewidth}{!}{\input{figures/tcgraph7.tikz}}\caption{Distribute the remaining slack.}\end{subfigure}\hfill
-\begin{subfigure}[b]{0.23\textwidth}\centering\resizebox{\linewidth}{!}{\input{figures/tcgraph8.tikz}}\caption{The final schedule.}\end{subfigure}
+\begin{subfigure}[b]{0.31\textwidth}\centering\scalebox{0.9}{\input{figures/tcgraph5.tikz}}\caption{Contract to a super-vertex.}\end{subfigure}\hfill
+\begin{subfigure}[b]{0.31\textwidth}\centering\scalebox{0.9}{\input{figures/tcgraph6.tikz}}\caption{Re-solve the residual graph.}\end{subfigure}\hfill
+\begin{subfigure}[b]{0.31\textwidth}\centering\scalebox{0.9}{\input{figures/tcgraph7.tikz}}\caption{Distribute the remaining slack.}\end{subfigure}
+\par\bigskip
+\begin{subfigure}[b]{0.31\textwidth}\centering\scalebox{0.9}{\input{figures/tcgraph8.tikz}}\caption{The final schedule.}\end{subfigure}
 \caption{The iterative EVEN (minimum-balancing) process on a small timing
 constraint graph: identify the most critical cycle, distribute its slack evenly,
 freeze the arrival times, contract the cycle to a super-vertex, and repeat until a
