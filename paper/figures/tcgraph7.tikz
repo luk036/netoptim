@@ -1,10 +1,18 @@
-\begin{tikzpicture}
-\def \radius {2cm}
+\begin{tikzpicture}[
+  >=latex,
+  tcgv2/.style = {circle, draw=blue!60!black, fill=blue!10,
+    line width=1pt, minimum size=8mm, inner sep=1pt, font=\small},
+  tcgvs/.style = {circle, draw=red!65!black, fill=red!20,
+    line width=1pt, minimum size=8mm, inner sep=1pt, font=\small},
+  sedge/.style = {->, >=latex, semithick},
+  lbl/.style = {fill=gray!15, inner sep=1.5pt, rounded corners=1pt,
+    font=\scriptsize}
+]
+  \node[tcgvs] (vs) at (0,0) {$0.25$};
+  \node[tcgv2] (v2) at (2.9,0) {$0$};
 
-\node[draw, rectangle, fill=yellow] at ({90}:\radius) (ns) {\Large{$0.25$}};
-\node[draw, circle, fill=cyan!20] at ({270}:\radius) (n3) {$0$};
-
-\path[->, >=latex] (n3) edge [bend left=60] node[left]{2} (ns);
-\path[->, >=latex] (ns) edge [bend left=60] node[right]{1.5} (n3);
-
+  \draw[sedge] (vs) to[bend left=45]
+    node[lbl, above] {$2$} (v2);
+  \draw[sedge] (v2) to[bend left=45]
+    node[lbl, below] {$1.5$} (vs);
 \end{tikzpicture}
