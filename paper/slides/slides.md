@@ -196,6 +196,22 @@ for each edge (p,q):
 - **Minimum balancing:** distribute slack on the critical cycle, contract it to a
   super-vertex, repeat --- the contraction order is the **criticality hierarchy**
 
+:::: {.columns}
+
+::: {.column width="48%"}
+```{=latex}
+\centering\resizebox{0.95\linewidth}{!}{\input{../figures/contraction_tree.tikz}}
+```
+:::
+
+::: {.column width="48%"}
+- Critical subgraphs form a hierarchy
+- Contracting reveals the most restrictive cycles first
+- Guides both skew assignment and clock-tree topology
+:::
+
+::::
+
 # Multi-Parameter Problems
 
 ## Multi-parameter problems and the ellipsoid method
@@ -250,28 +266,36 @@ for each edge (p,q):
 
 ::: {.column width="25%"}
 ```{=latex}
-\resizebox{\linewidth}{!}{\input{../figures/no_delay.tikz}}
+\begin{minipage}[b][2.9cm][c]{\linewidth}
+\centering\resizebox{\linewidth}{!}{\input{../figures/no_delay.tikz}}
+\end{minipage}
 ```
 Type (a): none
 :::
 
 ::: {.column width="25%"}
 ```{=latex}
-\resizebox{\linewidth}{!}{\input{../figures/independent.tikz}}
+\begin{minipage}[b][2.9cm][c]{\linewidth}
+\centering\resizebox{\linewidth}{!}{\input{../figures/independent.tikz}}
+\end{minipage}
 ```
 Type (b): $p_s, p_h$
 :::
 
 ::: {.column width="25%"}
 ```{=latex}
-\resizebox{\linewidth}{!}{\input{../figures/same_delay.tikz}}
+\begin{minipage}[b][2.9cm][c]{\linewidth}
+\centering\resizebox{\linewidth}{!}{\input{../figures/same_delay.tikz}}
+\end{minipage}
 ```
 Type (c): $p_s=p_h$
 :::
 
 ::: {.column width="25%"}
 ```{=latex}
-\resizebox{\linewidth}{!}{\input{../figures/setup_greater.tikz}}
+\begin{minipage}[b][2.9cm][c]{\linewidth}
+\centering\resizebox{\linewidth}{!}{\input{../figures/setup_greater.tikz}}
+\end{minipage}
 ```
 Type (d): $p_s \ge p_h$
 :::
@@ -298,6 +322,10 @@ Type (d): $p_s \ge p_h$
 - Different from a nominal period: we must reason about **distributions**
 - Primitive solutions (margin pre-allocation, LCES, incremental slack)
   all ignore **path-delay variance**
+
+```{=latex}
+\centering\resizebox{0.85\linewidth}{!}{\input{../figures/tcgraph9.tikz}}
+```
 
 ## EVEN / PROP / C-PROP
 
