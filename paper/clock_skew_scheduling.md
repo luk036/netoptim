@@ -9,11 +9,13 @@ arrival times $u_i$ and $u_j$, the (useful) skew is
 
 $$ y_{ij} = u_i - u_j . $$
 
-Two facts make skew a first-class design variable. First, the clock is
-*periodic*, so a common shift $u_i \leftarrow u_i + c$ changes nothing: only the
-*differences* $y_{ij}$ matter. Second, the setup- and hold-time constraints that
-guarantee correct data capture bound each skew from above and below, so each data
-path defines an interval of admissible skews. Clock skew scheduling (CSS) is the
+Two facts make skew a first-class design variable. First, only *relative*
+arrival times are observable: adding a common constant to every $u_i$ leaves
+every constraint unchanged, and because the clock is periodic an overall phase
+shift carries no physical meaning. Hence only the *differences* $y_{ij}$ matter.
+Second, the setup- and hold-time constraints that guarantee correct data capture
+bound each skew from above and below, so each data path defines an interval of
+admissible skews. Clock skew scheduling (CSS) is the
 problem of choosing the arrival times---equivalently the skews---so that every
 timing constraint is met and some secondary objective is optimized.
 
@@ -31,22 +33,26 @@ The value of a skew schedule is easily underestimated, because a schedule is a
 *plan* rather than a physical artifact and it is therefore tempting to dismiss it
 as an academic exercise. The practical considerations below argue otherwise.
 
-**The flow order must respect skew scheduling.** Scheduling requires accurate
-clock and data delays, which presuppose that global and clock-tree routing have
-already been performed. The conventional flow, however, treats clock-tree
-synthesis (CTS) as the most timing-critical step and performs it *before* routing
-the signal nets. A flow that is aware of useful skew would invert that priority:
-run CTS first, as if the signal wires were not yet fixed, and then re-route only
-the few nets whose geometry the clock tree displaces. This "CTS first, then
-re-route" ordering---rarely discussed---determines how much of the available
-scheduling freedom can actually be realized.
+**The flow order must respect skew scheduling.** A skew schedule is only as
+good as the delays it is computed from, and those delays are not final until
+clock-tree synthesis (CTS) and signal routing are both complete. The two steps
+are mutually dependent: CTS consumes the slack budget that the schedule
+allocates, while routing changes the data delays that the schedule assumed. A
+flow that treats the schedule as a one-shot pre-CTS step therefore computes it
+from estimates that later change. The practical consequence is that the schedule
+must be re-derived after routing---or, equivalently, that routing must be made
+aware of the skew budget---and how often this loop is closed determines how much
+of the available freedom survives into silicon [@held2003clock;
+@wang2006extensive].
 
-**Placement is the true lever.** If the placement is poor, no algorithm inside CTS
-can balance the clock tree, because the imbalance is a property of the register
-locations, not of the clock tree. Placement must therefore anticipate the
-scheduler. The consequence is that useful-skew design is less a single algorithm
-than a *tool-chain contract*: placement, routing, and CTS must each be aware of,
-and cooperate with, the skew schedule.
+**Placement is the main lever.** A clock tree can only equalize the delays that
+the register locations allow; if the placement is poor, no algorithm inside CTS
+recovers the imbalance, because that imbalance is a property of where the
+registers sit. Placement must therefore anticipate the scheduler, and the
+front-end tools that shape it must be aware of the skew budget
+[@wang2006extensive]. The consequence is that useful-skew design is less a
+single algorithm than a *tool-chain contract*: placement, routing, and CTS must
+each be aware of, and cooperate with, the skew schedule [@held2003clock].
 
 **A timetable, not a single departure time.** The clearest intuition is a railway
 timetable. Trains do not all depart at the same instant, nor are they required to
@@ -54,10 +60,7 @@ arrive simultaneously at every station; departures and arrivals are deliberately
 staggered to maximize the throughput of the network. Zero-skew clocking is the
 opposite policy---every register is clocked at the same instant---and it forgoes
 precisely the freedom that a timetable exploits. Useful skew is the timetable of
-the clock, and the asymmetry of current investment---large sums directed at
-lithography while the comparatively inexpensive software freedom of skew
-scheduling is left unexploited---becomes harder to justify as devices shrink and
-variation grows.
+the clock, and the schedulers in this article are the algorithms that build it.
 
 **Why the formulation survives increasing complexity.** The mathematical core of
 the problem is fixed at the outset and does not change as the model grows. The
@@ -65,14 +68,15 @@ governing invariant is that only *relative* arrival times matter: shifting every
 clock by the same amount is physically meaningless, just as it is immaterial
 whether a schedule starts on Christmas or on New Year's Day. This invariant is
 exactly the hypothesis under which the constraints form a system of difference
-constraints, so the negative-cycle feasibility test and the parametric machinery
-of Sections\ \ref{sec:period}--\ref{sec:gev} survive the statistical
-refinements almost unchanged. The scalar bisection
-of the single-parameter case generalizes to a Newton- or ellipsoid-style
-iteration when several parameters are present (Section\ \ref{sec:multiparam});
-entirely new machinery is required only if a constraint is placed on *absolute*
-time, a situation that current practice does not produce. This stability is the
-strongest reason to study the problem in the abstract form developed below.
+constraints, so the negative-cycle feasibility test and the single-parameter
+machinery of Sections\ \ref{sec:period}--\ref{sec:gev} survive the statistical
+refinements almost unchanged. The scalar bisection of the single-parameter case
+generalizes to a separation-based convex iteration when several parameters are
+present (Section\ \ref{sec:multiparam}). Constraints that fix an *absolute*
+time, such as interface timing at the chip boundary or a clock-domain crossing,
+do break the translation invariance and lie outside the flat model; they are
+discussed in Section\ \ref{sec:discussion}. This stability is the strongest
+reason to study the problem in the abstract form developed below.
 
 ## The central idea
 
@@ -134,17 +138,35 @@ diverges from physical design---clock-tree power and area, discrete cell sizes,
 spatial correlation, and hierarchical timing---the discrepancy is stated
 explicitly and revisited in Section\ \ref{sec:discussion}.
 
+**Relation to prior work.** The difference-constraint/negative-cycle view of
+timing is classical. It underlies the retiming formulation of Leiserson and Saxe
+[@leiserson1981optimizing; @leiserson1991retiming], the cycle bound on clock
+period [@burns1991performance; @sakallah1992analysis], the LP formulation of
+skew scheduling [@fishburn1990clock], and the graph algorithms of Shenoy et al.
+[@shenoy1992graph]. The equivalence between retiming and skew scheduling is made
+explicit by Sapatnekar and Deokar [@sapatnekar1996utilizing] and by Liu,
+Papaefthymiou, and Friedman [@liu1999maximizing]. The parametric and ratio-cycle
+machinery is due to Lawler [@lawler1976combinatorial], Megiddo
+[@megiddo1979combinatorial], Karp and Orlin [@karp1981parametric], and Young,
+Tarjan, and Orlin [@young1991faster]. The statistical line of work starts with
+Neves and Friedman [@neves1996optimal] and Kourtev and Friedman
+[@kourtev1999clock], and continues through the non-Gaussian and extreme-value
+models of Wang et al. [@wang2008timing] and Zhu et al. [@zhu2025gev]. What the present article adds is a single derivation that runs
+through all of these, together with an explicit account of what the model does
+not capture.
+
 # Preliminaries: Timing Constraints and the Timing Constraint Graph {#sec:prelim}
 
 ## Local data paths and clock skew
 
-Consider a data path that starts at the output of register $i$, passes through a
-block of combinational logic, and ends at the data input of register $j$
-(Figure\ \ref{fig:datapath}). The data signal traverses the logic in a delay that
-ranges between a minimum $d_{ij}$ and a maximum $D_{ij}$ over the relevant
-operating conditions. The two registers are clocked by edges whose arrival times
-at $i$ and $j$ are $u_i$ and $u_j$; the skew seen by the path is
-$y_{ij} = u_i - u_j$.
+Consider the register pair $(i,j)$ with at least one combinational path from
+the output of register $i$ to the data input of register $j$
+(Figure\ \ref{fig:datapath}). Let $D_{ij}$ be the largest delay over all such
+paths and $d_{ij}$ the smallest; these extrema are generally attained by
+*different* paths, and it is the pair of extrema that matters, since every
+individual path must satisfy both of the constraints derived below. The two
+registers are clocked by edges whose arrival times at $i$ and $j$ are $u_i$ and
+$u_j$; the skew seen by the pair is $y_{ij} = u_i - u_j$.
 
 ```{=latex}
 \begin{figure}[htbp]
@@ -160,8 +182,8 @@ the skew $y_{ij}=u_i-u_j$ of the two clock arrival times matters.}
 \centering
 \includegraphics[width=0.85\linewidth]{figures/fig04.pdf}
 \caption{Clock waveforms. The source clock \texttt{CLK\_src} and the clocks
-arriving at registers $i$ and $f$ are delayed by $t_i$ and $t_f$; their
-difference $t_i-t_f$ is the skew.}\label{fig:waveform}
+arriving at registers $i$ and $f$ are delayed by $u_i$ and $u_f$; their
+difference $u_i-u_f$ is the skew.}\label{fig:waveform}
 \end{figure}
 ```
 
@@ -195,8 +217,12 @@ not arrive at $j$ so early that it races past the previous capture:
 \end{equation}
 ```
 
-A violation of \eqref{eq:hold} is a *race condition*, also called *double
-clocking*. Combining the two, the admissible skew of path $i\to j$ lies in the
+A violation of \eqref{eq:hold} is a *hold violation*, also called *double
+clocking* or a *short-path race*. Both $T_{\mathrm{setup}}$ and
+$T_{\mathrm{hold}}$ are effective guard bands rather than raw library values: in
+practice they also absorb clock jitter, PLL uncertainty, and on-chip-variation
+derating, so the bounds below should be read as the residual margins available to
+skew. Combining the two, the admissible skew of path $i\to j$ lies in the
 *feasible skew region* (FSR)
 
 ```{=latex}
@@ -271,9 +297,15 @@ $$ y_{ij} = u_i - u_j \le S_{ij}, \qquad
    -y_{ij} = u_j - u_i \le H_{ij} . $$
 
 Since $S_{ij} = T_{\mathrm{CP}} - D_{ij} - T_{\mathrm{setup}}$ is exactly the upper
-skew bound, the reported slacks are directly the FSR bounds relative to the
-zero-skew solution. This is why a modern STA engine that reports only slacks is
-already sufficient as a front end: the slacks *are* the edge weights of the TCG.
+skew bound, the reported slacks are the FSR bounds relative to the zero-skew
+solution. This is why an STA engine that reports slacks at zero skew is already
+sufficient as a front end: those slacks *are* the edge weights of the TCG. Two
+caveats apply in practice. First, a modern STA engine reports propagated-clock
+slacks, which already include the skew of the current tree; the zero-skew
+quantities must be recovered by subtracting the reported arrival-time
+differences. Second, STA reports the worst slack per endpoint rather than one
+slack per register pair, so reconstructing the TCG requires the path-level
+report rather than the endpoint summary.
 
 # The Network-Potential Formulation {#sec:potential}
 
@@ -308,51 +340,70 @@ In this language the timing problem is the *feasible potential problem*
 \end{equation}
 ```
 
-Feasibility of \eqref{eq:fpp} has a clean combinatorial characterization. Let
-$d^{+}(P) = \sum_{e \in P} d^{+}_{e}$ and $d^{-}(P) = \sum_{e \in P} d^{-}_{e}$
-denote the *upper span* and *lower span* of a cycle $P$, where $d^{+}_{e}$ and
-$d^{-}_{e}$ are the upper and lower bounds on edge $e$. Because
-$\tau^{\mathsf{T}} y = \tau^{\mathsf{T}} A u = 0$ for the indicator vector $\tau$
-of any cycle, the constraints imply $d^{-}(P) \le 0 \le d^{+}(P)$ for every cycle
-$P$. Conversely, these cycle conditions are sufficient, and the "if" direction is
-constructive: it is exactly the shortest-path computation that produces $u$. In
-particular, when only upper bounds are present after adding reverse edges, the
-condition simplifies to $d^{+}(P) \ge 0$ for all cycles, and an infeasible
-instance returns a *negative cycle*.
+Feasibility of \eqref{eq:fpp} has a clean combinatorial characterization.
+Because $y = A u$ is a tension, $\tau^{\mathsf{T}} y = 0$ for every circulation
+$\tau$ (a vector with $A^{\mathsf{T}} \tau = 0$). Writing $\tau^{+}$ and
+$\tau^{-}$ for the positive and negative parts of $\tau$, the box constraints
+give
+$$ \overline{w}^{\mathsf{T}} \tau^{+} + \underline{w}^{\mathsf{T}} \tau^{-} \;\ge\; 0 , $$
+and this condition is also sufficient. Sufficiency is Hoffman's circulation
+theorem [@hoffman1960recent] applied to the graph obtained by splitting each edge
+into its upper and lower arcs; it is constructive, since the shortest-path
+computation that produces $u$ is exactly the proof. For a simple directed cycle
+the condition reduces to the familiar span inequality. When only upper bounds are
+present---as in the timing constraint graph of Section\ \ref{sec:prelim}, where
+the lower bounds have been folded into reverse arcs---it reduces to the
+requirement that every cycle have nonnegative weight, and an infeasible instance
+returns a *negative cycle*.
 
 ## Bellman--Ford and the case for lazy evaluation
 
-The classical instrument for this task is the Bellman--Ford algorithm
-[@bellman1958routing; @cormen2009introduction] (Algorithm\ \ref{alg:bf}). It computes shortest-path potentials and, in a final
-pass, either certifies feasibility or exhibits a negative cycle. Its simplicity
-is appealing, but it has practical drawbacks that matter in timing closure:
+Difference-constraint systems have a long history in timing analysis and in
+temporal reasoning, where the same negative-cycle criterion appears under
+different names [@pratt1977new; @shostak1981deciding; @dechter1991temporal]. The
+classical instrument for this task is the Bellman--Ford algorithm
+[@bellman1958routing; @cormen2009introduction] (Algorithm\ \ref{alg:bf}). It
+computes shortest-path potentials and, in a final pass, either certifies
+feasibility or exhibits a negative cycle. Its simplicity is appealing, but it has
+practical drawbacks that matter in timing closure:
 
 1. it is designed to find shortest paths, with negative-cycle detection only a
    by-product;
-2. it detects a negative cycle only at the *end* of the computation;
-3. it requires all edge weights $w$ to be known up front.
+2. the basic pass structure reports infeasibility only after all $|V|$ passes
+   have been completed;
+3. it evaluates every edge weight on every pass.
 
-In an interactive timing-closure loop, the recommendation is therefore *lazy
-evaluation*: run the analysis on demand, vertex by vertex, and **stop as soon as
-a negative cycle is found**. The early-exit variant turns the algorithm from a
-global pass into a targeted repair tool.
+The second and third points matter because, in a parametric or interactive loop,
+the weights are expensive to obtain: each one is an STA/SSTA query, and a
+tentative schedule may violate only a small subset of the constraints. Two
+standard remedies apply. A queue-based relaxation reports a negative cycle as
+soon as some vertex has been relaxed $|V|$ times, so the analysis stops at the
+first certificate instead of running to completion [@cherkassky1999negative].
+More importantly, when the weights depend on a parameter, only the arcs traversed
+while searching for a violated cycle need to be evaluated; the full set of
+weights is never materialized. This is the *lazy evaluation* principle used in
+Section\ \ref{sec:multiparam}. It is a statement about *evaluating weights*, not
+about knowing the graph, which must of course be given.
 
 ```{=latex}
 \begin{algorithm*}[htbp]
-\caption{Negative-cycle feasibility test (Bellman--Ford).}\label{alg:bf}
+\caption{Negative-cycle feasibility test (Bellman--Ford), with early exit when
+no relaxation occurs.}\label{alg:bf}
 \KwIn{TCG $G=(V,E)$ with weights $w_e$}
 \KwOut{a feasible potential $u$, or a negative cycle}
 \ForEach{$v \in V$}{ $u_v \leftarrow 0$;\quad $\pi_v \leftarrow \mathrm{nil}$ }
 \For{$k \leftarrow 1$ \KwTo $|V|$}{
+  $changed \leftarrow$ \textrm{false}\;
   \ForEach{$(p,q) \in E$}{
     \If{$u_q > u_p + w_{pq}$}{
-      $u_q \leftarrow u_p + w_{pq}$;\quad $\pi_q \leftarrow p$\;
+      $u_q \leftarrow u_p + w_{pq}$;\quad $\pi_q \leftarrow p$;\quad $changed \leftarrow$ \textrm{true}\;
     }
   }
+  \lIf{\textrm{not} $changed$}{\Return{$u$}}
 }
 \ForEach{$(p,q) \in E$}{
   \If{$u_q > u_p + w_{pq}$}{
-    \Return{the negative cycle obtained by tracing $\pi$}\;
+    \Return{the cycle obtained by tracing $\pi$ from $q$}\;
   }
 }
 \Return{$u$}
@@ -364,7 +415,7 @@ global pass into a targeted repair tool.
 ## Minimizing the clock period
 
 A traditional objective is to find the smallest clock period $T_{\mathrm{CP}}$
-for which a feasible schedule exists. This is a linear program,
+for which a feasible schedule exists. This is the linear program \eqref{eq:mincp},
 
 ```{=latex}
 \begin{equation}\label{eq:mincp}
@@ -387,10 +438,13 @@ $$ T_{\mathrm{CP}} \;\ge\;
    \frac{\sum_{e \in C^{\mathrm{s}}} (D_{e} + T_{\mathrm{setup}})
        - \sum_{e \in C^{\mathrm{h}}} (d_{e} - T_{\mathrm{hold}})}{k} . $$
 
-The smallest feasible period is therefore a *maximum cycle ratio*: it is obtained
-by maximizing a ratio of a "cost" sum to a "time" sum over cycles. This is the
-minimum-cost-to-time-ratio cycle problem, and when the denominator is constant
-across edges it becomes the minimum mean cycle problem.
+The smallest feasible period is therefore the *maximum* over cycles of a ratio
+of a "cost" sum to a "time" sum. Negating the cost turns this into the *minimum*
+cost-to-time ratio cycle problem, which is the form solved by the cycle-based
+algorithms below; when the denominator is constant across edges it further
+reduces to the minimum mean cycle problem. This is the same cycle bound that
+retiming theory derives from a different argument [@leiserson1981optimizing;
+@burns1991performance].
 
 ## The parametric potential problem
 
@@ -409,15 +463,14 @@ If $d(\beta) = m - s\beta$ is affine with $s \ge 0$, \eqref{eq:ppp} is the
 minimum cost-to-time ratio cycle problem; if $s$ is a constant, it is the minimum
 mean cycle problem. If $d(\beta)$ is nonlinear, \eqref{eq:ppp} still makes sense
 but the linear combinatorial machinery must be replaced by binary search or a
-convex solver. A useful sufficient condition is the following.
-
-```{=latex}
-\begin{quote}
-\itshape
-If $g(\beta)$ and every $f_e(\beta)$ are monotone decreasing, the parametric
-problem $\max\{g(\beta) : u_i - u_j \le f_e(\beta)\}$ has a unique solution.
-\end{quote}
-```
+convex solver. If every $f_e$ is non-increasing in $\beta$, the constraints only tighten as
+$\beta$ grows, so the feasible set of $\beta$ is a down-set: an interval
+$(-\infty, \beta^{\star}]$ (possibly empty). If, in addition, $g$ is strictly
+increasing, then $g$ attains its maximum at the right endpoint and
+$\beta^{\star}$ is the unique maximizer. Uniqueness refers to $\beta$ alone: the
+potentials $u$ are never unique, since the system is invariant under a common
+shift. If $g$ is not monotone, or the feasible set is unbounded above, the
+problem may have no finite optimum.
 
 ## Cycle-based algorithms
 
@@ -430,13 +483,19 @@ the lower bound moves up. Each test costs one Bellman--Ford pass, and the number
 of tests is logarithmic in the inverse tolerance. Lawler's method is simple and
 robust but can be slow.
 
-*Cycle cancellation (Howard)* [@howard1960dynamic]. Howard's policy iteration maintains a schedule
-(equivalently, a set of shortest-path trees) and repeatedly finds a cycle along
-which the ratio can be improved, "zeroing out" that cycle with the smallest
-possible effort. It converges very fast in practice and, as a by-product, returns
-the sequence of critical cycles in decreasing order of criticality. An improved
-variant introduces binary-search steps to accelerate convergence; hybrid methods
-combine the strengths of both.
+*Cycle cancellation (Howard)* [@howard1960dynamic]. Howard's policy iteration
+maintains a schedule (equivalently, a set of shortest-path trees) and repeatedly
+finds a cycle along which the ratio can be improved, "zeroing out" that cycle
+with the smallest possible effort. It converges very fast in practice and returns
+the optimum together with *one* critical cycle. The gains of the intermediate
+policies are monotone, but the intermediate cycles are not themselves critical,
+and the algorithm has no polynomial worst-case bound; [@dasdan2004experimental]
+reports it, together with Valdes' algorithm, as the fastest on circuit instances,
+while Young--Tarjan--Orlin is fastest overall. An improved variant introduces
+binary-search steps to accelerate convergence, and hybrid methods combine the
+strengths of both. The *sequence* of critical cycles, in decreasing order of
+criticality, is produced instead by the minimum-balancing algorithm of
+Section\ \ref{sec:period}.
 
 ## Multi-parameter problems and the ellipsoid method {#sec:multiparam}
 
@@ -450,7 +509,7 @@ problem is
 ```{=latex}
 \begin{equation}\label{eq:multiparam}
   \begin{gathered}
-  \max\{\, g(\beta) \;:\; t_i - t_j \le f_{ij}(\beta)\ \ \forall (i,j)\in E \,\}, \\
+  \max\{\, g(\beta) \;:\; u_i - u_j \le f_{ij}(\beta)\ \ \forall (i,j)\in E \,\}, \\
   \beta \in \mathbb{R}^{p},
   \end{gathered}
 \end{equation}
@@ -462,17 +521,23 @@ parametric potential problem \eqref{eq:ppp}, solved by the minimum-ratio-cycle
 algorithms. For $p>1$, parametric shortest-path theory no longer applies, and
 one must turn to a general convex optimization method.
 
-The reason the problem stays tractable is that a *negative-cycle test is a
-separation oracle*. Given a trial $\beta$, either the timing constraint graph
-$G(\beta)$ is feasible, or it contains a negative cycle $C$; in the latter case
-
-$$ \sum_{e \in C} f_e(\beta) < 0 $$
-
-is a violated constraint that separates $\beta$ from the feasible set. An oracle
-therefore needs only *one* violated constraint per iteration and never requires
-all $|E|$ constraints---indeed, all path delays---to be known in advance. This is
-the "lazy evaluation" principle of Section\ \ref{sec:potential} lifted from
-feasibility to optimization.
+The reason the problem stays tractable is that the procedure returning a
+negative cycle is a *separation oracle*. Given a trial $\beta$, either the timing
+constraint graph $G(\beta)$ is feasible, or it contains a negative cycle $C$. A
+negative cycle certifies infeasibility of the *fixed* $\beta$; to obtain a cut in
+$\beta$-space, one uses the convexity of the cycle sum. Let
+$h_C(\beta) = \sum_{e\in C} f_e(\beta)$; feasibility requires
+$h_C(\beta) \ge 0$ for every cycle. If $h_C$ is convex and
+$h_C(\hat\beta) < 0$, then for any feasible $\beta'$,
+$$ h_C(\beta') \;\ge\; h_C(\hat\beta) + g^{\mathsf{T}}(\beta' - \hat\beta),
+\qquad g = \nabla h_C(\hat\beta), $$
+and since $h_C(\beta') \ge 0 > h_C(\hat\beta)$ the subgradient satisfies
+$g^{\mathsf{T}}(\beta' - \hat\beta) > 0$. The half-space
+$g^{\mathsf{T}}(\beta' - \hat\beta) \le 0$ therefore contains no feasible point,
+and $g$ is a valid cut. An oracle thus needs only *one* violated cycle per
+iteration, and it evaluates only the arcs it traverses. This is the "lazy
+evaluation" principle of Section\ \ref{sec:potential} lifted from feasibility to
+optimization.
 
 The *ellipsoid method* [@khachiyan1979polynomial; @grotschel1988geometric] is the
 natural engine for such an oracle: it maintains an ellipsoid known to contain the
@@ -481,21 +546,25 @@ current center, after which the ellipsoid is shrunk to the appropriate side unti
 its volume (and hence the optimality gap) drops below a tolerance. Because it
 needs only separation, it tolerates non-differentiable objectives and nonlinear
 constraints; conceptually it is the multi-dimensional generalization of the
-bisection strategy used by Lawler's algorithm. Its update is
+bisection strategy used by Lawler's algorithm. For a central cut through
+$\beta_k$ with normal $g_k$, the update is
 
 $$ \beta_{k+1} = \beta_k - \frac{1}{p+1}\,
-   \frac{A_k g_k}{\sqrt{g_k^{\mathsf{T}} A_k g_k}}, $$
+   \frac{A_k g_k}{\sqrt{g_k^{\mathsf{T}} A_k g_k}}, \qquad
+   A_{k+1} = \frac{p^2}{p^2-1}\Bigl(A_k - \frac{2}{p+1}\,
+   \frac{A_k g_k g_k^{\mathsf{T}} A_k}{g_k^{\mathsf{T}} A_k g_k}\Bigr), $$
 
-where $A_k$ defines the current ellipsoid and $g_k$ is the separating gradient;
-deep, central, and parallel-cut refinements accelerate convergence in practice.
+where $A_k$ defines the current ellipsoid and $p$ is the dimension of $\beta$.
+Each iteration reduces the volume by at least a factor $e^{-1/(2p)}$, so
+$O(p^2 \log(1/\varepsilon))$ iterations suffice for an
+$\varepsilon$-optimal solution; deep-cut and parallel-cut refinements reduce the
+constant in practice.
 
-This is exactly the architecture realized by the companion libraries `digraphx`
-and `netoptim` (Section\ \ref{sec:implementation}). The resulting solver handles
-both linear and nonlinear convex multi-parameter clock skew scheduling;
-empirically it is reported to be up to an order of magnitude faster than a
-general linear-programming solver on the linear problem, and several hundred
-times faster than a general convex-programming solver on the nonlinear problem
-[@zhou2015multiparameter].
+The same architecture is realized by the reference implementation of
+Section\ \ref{sec:implementation}. On the linear problem the resulting solver has
+been reported to be faster than a general LP solver, and on the nonlinear problem
+substantially faster than a general convex solver [@zhou2015multiparameter];
+those figures are inherited from that study and are not re-validated here.
 
 ## Slack maximization
 
@@ -523,6 +592,12 @@ node merges a critical cycle; deeper subtrees are less critical.}\label{fig:hier
 # Convex and Quasi-Convex Network Problems {#sec:cvxnet}
 
 ## From a scalar parameter to a quasi-convex objective
+
+This section is background rather than survey. It collects the network-
+optimization primitives that the clock-specific sections invoke---cycle
+cancellation, line search, and the barrier method---and states the structural
+correspondences that make them applicable, and flags where the analogy to timing
+stops.
 
 Sections\ \ref{sec:period} and\ \ref{sec:multiparam} reduced every scheduling
 variant to a parametric potential problem---\eqref{eq:ppp} and
@@ -556,7 +631,7 @@ functions, distance ratios, and the minimum cost-to-time ratio cycle of
 Section\ \ref{sec:period} are all of this form.
 
 Minimizing a quasi-convex $f$ therefore reduces to a sequence of convex
-feasibility problems parametrized by $\gamma$,
+feasibility problems \eqref{eq:quasi} parametrized by $\gamma$,
 
 ```{=latex}
 \begin{equation}\label{eq:quasi}
@@ -705,7 +780,10 @@ $$ d + F^{-1}(1-\gamma)\,(\|\Sigma^{1/2} x\|_2)^{-1}\,\Sigma x . $$
 
 This is the network analogue of the per-edge statistical constraints of
 Section\ \ref{sec:yield}: the covariance enters through the cone term, while the
-quantile $F^{-1}(1-\gamma)$ plays the role of the yield parameter.
+quantile $F^{-1}(1-\gamma)$ plays the role of the yield parameter. The analogy is
+structural rather than a formal duality---the timing problem constrains
+tensions, whereas this problem constrains flows---and it is not used in the
+sequel.
 
 ## Additional constraints and the barrier method
 
@@ -754,30 +832,44 @@ natural formulation adds a nonnegative padding vector $p$:
 \end{equation}
 ```
 
-If the objective is to minimize the total inserted delay $\sum_e p_e$, then
-\eqref{eq:padding} is the *dual* of a standard minimum-cost flow problem, solvable
-by the network simplex method. This observation is appealing but, in modern
-designs, *impractical*: delay insertion is realized by cell substitution, so
-minimizing $\sum p$ does not reflect the true cost, and---more importantly---there
-may be no valid position to insert delay along some paths.
+If the objective is to minimize the total inserted delay $\sum_e p_e$, the
+continuous problem has a compact dual. With multipliers $\lambda \ge 0$ for
+$y - p \le d$, $\mu$ for $A u - y = 0$, and $\nu \ge 0$ for $p \ge 0$,
+eliminating $p$, $y$, and $u$ gives
+$$ \min\; \lambda^{\mathsf{T}} d \quad\text{s.t.}\quad
+   0 \le \lambda \le \mathbf{1}, \qquad A^{\mathsf{T}} \lambda = 0 , $$
+a minimum-cost circulation with unit capacities on the arcs of the timing
+constraint graph. The dual is therefore an ordinary network-flow problem,
+solvable by the network simplex method. This observation is appealing but, in
+modern designs, *impractical*: delay insertion is realized by cell substitution,
+so minimizing $\sum p$ does not reflect the true cost, and---more importantly---
+there may be no valid position to insert delay along some paths
+[@shenoy1993minimum].
 
-## The four structural configurations
+## The structural configurations
 
 A better strategy is to decide *where* delay may be inserted *before* deciding
 *how much* to insert. This is *path relationship analysis* (PRA). For a pair of
 registers $i$ and $j$, the maximum-delay (setup) path and the minimum-delay (hold)
-path interact in one of four ways, and each interaction determines how the TCG
-must be modified (Figure\ \ref{fig:padding}):
+path interact in one of the ways listed below, and each interaction determines
+how the TCG must be modified (Figure\ \ref{fig:padding}):
 
-1. **Type (a), no insertion.** The two paths coincide or cannot be modified; no
-   delay may be inserted independently, and the TCG is unchanged.
+1. **Type (a), no insertion.** No cell on either path can be replaced (the path
+   is already at the slow end of the library, or the nets are fixed); the TCG is
+   unchanged.
 2. **Type (b), independent.** The setup and hold paths are disjoint; delays
    $p_s$ and $p_h$ may be inserted independently, modeled by auxiliary nodes
    connected to the original vertices.
-3. **Type (c), shared.** The two paths overlap entirely, so a single delay must
-   be shared: $p_s = p_h$.
+3. **Type (c), identical.** The two paths are the same set of cells, so a single
+   delay must be shared: $p_s = p_h$.
 4. **Type (d), containment.** The hold path is a sub-path of the setup path;
-   padding upstream affects both, enforcing $p_s \ge p_h$.
+   padding the shared prefix affects both, so $p_s \ge p_h$.
+
+A fifth case, *partial overlap*---the two paths share a proper sub-path but
+neither contains the other---is common in practice and behaves like (d) on the
+shared segment and like (b) on the private segments. The four cases above are
+those that change the constraint graph in distinct ways; the padding formulation
+itself is developed in [@shenoy1993minimum].
 
 ```{=latex}
 \begin{figure*}[htbp]
@@ -823,13 +915,14 @@ continuous. Closing the gap between a relaxed padding and a discrete, cell-level
 solution is a separate combinatorial problem; choosing positions *before* values,
 as above, is what keeps that second problem tractable in practice.
 
-Discreteness does not by itself place the problem beyond convex machinery. The
-level-set and cutting-plane methods that underlie the solvers are not restricted
-to continuous variables: some discrete problems whose relaxations are integral---
-minimum-cost matching being the classic example---are solved exactly by the same
-separation logic [@grotschel1988geometric]. Extending \eqref{eq:padding} to a
-discrete technology library therefore appears feasible, although it requires real
-cell-level data; the continuous relaxation studied here is the first step.
+Discreteness does not by itself place the problem beyond convex machinery. Some
+discrete problems whose relaxations are integral---minimum-cost matching being the
+classic example---have polynomial-time algorithms built on separation, because a
+separating hyperplane can be found without enumerating the constraints
+[@grotschel1988geometric]. Extending \eqref{eq:padding} to a discrete technology
+library therefore *may* be feasible, but it requires cell-level cost data and a
+proof that the resulting relaxation is integral; the continuous relaxation
+studied here is the first step.
 
 # Yield-Driven Scheduling under Process Variations {#sec:yield}
 
@@ -841,7 +934,7 @@ nominal period to the *highest timing yield*. A circuit is called *functionally
 correct* for a given sample of process parameters if all of its setup- and
 hold-time constraints are satisfied; the *timing yield* is the fraction of
 manufactured samples that are correct [@neves1996optimal; @kourtev1999clock;
-@tsai2005yield; @visweswariah2004first].
+@tsai2005yield; @visweswariah2004first; @venkataraman2005skew].
 
 ```{=latex}
 \begin{figure}[htbp]
@@ -855,7 +948,9 @@ consume, which motivates yield-driven scheduling.}\label{fig:uncertainty}
 
 Maximizing yield is fundamentally different from minimizing a nominal period: it
 forces the schedule to reason about the *distributions* of the path delays rather
-than their worst-case values.
+than their worst-case values. Figure\ \ref{fig:uncertainty} illustrates why
+the margins left after period minimization are exactly the ones that variation
+consumes.
 
 ## Primitive solutions and their shortcomings
 
@@ -896,11 +991,14 @@ variables $\tilde{D}_{ij}$ and $\tilde{d}_{ij}$, and the setup- and hold-time
 constraints become probabilistic:
 $$ T_{\mathrm{skew}}(i,j) \le T_{\mathrm{CP}} - \tilde{D}_{ij} - T_{\mathrm{setup}}, $$
 $$ T_{\mathrm{skew}}(i,j) \ge T_{\mathrm{hold}} - \tilde{d}_{ij}, $$
-where $T_{\mathrm{skew}}(i,j) = t_i - t_j$. After statistical static timing
+where $T_{\mathrm{skew}}(i,j) = u_i - u_j$. After statistical static timing
 analysis (SSTA), every edge of the timing constraint graph carries a pair
-$(\mu_{ij}, \sigma_{ij})$---the mean and standard deviation of its delay---so the
-schedule must bound the *probability* of violation rather than its worst case
-(Figure\ \ref{fig:stattcg}).
+$(\mu_{ij}, \sigma_{ij})$---the mean and standard deviation of its *arc weight*,
+equivalently of the corresponding slack---so the schedule must bound the
+*probability* of violation rather than its worst case
+(Figure\ \ref{fig:stattcg}). The arrival times $u_i$ remain deterministic;
+only the arc weights are random. [@agarwal2003statistical; @chang2005statistical;
+@blaauw2008statistical; @orshansky2002impact; @liu2000impact].
 
 ```{=latex}
 \begin{figure}[htbp]
@@ -916,24 +1014,28 @@ deterministic weight.}\label{fig:stattcg}
 
 The EVEN method assumes that all path delays have equal variance and maximizes a
 uniform margin $\beta$:
-$$ \max \beta \quad\text{s.t.}\quad t_j - t_i \le \mu_{ij} - \beta . $$
-This is the *minimum mean cycle* problem, whose optimum is the mean edge weight of
-the critical cycle $C$ (the first negative cycle),
-$$ \beta^\star = \frac{1}{|C|}\sum_{(i,j)\in C} \mu_{ij}, $$
-computable by Karp's algorithm or by the faster methods of Dasdan and Gupta
-[@karp1978characterization; @dasdan1998faster].
+$$ \max \beta \quad\text{s.t.}\quad
+   u_i - u_j \le \mu_{ij} - \beta, \qquad
+   u_j - u_i \le \mu^{h}_{ij} - \beta , $$
+where $\mu_{ij}$ is the mean of the setup arc weight
+$T_{\mathrm{CP}} - D_{ij} - T_{\mathrm{setup}}$ and $\mu^{h}_{ij}$ the mean of the
+hold arc weight $d_{ij} - T_{\mathrm{hold}}$. This is the *minimum mean cycle*
+problem, whose optimum is the mean edge weight of the critical cycle $C$,
+$$ \beta^\star = \min_{C} \frac{1}{|C|}\sum_{e\in C} \mu_{e}, $$
+so the critical cycle is the *minimizer*, computable by Karp's algorithm or by the
+faster methods of Dasdan and Gupta [@karp1978characterization; @dasdan1998faster].
 
 EVEN then proceeds iteratively, much like minimum balancing: it identifies the
 most timing-critical cycle, distributes the slack evenly along it, freezes the
 corresponding skews, replaces the cycle by a super-vertex, and repeats
-(Figure\ \ref{fig:even}). For the
-resulting schedule the slack of each edge is
+(Figure\ \ref{fig:even}). For the resulting schedule the *setup* slack of each
+edge is
 $$ \mathrm{slack}_{ij} = T_{\mathrm{CP}} - D_{ij} - T_{\mathrm{setup}}
-   - \mathrm{skew}_{ij} . $$
-EVEN's weakness is exactly its assumption: the timing uncertainty of a long
-combinational path is normally larger than that of a short one, so an even slack
-distribution is not yield-optimal whenever the path delays along a critical cycle
-differ.
+   - \mathrm{skew}_{ij} , $$
+with the hold slack defined analogously on the reverse arc. EVEN's weakness is
+exactly its assumption: the timing uncertainty of a long combinational path is
+normally larger than that of a short one, so an even slack distribution is not
+yield-optimal whenever the path delays along a critical cycle differ.
 
 ```{=latex}
 \begin{figure*}[htbp]
@@ -956,23 +1058,24 @@ single vertex remains.}\label{fig:even}
 
 ## PROP: variance-proportional slack
 
-PROP models each gate delay as Gaussian with a common variance and a path as the
-sum of $n$ such gates, so a path delay is $\mathcal{N}(n\mu, n\sigma^2)$ and its
-standard deviation grows as the square root of the path length. It distributes the
-slack along the most critical cycle in proportion to those square roots by
-updating the TCG weights with a parameter $\alpha$,
-$$ \begin{aligned}
-   \overline{w}^{\,\mathrm{PROP}}_{ij} &= T_{\mathrm{CP}}
-     - \bigl(D_{ij} + \alpha\sqrt{D_{ij}}\,\sigma\bigr) - T_{\mathrm{setup}}, \\
-   \underline{w}^{\,\mathrm{PROP}}_{ij} &= -T_{\mathrm{hold}}
-     + \bigl(d_{ij} - \alpha\sqrt{d_{ij}}\,\sigma\bigr),
-   \end{aligned} $$
-where $\alpha$ ensures a minimum timing margin for each constraint. For a fixed
-clock period, $\alpha$ is increased until Bellman--Ford reports infeasibility; the
-largest feasible $\alpha$ gives every edge of the most critical cycle a slack equal
-to its pre-allocated margin, after which the remaining skews are filled in by
-EVEN. PROP's weaknesses are its assumption of a common gate distribution and its
-unjustified use of the square root of the path delay as the weighting.
+PROP models each gate delay as Gaussian with a common standard deviation $\sigma$
+and a path as the sum of $n$ such gates, so a path delay is
+$\mathcal{N}(n\mu_0, n\sigma^2)$ and its standard deviation grows as $\sqrt{n}$.
+Measuring delays in units of a nominal gate delay---so that $D_{ij}$ is
+approximately the stage count---PROP distributes the slack along the most critical
+cycle in proportion to those square roots by updating the TCG arc weights with a
+parameter $\alpha$:
+$$ w^{\mathrm{s}}_{ij}(\alpha) = T_{\mathrm{CP}} - D_{ij}
+     - T_{\mathrm{setup}} - \alpha\,\sigma\sqrt{D_{ij}}, \qquad
+   w^{\mathrm{h}}_{ij}(\alpha) = d_{ij} - T_{\mathrm{hold}}
+     - \alpha\,\sigma\sqrt{d_{ij}} . $$
+For a fixed clock period, $\alpha$ is increased until Bellman--Ford reports
+infeasibility; the largest feasible $\alpha$ gives every edge of the most critical
+cycle a slack equal to its pre-allocated margin, after which the remaining skews
+are filled in by EVEN. PROP's weaknesses are its assumption of a common gate
+distribution, its use of path delay as a proxy for stage count, and the fact that
+the $\sqrt{D}$ weighting is a modelling choice rather than a consequence of the
+statistics.
 
 ## FP-PROP: false-path awareness
 
@@ -996,17 +1099,20 @@ constraints.}\label{fig:falsepath}
 ## Most critical cycle and C-PROP
 
 Traditionally the most critical cycle is the *minimum mean cycle*, weighted by
-$\sum \mu_{ij}/|C|$. Under unequal variances the sound criterion weights each edge
-by its own uncertainty, and the critical cycle is the one maximizing the ratio
+$\sum \mu_{ij}/|C|$. Under unequal variances the criterion weights each edge by
+its own uncertainty, and the critical cycle is the one *minimizing* the ratio
 $\sum \mu_{ij} \big/ \sum \sigma_{ij}$. C-PROP is exactly the corresponding
 slack-maximization problem,
-$$ \max \beta \quad\text{s.t.}\quad t_j - t_i \le \mu_{ij} - \sigma_{ij}\beta , $$
+$$ \max \beta \quad\text{s.t.}\quad
+   u_i - u_j \le \mu_{ij} - \sigma_{ij}\beta, \qquad
+   u_j - u_i \le \mu^{h}_{ij} - \sigma^{h}_{ij}\beta , $$
 a *minimum cost-to-time ratio cycle* problem whose optimum is
-$$ \beta^\star = \frac{\sum_{(i,j)\in C} \mu_{ij}}{\sum_{(i,j)\in C} \sigma_{ij}}, $$
+$$ \beta^\star = \min_{C}
+   \frac{\sum_{e\in C} \mu_{e}}{\sum_{e\in C} \sigma_{e}}, $$
 solved efficiently by Howard's algorithm [@wei2006clock]. C-PROP reduces to EVEN
 when all $\sigma_{ij}$ are equal, and as a variance tends to zero it assigns only a
 minimal margin to that constraint while leaving more for the others---precisely the
-desired behavior.
+desired behavior. Figure\ \ref{fig:cprop} shows the optimum for a small example.
 
 ```{=latex}
 \begin{figure}[htbp]
@@ -1039,48 +1145,52 @@ root path---for example, $T_1^{\mathrm{final}} = T_1 + T_7 + T_9$.}\label{fig:tr
 
 ## One parametric family
 
-Minimum-period scheduling, EVEN, and C-PROP are three members of the single family
-\eqref{eq:multiparam}, differing only in the objective $g(\beta)$ and the
-right-hand sides $f_{ij}(\beta)$ (Table\ \ref{tbl:family}).
+Minimum-period scheduling, EVEN, PROP, and C-PROP are four members of a single
+family of parametric potential problems, differing in the objective $g(\beta)$ and
+the right-hand sides $f_{ij}(\beta)$ (Table\ \ref{tbl:family}).
 
 ```{=latex}
 \begin{table*}[htbp]
 \centering
-\caption{Clock skew scheduling as one parametric family. Rows give the objective
-$g(\beta)$ and the setup and hold edge bounds; every constraint reads
-$t_i - t_j \le f_e(\beta)$.}\label{tbl:family}
-\begin{tabular}{lccc}
+\caption{Clock skew scheduling as one parametric family. Every row is
+$\max\{g(\beta) : u_i - u_j \le f_{ij}(\beta),\ u_j - u_i \le f_{ji}(\beta)\}$
+for the objective and bounds shown; the units of $\beta$ differ between rows.}\label{tbl:family}
+\begin{tabular}{lcccc}
 \toprule
-Problem & $g(\beta)$ & $f_{ij}(\beta)$ (setup) & $f_{ji}(\beta)$ (hold) \\
+Problem & $g(\beta)$ & $f_{ij}(\beta)$ (setup) & $f_{ji}(\beta)$ (hold) & unit of $\beta$ \\
 \midrule
-Min.\ CP & $-\beta$ & $\beta - D_{ij} - T_{\mathrm{setup}}$ & $d_{ij} - T_{\mathrm{hold}}$ \\
-EVEN     & $\beta$ & $T_{\mathrm{CP}} - D_{ij} - T_{\mathrm{setup}} - \beta$ & $d_{ij} - T_{\mathrm{hold}} - \beta$ \\
-C-PROP   & $\beta$ & $T_{\mathrm{CP}} - D_{ij} - T_{\mathrm{setup}} - \sigma_{ij}\beta$ & $d_{ij} - T_{\mathrm{hold}} - \sigma_{ij}\beta$ \\
+Min.\ CP & $-\beta$ & $\beta - D_{ij} - T_{\mathrm{setup}}$ & $d_{ij} - T_{\mathrm{hold}}$ & time \\
+EVEN     & $\beta$ & $T_{\mathrm{CP}} - D_{ij} - T_{\mathrm{setup}} - \beta$ & $d_{ij} - T_{\mathrm{hold}} - \beta$ & time \\
+PROP     & $\beta$ & $T_{\mathrm{CP}} - D_{ij} - T_{\mathrm{setup}} - \beta\sigma\sqrt{D_{ij}}$ & $d_{ij} - T_{\mathrm{hold}} - \beta\sigma\sqrt{d_{ij}}$ & time \\
+C-PROP   & $\beta$ & $T_{\mathrm{CP}} - D_{ij} - T_{\mathrm{setup}} - \sigma_{ij}\beta$ & $d_{ij} - T_{\mathrm{hold}} - \sigma^{h}_{ij}\beta$ & number of $\sigma$ \\
 \bottomrule
 \end{tabular}
 \end{table*}
 ```
 
-Here $\beta$ plays the role of the clock period in the Min.\ CP row and of the
-uniform margin in the EVEN and C-PROP rows. The objective $g$ and the bounds
-$f_{ij}$ need not be linear: any *monotone decreasing* functions will do, and the
-problem then still has a unique solution.
+Here $\beta$ is the clock period in the Min.\ CP row, a uniform time margin in
+the EVEN and PROP rows, and a multiple of the per-edge standard deviation in the
+C-PROP row; the units differ, and the table is a statement about form rather than
+about a common numerical scale. The Min.\ CP row is the one member whose
+right-hand sides *increase* with $\beta$: it is a minimization, and it fits the
+$\max$ template only after the substitution $\beta \mapsto -\beta$. For the other
+rows every $f$ is non-increasing in $\beta$, so the feasible set is an interval
+and the optimum is its right endpoint.
 
 ## Yield maximization and the correlation question
 
 The statistical objectives above are instances of the max-min formulation
-$$ \max \Bigl\{ \min_{ij} \Pr\bigl\{ t_j - t_i \le \tilde{W}_{ij} \bigr\} \Bigr\}, $$
-where $\tilde{W}_{ij}$ is the random edge slack. This is *not* exactly the timing
-yield, but it is reasonable, easy to solve, and---crucially---it needs no
-correlation information among the $\tilde{W}_{ij}$. Writing $F_{ij}$ for the CDF of
-$\tilde{W}_{ij}$, it is equivalent to
-$$ \begin{array}{ll}
-   \max \beta & \text{subject to}\quad
-      t_i - t_j \le T_{\mathrm{CP}} - F^{-1}_{ji}(\beta), \\
-   & t_j - t_i \le F^{-1}_{ij}(1-\beta).
-   \end{array} $$
+$$ \max_{u}\ \min_{ij}\ \Pr\bigl\{ u_j - u_i \le \tilde{W}_{ij} \bigr\}, $$
+where $\tilde{W}_{ij}$ is the random slack of arc $(i,j)$. This is *not* exactly
+the timing yield, but it is easy to solve and---crucially---it needs no
+correlation information among the $\tilde{W}_{ij}$. Writing $F_{ij}$ for the CDF
+of $\tilde{W}_{ij}$, it is equivalent to
+$$ \max \beta \quad\text{subject to}\quad
+   u_j - u_i \le F^{-1}_{ij}(\beta), \qquad
+   u_i - u_j \le F^{-1}_{ji}(\beta). $$
 Because every CDF is monotone increasing, its inverse is well defined and the
-problem remains a parametric potential problem.
+problem remains a parametric potential problem: $\max \beta$ subject to
+difference constraints whose right-hand sides decrease with $\beta$.
 
 The reason no correlation is required is that the objective bounds each
 *individual* constraint separately, so only the *marginal* distributions are
@@ -1089,9 +1199,11 @@ accounted for upstream, in the STA/SSTA step that produces $\tilde{D}_{ij}$ and
 $\tilde{d}_{ij}$, and once those marginals are fixed the per-edge objective needs
 no further correlation information. The price is that the result is a *surrogate*
 for, not the true, timing yield, which is a property of the *joint* distribution of
-the path delays. Replacing the surrogate by the true joint yield would require the
-full correlation matrix, which contemporary SSTA does not report, and remains an
-open problem (Section\ \ref{sec:discussion}). Figure\ \ref{fig:comparison} compares
+the path delays; the surrogate is not monotone in any obvious way with respect to
+the joint yield, so a schedule that improves it can in principle degrade the true
+yield. Replacing the surrogate by the true joint yield would require the full
+correlation matrix, which contemporary SSTA does not report, and remains an open
+problem (Section\ \ref{sec:discussion}). Figure\ \ref{fig:comparison} compares
 the schedules produced by the methods above.
 
 ```{=latex}
@@ -1104,41 +1216,43 @@ the schedules produced by the methods above.
 
 ## Gaussian model and linearization
 
-When the edge slacks are Gaussian, the probabilistic constraints can be written
-explicitly. With $z = \sqrt{2}\,\mathrm{erf}^{-1}(2\beta-1)$, maximizing the yield
-parameter $\beta$ becomes
-$$ \begin{array}{ll}
-   \text{maximize} & \beta \\
-   \text{subject to} & t_i - t_j \le T_{\mathrm{CP}} - \mu^{D}_{ij}
-       - \sigma^{D}_{ij} z, \\
-   & t_j - t_i \le \mu^{H}_{ij} - \sigma^{H}_{ij} z.
-   \end{array} $$
-Since $\mathrm{erf}^{-1}$ is anti-symmetric and monotone, the substitution
-$\beta' = z$ linearizes the constraints into a minimum cost-to-time ratio problem,
-$$ t_i - t_j \le T_{\mathrm{CP}} - \mu^{D}_{ij} - \sigma^{D}_{ij}\beta', \qquad
-   t_j - t_i \le \mu^{H}_{ij} - \sigma^{H}_{ij}\beta', $$
-solvable by binary search on $\beta'$.
+When the arc slacks are Gaussian, the probabilistic constraints can be written
+explicitly. With $z = \sqrt{2}\,\mathrm{erf}^{-1}(2\beta-1)$ (the standard
+normal $\beta$-quantile), maximizing the yield parameter $\beta$ becomes
+$$ \max \beta \quad\text{subject to}\quad
+   u_i - u_j \le T_{\mathrm{CP}} - \mu^{D}_{ij} - \sigma^{D}_{ij} z, \qquad
+   u_j - u_i \le \mu^{H}_{ij} - \sigma^{H}_{ij} z . $$
+Because $z$ is a strictly increasing function of $\beta$, maximizing $\beta$ is
+equivalent to maximizing $z$, and in the variable $z$ the constraints are affine.
+The result is a parametric potential problem with per-edge slopes $\sigma_e$;
+with $T_{\mathrm{CP}}$ fixed it is a max-ratio problem, solved by bisection on
+$z$.
 
 ## Log-normal model
 
 A log-normal model replaces the Gaussian quantile by an exponential one, giving
-$$ t_i - t_j \le T_{\mathrm{CP}} - \exp\bigl(\mu^{D}_{ij}
-   + \sigma^{D}_{ij}\beta'\bigr), $$
-$$ t_j - t_i \le \exp\bigl(\mu^{H}_{ij} - \sigma^{H}_{ij}\beta'\bigr). $$
-This bypasses the explicit evaluation of the error function. The problem is
-nonlinear and non-convex, but it is still monotone in $\beta'$ and can be solved
-efficiently by binary search.
+$$ u_i - u_j \le T_{\mathrm{CP}} - \exp\bigl(\mu^{D}_{ij}
+   + \sigma^{D}_{ij} z\bigr), \qquad
+   u_j - u_i \le \exp\bigl(\mu^{H}_{ij} - \sigma^{H}_{ij} z\bigr). $$
+This avoids evaluating the error function. The problem is nonlinear and its
+feasible set is not convex, but feasibility is monotone in $z$, so bisection still
+applies; each test is a negative-cycle detection with transcendental weights,
+which makes this the most expensive member of the family.
 
-## Experimental results
+## Illustrative comparison
 
-Figure\ \ref{fig:results} reproduces the lecture's experimental results for the
-yield-driven scheduling methods.
+Figure\ \ref{fig:results} reproduces an illustrative comparison from the course
+notes [@luk2026lecture]. It shows the qualitative behavior of the methods above on
+a small example; no benchmark, instance sizes, or runtime data accompany it, and
+it should not be read as an empirical comparison. Section\ \ref{sec:scope} states
+why no such comparison is reported here.
 
 ```{=latex}
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.8\linewidth]{figures/fig20.png}
-\caption{Experimental results for the yield-driven scheduling methods.}\label{fig:results}
+\caption{Illustrative comparison of the yield-driven scheduling methods;
+not a benchmark.}\label{fig:results}
 \end{figure}
 ```
 
@@ -1152,59 +1266,75 @@ $$ \min \frac{T_{\mathrm{CP}}}{\beta} \quad\text{subject to}\quad
    y_{ji} \le F_{ij}^{-1}(1-\beta)\ \ (j,i) \in E_h, \quad
    T_{\mathrm{CP}} \ge 0,\ \ 0 \le \beta \le 1 . $$
 
-The setup bound shrinks linearly with the period and grows with the yield, while
-the hold bound grows with the yield; both involve the quantile $F_{ij}^{-1}$,
-which is not concave over the whole interval $[0,1]$. In practice only high-yield
-operation is of interest---say $\beta \ge 0.8$---and on that range the problem is
-convex. Introducing the epigraph variable $\gamma$ linearizes the ratio,
+The setup bound tightens as the period shrinks and as the yield target rises; the
+hold bound tightens as the yield target rises, because $F_{ij}^{-1}(1-\beta)$
+falls with $\beta$. Both involve $F^{-1}$, which is not concave over $[0,1]$:
+for a Gaussian it is convex above the median and concave below, and the two
+constraints therefore require opposite curvatures. They are compatible exactly
+when $\beta$ and $1-\beta$ lie on opposite sides of the median---for Gaussians,
+when $\beta > 1/2$. Restricting to $\beta \ge 0.8$ is therefore sufficient for
+the Gaussian model, but the corresponding threshold for a log-normal or GEV
+marginal must be computed from its mode, and the claim of convexity is
+distribution-dependent.
 
-$$ \min\ \gamma \quad\text{subject to}\quad
+For a trial value of $\gamma$, the constraint $T_{\mathrm{CP}} \le \gamma\beta$
+is linear, and the remaining feasibility test is a parametric potential problem;
+bisection on $\gamma$ converges to the optimal ratio. The problem is therefore
+solved as a sequence of convex feasibility problems,
+$$ \text{find } (y, T_{\mathrm{CP}}, \beta) \quad\text{s.t.}\quad
    T_{\mathrm{CP}} - \gamma\beta \le 0,\quad
    y_{ij} \le T_{\mathrm{CP}} - F_{ij}^{-1}(\beta),\quad
    y_{ji} \le F_{ij}^{-1}(1-\beta),\quad
    T_{\mathrm{CP}} \ge 0,\ \ 0.8 \le \beta \le 1, $$
-
-a convex network problem solved by binary search or the ellipsoid method, in the
-manner of Section\ \ref{sec:cvxnet}.
+rather than as a single convex program. The constraint
+$T_{\mathrm{CP}} - \gamma\beta \le 0$ is bilinear in
+$(\gamma, \beta)$ and is *not* convex when $\gamma$ is a variable, which is why
+the ratio is handled by bisection rather than by an epigraph variable.
 
 ## Yield-driven delay padding and its dual
 
-The padding formulation of Section\ \ref{sec:padding} and the yield formulation of
-the present section can be merged into a single program that trades yield against
-the cost of inserted delay. With a padding vector $p \ge 0$, a weight $\gamma$ on
-the yield, and per-edge Gaussian delays $\mathbf{d}_{ij}$ of mean $d_{ij}$ and
-variance $s_{ij}$, the problem is
+The padding formulation of Section\ \ref{sec:padding} and the yield formulation
+of the present section can be merged into a single program that trades yield
+against the cost of inserted delay. With a padding vector $p \ge 0$, a weight
+$\gamma$ on the yield, per-edge Gaussian delays of mean $d_{ij}$ and standard
+deviation $\sigma_{ij}$, and a padding-cost vector $k$, the problem is
 
-$$ \max\ \gamma\beta - c^{\mathsf{T}} p \quad\text{subject to}\quad
+$$ \max\ \gamma\beta - k^{\mathsf{T}} p \quad\text{subject to}\quad
    \beta \le \Pr\{y_{ij} \le \mathbf{d}_{ij} + p_{ij}\},\quad A u = y,\quad
-   p \ge 0, $$
+   p \ge 0 . $$
 
-which is equivalent to the linear program
+If the quantile is linearized as $Q(\beta) = d - \beta\sigma$---equivalently,
+if $\beta$ is reparameterized by its Gaussian $z$-score---the chance constraint
+becomes the linear constraint $y \le d - \beta\sigma + p$, and the program is
+the linear program
 
-$$ \max\ \gamma\beta - c^{\mathsf{T}} p \quad\text{subject to}\quad
-   y \le d - \beta s + p,\quad A u = y,\quad p \ge 0 . $$
+$$ \max\ \gamma\beta - k^{\mathsf{T}} p \quad\text{subject to}\quad
+   y \le d - \beta\sigma + p,\quad A u = y,\quad p \ge 0 . $$
 
-Its dual is a min-cost flow with one additional constraint,
+Its dual is a min-cost circulation with two side constraints,
 
-$$ \min\ d^{\mathsf{T}} x \quad\text{subject to}\quad
-   0 \le x \le c,\quad A^{\mathsf{T}} x = b,\quad b(V) = 0,\quad
-   s^{\mathsf{T}} x \le \gamma, $$
+$$ \min\ \lambda^{\mathsf{T}} d \quad\text{subject to}\quad
+   0 \le \lambda \le k,\quad A^{\mathsf{T}} \lambda = 0,\quad
+   \sigma^{\mathsf{T}} \lambda = \gamma, $$
 
-in which the non-network constraint $s^{\mathsf{T}} x \le \gamma$ is exactly the
-one handled by the barrier method \eqref{eq:barrier}. Sections\ \ref{sec:padding}
-and \ref{sec:yield} are therefore primal and dual views of a single problem,
-which is why they share the same negative-cycle core.
+in which the last constraint is the non-network one handled by the barrier method
+\eqref{eq:barrier}. Sections\ \ref{sec:padding} and \ref{sec:yield} are
+therefore primal and dual views of a single problem, which is why they share the
+same negative-cycle core. The linearization is a modelling choice: with the exact
+Gaussian quantile the program is no longer an LP, and the dual acquires a
+nonlinear term.
 
 # Non-Gaussian and Heavy-Tailed Delay Models {#sec:gev}
 
 ## Why the Gaussian model fails
 
 At 65\,nm and below, the distribution of a *maximum* path delay is typically
-asymmetric and heavy-tailed, so the central limit theorem does not rescue the
-Gaussian assumption. Setup failures occur in slow corners and depend on the upper
+asymmetric and heavy-tailed [@bowman2002impact; @blaauw2008statistical], so the
+central limit theorem does not rescue the Gaussian assumption. Setup failures occur in slow corners and depend on the upper
 tail; hold failures occur in fast corners and depend on the lower tail. A model
 that fits the bulk but misses the tails therefore mis-estimates yield precisely
-where it matters (Figure\ \ref{fig:nongaussian}).
+where it matters (Figure\ \ref{fig:nongaussian}, reproduced from the course
+notes [@luk2026lecture]).
 
 ```{=latex}
 \begin{figure}[htbp]
@@ -1212,16 +1342,16 @@ where it matters (Figure\ \ref{fig:nongaussian}).
 \includegraphics[width=0.8\linewidth]{figures/non-gaussian.png}
 \caption{Path-delay distributions are not Gaussian: they are asymmetric and
 heavy-tailed, so a Gaussian fit captures the bulk but understates the tails
-that govern setup and hold failures (illustration from the lecture).
-}\label{fig:nongaussian}
+that govern setup and hold failures (illustration).}\label{fig:nongaussian}
 \end{figure}
 ```
 
 ## Unimodality and quantile functions
 
-A continuous distribution with mode $m$ is *unimodal* if its CDF is convex for
-$x<m$ and concave for $x>m$. Normal, log-normal, and log-logistic distributions
-are unimodal, and their *quantile functions* are available in closed form:
+A continuous distribution with mode $m$ is *unimodal* if its density increases
+up to $m$ and decreases after it, so its CDF is convex for $x<m$ and concave for
+$x>m$. Normal, log-normal, and log-logistic distributions are unimodal, and their
+*quantile functions* are available in closed form:
 
 $$ \begin{array}{lll}
    \text{Normal:} & \mu + \sigma\sqrt{2}\,\mathrm{erf}^{-1}(2p-1), & \\[2pt]
@@ -1230,13 +1360,18 @@ $$ \begin{array}{lll}
    \end{array} $$
 
 For the log-normal distribution the mode is $\exp(\mu-\sigma^2)$ and the CDF at
-the mode is $\tfrac12\bigl(1+\mathrm{erf}(-\sigma/\sqrt{2})\bigr)$.
+the mode is $\tfrac12\bigl(1+\mathrm{erf}(-\sigma/\sqrt{2})\bigr)$. Because the
+CDF is convex below the mode and concave above it, the quantile function
+$Q = F^{-1}$ is *concave* on $(0, F(m))$ and *convex* on $(F(m), 1)$. This is the
+property used in Section\ \ref{sec:yield} when the co-optimization program is
+claimed to be convex on a high-yield range.
 
 ## Generalized extreme value distribution
 
-The *generalized extreme value* (GEV) distribution [@jenkinson1955frequency]
-unifies the three extreme-value types and models skewness and tail weight through
-three parameters: location $\mu$, scale $\sigma>0$, and shape $\xi$. Its PDF and
+The *generalized extreme value* (GEV) distribution
+[@jenkinson1955frequency; @coles2001introduction] unifies the three extreme-value
+types and models skewness and tail weight through three parameters: location
+$\mu$, scale $\sigma>0$, and shape $\xi$. Its PDF and
 CDF are
 
 $$ \begin{gathered}
@@ -1255,7 +1390,16 @@ The quantile function is
 ```
 
 Because circuit delays are strictly positive and their maxima are heavy-tailed,
-the case $\xi \ne 0$ is the relevant one.
+the case $\xi > 0$ (Fr\'echet) is the relevant one. Two cautions apply. First,
+\eqref{eq:gev} is the quantile of a *maximum*; applying the same family to a
+minimum requires the reflected variable, and the tail index of a minimum is the
+negative of that of the maximum, so a single $\xi$ cannot describe both tails
+unless the two distributions are reflections of each other. Second, the GEV
+support is $1 + \xi(x-\mu)/\sigma > 0$: for $\xi>0$ the support is bounded below
+by $\mu - \sigma/\xi$, which may be negative, whereas delays are positive; for
+$\xi<0$ the upper tail is bounded, which contradicts the heavy-tail premise. In
+practice the distribution must be truncated at zero and the fit checked against
+the data, not assumed.
 
 ## Statistical timing constraints with GEV
 
@@ -1269,7 +1413,7 @@ and are converted to their deterministic equivalents through the quantile
 function \eqref{eq:gev}:
 
 $$ T_{\mathrm{CP}} - T_{\mathrm{setup}} - T_{\mathrm{skew}} \ge Q_D(\beta), $$
-$$ T_{\mathrm{hold}} - T_{\mathrm{skew}} \ge Q_d(1-\beta). $$
+$$ T_{\mathrm{hold}} - T_{\mathrm{skew}} \le Q_d(1-\beta). $$
 
 The setup constraint is sensitive to the *upper* tail $Q_D(\beta)$ (slow corners),
 whereas the hold constraint is sensitive to the *lower* tail $Q_d(1-\beta)$ (fast
@@ -1278,32 +1422,39 @@ yield parameter $\beta$ remains a single scalar and the parametric framework of
 Section\ \ref{sec:period} still applies. In general Lawler's binary search solves
 the resulting problem; for the special GEV form one may bypass the explicit
 quantile by searching directly on a transformed parameter, exactly as in the
-Gaussian linearization of Section\ \ref{sec:yield}.
+Gaussian linearization of Section\ \ref{sec:yield}. The GEV model has been used
+for yield-driven skew scheduling by Wang et al. [@wang2008timing] and, in the
+form above, by Zhu et al. [@zhu2025gev].
 
 # Algorithms {#sec:algorithms}
 
 ## Overview
 
-Table\ \ref{tbl:algs} compares the principal algorithms for the parametric
-potential problem \eqref{eq:ppp}. They share one primitive: the detection and
-cancellation of negative cycles. The parametric shortest-path algorithm of
-Young, Tarjan, and Orlin [@young1991faster] attains the best worst-case bound
-among them.
+Table\ \ref{tbl:algs} compares the algorithms used in this survey. They share one
+primitive: the detection and cancellation of negative cycles. No single row
+dominates. The clean parametric bounds require unit slopes; the general
+min-ratio problem needs a different parametric-search algorithm; and Howard's
+practical speed comes without a polynomial guarantee. The hypothesis column is
+therefore part of the result, not a footnote.
 
 ```{=latex}
 \begin{table*}[htbp]
 \centering
-\caption{Algorithms for the parametric potential problem. Here $n=|V|$ and
-$m=|E|$; $\epsilon$ is the binary-search tolerance.}\label{tbl:algs}
-\begin{tabular}{lll}
+\caption{Algorithms for the problems used in this survey. Here $n=|V|$,
+$m=|E|$, $K$ bounds the integer edge slopes, and $\epsilon$ is the binary-search
+tolerance. The hypothesis column is part of the result.}\label{tbl:algs}
+\begin{tabular}{llll}
 \toprule
-Method & Strategy & Cost / behavior \\
+Problem & Method & Hypothesis & Cost / behavior \\
 \midrule
-Bellman--Ford & single feasibility test & $O(nm)$ \\
-Karp & minimum mean cycle & $O(nm)$ \\
-Lawler & binary search + feasibility test & $O(nm\log(1/\epsilon))$ \\
-Howard & policy iteration / cycle cancellation & fast in practice, exact \\
-Young--Tarjan--Orlin & parametric shortest path & $O(nm + n^{2}\log n)$ \\
+Min mean cycle & Karp & --- & $O(nm)$ \\
+Min ratio cycle & Lawler & finite range, tolerance $\epsilon$ & $O(nm\log(1/\epsilon))$ \\
+Min ratio cycle & Megiddo & positive times & $O(n^{2}m\log n)$ \\
+Min ratio cycle & Bringmann et al. & positive times & $\tilde{O}(m^{3/4}n^{3/2})$ \\
+Parametric shortest path & Karp--Orlin & slopes $0/-1$ & $O(nm\log n)$ \\
+Parametric shortest path & Young--Tarjan--Orlin & slopes $0/-1$ & $O(nm + n^{2}\log n)$ \\
+Parametric shortest path & Young--Tarjan--Orlin & slopes in $[-K,0]$ & $O(Knm + Kn^{2}\log n)$ \\
+Min mean / ratio cycle & Howard & --- & exact; no polynomial bound \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -1313,8 +1464,8 @@ Young--Tarjan--Orlin & parametric shortest path & $O(nm + n^{2}\log n)$ \\
 
 Lawler's method brackets $\beta$ and halves the interval with a feasibility test
 (Algorithm\ \ref{alg:bf}) at each step. It is easy to implement and robust to
-nonlinear $d(\beta)$, at the cost of repeated full-graph scans. It converges
-locally in the sense that each test is global but the bracket shrinks slowly
+nonlinear $d(\beta)$, at the cost of repeated full-graph scans; each test costs
+$O(nm)$ and the bracket shrinks by a factor of two per test
 (Figure\ \ref{fig:lawler}).
 
 ```{=latex}
@@ -1330,14 +1481,19 @@ met.}\label{fig:lawler}
 
 ## Howard's policy iteration
 
-Howard's algorithm is the method of choice for the single-parameter problem. It
-maintains one chosen outgoing arc per vertex (a *policy*); the policy graph
-contains a cycle, whose current ratio gives an improved $\beta$; the potentials
-are then recomputed with respect to the parameterized weights and the policy is
-updated. Each iteration produces a strictly better $\beta$, and the algorithm
-returns the optimum together with its critical cycle. Variants that interleave
-binary-search pivots converge even faster, and hybrid Lawler--Howard methods are
-common in practice (Figures\ \ref{fig:howard} and\ \ref{fig:hybrid}).
+Howard's algorithm is the method of choice for the single-parameter problem in
+practice. It maintains one chosen outgoing arc per vertex (a *policy*); the policy
+graph contains a cycle, whose current ratio gives an improved $\beta$; the
+potentials are then recomputed with respect to the parameterized weights and the
+policy is updated. Each iteration produces a strictly better $\beta$, and the
+algorithm returns the optimum together with *one* critical cycle. The gains of
+the intermediate policies are monotone, but those intermediate cycles are not
+themselves critical, and no polynomial worst-case bound is known; the known lower
+bounds for the deterministic problem are quadratic [@hansen2010lower], while
+exponential lower bounds exist for the more general stochastic setting. Variants
+that interleave binary-search pivots converge even faster, and hybrid
+Lawler--Howard methods are common in practice (Figures\ \ref{fig:howard}
+and\ \ref{fig:hybrid}).
 
 ```{=latex}
 \begin{figure}[htbp]
@@ -1362,12 +1518,20 @@ iteration, accelerating convergence.}\label{fig:hybrid}
 
 For the equal-variance case, the minimum mean cycle admits a closed-form
 characterization [@karp1978characterization], computable in $O(nm)$ time from
-shortest-path distances with a bounded number of edges. Karp's algorithm is the
-canonical subroutine for EVEN and for the minimum-mean-cycle form of any
-scheduling instance. The broader family of minimum-ratio algorithms is surveyed
-by Dasdan and Gupta [@dasdan1998faster].
+shortest-path distances with a bounded number of edges; the computation is $n$
+Bellman--Ford passes, one per path length. Karp's algorithm is the canonical
+subroutine for EVEN and for the minimum-mean-cycle form of any scheduling
+instance. The broader family of minimum-ratio algorithms is surveyed by Dasdan
+and Gupta [@dasdan1998faster] and Dasdan [@dasdan2004experimental]; the
+parametric approach originates with Karp and Orlin [@karp1981parametric] and
+Gusfield [@gusfield1983parametric], and Carstensen
+[@carstensen1983complexity] showed that arbitrary slopes can produce
+$n^{\Omega(\log n)}$ breakpoints, which is why the unit-slope hypothesis in
+Table\ \ref{tbl:algs} cannot be dropped. The current best strongly polynomial
+bound for the general min-ratio problem is due to Bringmann, Hansen, and
+Krinninger [@bringmann2017improved].
 
-## From schedule to a sequentially realizable clock tree
+## From schedule to a realizable clock tree
 
 The scheduling algorithms return arrival times, but these must be *realized* by a
 physical clock tree. Here the network viewpoint again pays off: the minimum
@@ -1382,10 +1546,16 @@ discusses how to exploit this structure.
 A clock tree delivering prescribed arrival times is built by *deferred-merge
 embedding* (DME) with Elmore delay and buffer insertion. Constraining the tree to
 deliver a *bounded* skew is possible but significantly complicates the
-algorithm. The practical recommendation is to keep the scheduled skews as a
+algorithm. The schedule itself should carry the matching bound: the program of
+Section\ \ref{sec:period} constrains only differences $u_i - u_j$, so it must be
+augmented with $0 \le u_i \le U_{\max}$ (equivalently,
+$\max_i u_i - \min_i u_i \le U_{\max}$) to exclude schedules whose spread no
+tree can deliver; without such a bound the optimum may place two registers a full
+period apart. The practical recommendation is to keep the scheduled skews as a
 budget: if the schedule is over-optimized, the tree becomes hard to build, and
-budgeting techniques must be applied. After construction, a detailed timing
-analysis (not merely Elmore delay) should confirm the arrival times.
+budgeting techniques must be applied [@held2003clock]. After construction, a
+detailed timing analysis (not merely Elmore delay) should confirm the arrival
+times.
 
 Realizing a prescribed skew is not free. Deferred-merge embedding places merging
 points and inserts buffers to meet target delays, and the buffer count,
@@ -1437,11 +1607,11 @@ tree will eventually produce; the scheduler emits a target, and CTS then tries t
 approach it. The uncertainty of the underlying delays is already carried by the
 maximum and minimum path delays $\overline{w}$ and $\underline{w}$ supplied by
 STA/SSTA, so the target vector itself must remain a single, deterministic value,
-much as a class is scheduled for 03:25 p.m. and not for a distribution of starting
-times. This is why a reviewer who asks "why is the arrival time not a random
-variable when the method is statistical?" has mistaken the deterministic *target*
-for the random *outcome*---and, likewise, why an arrival time attributed to CTS is
-an *actual* skew, not the quantity optimized in
+much as a meeting is scheduled for 03:25 p.m. and not for a distribution of
+starting times. The distinction is therefore one of role rather than of
+statistics: the scheduler emits a deterministic target, while the timing engine
+supplies the distributions from which that target is computed. An arrival time
+reported after CTS is an *actual* skew, not the quantity optimized in
 Sections\ \ref{sec:period}--\ref{sec:yield}.
 
 ## Criticality-ordered topology and placement
@@ -1455,15 +1625,17 @@ also follows the topology---placing registers of the same branch physically
 together---spatial correlation further reduces skew variation. Since
 contemporary statistical timing analysis does not report the correlation
 information needed for a first-principles optimization, aligning topology,
-placement, and criticality is a valuable, practical surrogate.
+placement, and criticality is a valuable, practical surrogate
+[@held2003clock; @wang2006extensive].
 
 ## Co-optimization after the tree is built
 
 After clock-tree synthesis the delay estimates are more accurate, raising the
 question of whether to re-schedule. Some methods relax the constraint to
 $1.2\,u_i - 0.8\,u_j \le w_{ij}$, reflecting that a built tree cannot realize an
-exact skew; the resulting problem is no longer a pure network flow but remains a
-linear program. It is also possible to relax the fixed arrival time to an
+exact skew. The coefficients differ from unity, so the constraint is no longer a
+difference constraint and the negative-cycle test does not apply; the resulting
+problem remains a linear program and is solved by a general LP method. It is also possible to relax the fixed arrival time to an
 *interval*, which reduces clock-tree wirelength and makes the schedule robust to
 unavoidable process variation.
 
@@ -1503,18 +1675,23 @@ The separation oracles live in `netoptim`. `NetworkOracle` wraps the
 negative-cycle finder and, on detecting a negative cycle, returns the cutting
 plane of Section\ \ref{sec:multiparam}; `OptScalingOracle` and
 `ClockScheduleOracle` package the matrix-scaling and two-parameter (period,
-yield) problems as further instances of the same oracle contract. The `ellalgo`
+uniform-margin) problems as further instances of the same oracle contract. The
+two-parameter oracle of `ClockScheduleOracle` is the EVEN-style problem of
+Section\ \ref{sec:yield}, in which $\beta$ is a time margin; reaching the
+probability-level yield model would replace $\beta$ by the corresponding
+quantile and keep the same cut construction. The `ellalgo`
 libraries supply the ellipsoid and cutting-plane drivers that consume these
 planes.
 
 Two implementation points deserve recording, because both are easy to get wrong
 and both concern the certificate rather than the arithmetic. First, the oracle
-must emit a *valid* separating plane: Howard's per-edge verification can surface
-a cycle whose total weight is not actually negative, so the oracle retains the
-most-violated cycle it finds and cuts only when that cycle is genuinely
-negative. Second, the actionable output is the *most critical* cycle, so the
-feasibility oracle selects the minimum-mean negative cycle rather than the first
-one returned---the certificate discussed in Section\ \ref{sec:potential}.
+must emit a *valid* separating plane. Howard's per-edge verification can surface
+a cycle whose total weight is not actually negative; the cycle generator in
+`digraphx` filters such cycles, and the oracle in `netoptim` retains the
+most-violated cycle it is given. Second, the actionable output is the *most
+critical* cycle, so the feasibility oracle selects the minimum-mean negative
+cycle rather than the first one returned---the certificate discussed in
+Section\ \ref{sec:potential}.
 
 ## Scope and limitations {#sec:scope}
 
@@ -1540,56 +1717,45 @@ framework is thus best understood as the exact *algorithmic core* of a larger
 physical-optimization problem, to which the surrounding engineering steps add
 costs and constraints that the core itself does not capture.
 
-The absence of benchmark experiments is a matter of cost and access rather than
-relevance. Few groups carry out end-to-end useful-skew studies, and the enabling
-data---a manufactured test chip together with the spatial-correlation extraction
-that accompanies it---costs millions, which places a controlled comparison beyond
-the reach of a single algorithmic study. The position taken here is that the
-concepts must be settled first: a simple modeling error, such as treating the
-arrival time as a distribution or assuming Gaussian path delays, squanders exactly
-the data such an experiment is meant to produce. The open problems below are
-therefore stated so that groups with measurement access can pursue them.
+No new experiments are reported. That is a limitation of scope, not a claim that
+experiments are impossible: random timing constraint graphs, the public ISCAS-89
+and ITC-99 suites, an open PDK, and an open RTL-to-GDS flow all support a
+controlled comparison, and the algorithms themselves are small. What such a study
+would not settle is the physical side---whether the scheduled skews survive
+clock-tree construction and silicon---which does require measurement data. The
+open problems below are stated so that groups with that access can pursue them.
 
-## Common misconceptions
+## Modelling assumptions
 
-Because the topic sits between algorithms and physical design, a few misreadings
-recur in reviews; they are worth stating explicitly.
+The formulation rests on assumptions that are easy to misread; they are stated
+here once, positively.
 
-- **"The arrival time should be a distribution because the method is
-  statistical."** The arrival time optimized here is a deterministic *target*, set
-  before the clock tree exists; the random quantity is the *actual* skew the tree
-  delivers (Section\ \ref{sec:cts}). The statistics enter through the path-delay
-  bounds, not through the target vector.
-- **"The formulation assumes uncorrelated delays."** It does not. It is a
-  per-edge objective that consumes only marginal path-delay distributions;
-  correlation is accounted for upstream, when STA/SSTA produces those
-  distributions (Section\ \ref{sec:yield}).
-- **"Clock-tree synthesis is blamed for an unfixable design."** When a scheduled
-  skew proves hard to realize, the root cause is usually the *placement*:
-  registers positioned without regard to the redefined critical paths. No amount
-  of clock-tree effort recovers a poor register placement (Section\ \ref{sec:cts}).
-- **"The model ignores power, area, and routing congestion."** Those costs are
-  real but belong to the physical stage, which the scheduler precedes. The
-  recommended practice is to treat the schedule as a budget and to re-optimize
-  once the tree exists (Section\ \ref{sec:cts}), rather than to burden the
-  network-potential core with costs it cannot represent.
-- **"The flat-graph model cannot handle hierarchy."** The abstraction is a
-  boundary condition, not a claim about the design: whatever the timing engine can
-  characterize---hierarchical or not---is supplied to the scheduler as path
-  delays. The hard problem lies in STA/SSTA itself, not in the scheduling core
-  (Section\ \ref{sec:scope}).
-- **"There are no benchmark experiments."** The omission reflects cost and access,
-  not relevance; the empirical claims are inherited from the literature, and the
-  open problems are stated for groups with measurement access
-  (Section\ \ref{sec:scope}).
+- **The optimized arrival times are deterministic targets.** They are computed
+  before the clock tree exists and are not random variables. The random quantity
+  is the *actual* skew the tree delivers (Section\ \ref{sec:cts}); the statistics
+  enter through the path-delay bounds, not through the target vector.
+- **The yield objective is per-edge.** It consumes marginal path-delay
+  distributions and does not require the joint distribution. Correlation is
+  accounted for upstream, when SSTA produces those marginals; the objective is a
+  surrogate for the joint yield, not the joint yield itself
+  (Section\ \ref{sec:yield}).
+- **The schedule precedes the physical stages.** Power, area, and congestion are
+  not in the objective. The schedule is a budget that the physical flow must
+  realize or revise (Section\ \ref{sec:cts}).
+- **The graph is flat.** Hierarchy, clock-domain crossings, and gating are
+  boundary conditions supplied by the timing engine, not properties of the
+  scheduling core (Section\ \ref{sec:scope}).
+- **No benchmark is reported.** The empirical claims are inherited from the
+  cited literature (Section\ \ref{sec:scope}).
 
 ## Open problems
 
 Several questions remain open.
 
-- **Correlation-aware yield.** The max-min formulations here do not require
-  correlation information, but they are not the true timing yield. Incorporating
-  spatial correlation, as captured by Gaussian processes, remains a challenge.
+- **Correlation-aware yield.** Incorporating spatial correlation into a *joint*
+  yield objective---as opposed to the per-edge surrogate used here---remains open,
+  although correlation itself is well modeled in SSTA
+  [@agarwal2003statistical; @chang2005statistical].
 - **Quantized delay padding.** Delay insertion by cell swapping is inherently
   quantized; integer or mixed-integer versions of \eqref{eq:padding} deserve more
   attention.
@@ -1603,7 +1769,8 @@ Several questions remain open.
 - **Hierarchical and gated designs.** Flat difference constraints assume a single
   synchronous graph; hierarchical timing, clock-domain crossings (CDCs), and
   dynamic clock gating call for decomposed or interface-constrained
-  formulations.
+  formulations. Multi-domain scheduling is the first step
+  [@ravindran2003multi].
 - **Independent evaluation.** The speedups quoted in this survey are those
   reported in the cited papers; an apples-to-apples study on modern
   multi-million-gate benchmarks remains to be done.
@@ -1611,7 +1778,7 @@ Several questions remain open.
 # Conclusion {#sec:conclusion}
 
 Clock skew scheduling turns the inevitable, unwanted skew of a clock network into
-a deliberate design variable. We have shown that the problem has a single
+a deliberate design variable. This survey has argued that the problem has a single
 mathematical core: the timing constraints are a system of difference constraints,
 feasibility is the absence of a negative cycle in the timing constraint graph, and
 the optimization variants---minimum clock period, maximum slack, maximum

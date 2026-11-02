@@ -11,9 +11,10 @@ abstract: |
   system of difference constraints, feasible when the timing constraint graph has
   no negative cycle. Period minimization, slack maximization, and yield-driven
   scheduling reduce to parametric potential problems solved by Bellman--Ford,
-  Lawler, Howard, Karp, and the ellipsoid method. We extend the core with delay
-  padding, statistical methods, GEV delay models, and clock-tree co-optimization,
-  closing with idealizations, common misconceptions, and open problems.
+  Lawler, Howard, Karp, and the ellipsoid method. The survey extends the core with
+  delay padding, statistical methods, GEV delay models, and clock-tree
+  co-optimization, closing with idealizations, modelling assumptions, and open
+  problems.
 keywords:
   - clock skew scheduling
   - useful skew
