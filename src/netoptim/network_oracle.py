@@ -88,6 +88,8 @@ class NetworkOracle(OracleFeas[Any]):
         network problem. It searches for negative cycles in the graph
         using Howard's algorithm. If a negative cycle exists, it returns
         a cutting plane (gradient, intercept) to cut off the infeasible point.
+        When several cycles are found, the one with the smallest mean weight is
+        used, since it is the most critical certificate.
 
         Args:
             x: The current iterate value to assess for feasibility.

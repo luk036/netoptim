@@ -1,8 +1,8 @@
 """Multi-parameter clock-skew scheduling oracle.
 
 Wraps Howard's negative-cycle finder as a separation oracle for the
-two-parameter (clock period, yield) ratio problem, driven by the ellipsoid
-method (:func:`ellalgo.cutting_plane.cutting_plane_optim`).
+two-parameter (clock period, uniform slack margin) ratio problem, driven by the
+ellipsoid method (:func:`ellalgo.cutting_plane.cutting_plane_optim`).
 """
 
 from typing import Any, Dict, Optional, Tuple
@@ -18,10 +18,13 @@ Arr = np.ndarray
 
 
 class ClockScheduleOracle(OracleOptim[Arr]):
-    """Oracle for minimum-period / maximum-yield clock skew scheduling.
+    """Oracle for minimum-period / maximum-margin clock skew scheduling.
 
     Solves ``min TCP / beta`` subject to the timing constraint graph being
-    feasible at period ``TCP`` and yield ``beta``.  The iterate is
+    feasible at period ``TCP`` and uniform slack margin ``beta``.  This is the
+    EVEN-style problem; a probability-level yield model would replace ``beta``
+    by the corresponding delay quantile.  Setup and hold times are taken as
+    zero, so they should be folded into the edge ``delay``.  The iterate is
     ``x = (TCP, beta)``; the timing constraint graph is given as an
     adjacency mapping whose edges carry ``{"type": "s"|"h", "delay": d}``.
     A negative cycle, if any, supplies the separating cutting plane.
