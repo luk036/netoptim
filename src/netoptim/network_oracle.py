@@ -1,9 +1,21 @@
+"""Negative-cycle feasibility oracle for parametric network problems.
+
+:class:`NetworkOracle` turns each edge weight into a graph arc and searches for
+a negative cycle with Howard's algorithm (from :mod:`digraphx`).  A negative
+cycle certifies that the current iterate ``x`` is infeasible, i.e. that no node
+potentials ``u`` satisfy ``u[j] - u[i] <= oracle(edge, x)`` on every arc.  For
+the most critical cycle (the one with the smallest mean weight) it emits the
+cutting plane ``(g, h)`` with ``g = -sum(grad(edge, x))`` and
+``h = -sum(weight(edge))``, following the ellipsoid convention
+``g^T (x - xc) + h <= 0``.
+"""
+
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 from digraphx.neg_cycle import NegCycleFinder
 from ellalgo.ell_typing import OracleFeas
 
-from ._typing import Cut, EdgeOracle
+from ._typing import Cut, Dist, EdgeOracle
 
 Graph = Dict[Any, Dict[Any, Union[Dict[str, Any], Tuple[Any, Any]]]]
 """A directed graph represented as an adjacency dictionary.
@@ -44,29 +56,30 @@ class NetworkOracle(OracleFeas[Any]):
         ...     "v2": {"v1": {"w": -2}, "v3": {"w": 1}},
         ...     "v3": {"v1": {"w": -3}, "v2": {"w": -2}},
         ... }
-        >>> u = {"v1": 0.0, "v2": 0.0, "v3": 0.0}
+        >>> dist = {"v1": 0.0, "v2": 0.0, "v3": 0.0}
         >>> oracle = Mock()
         >>> oracle.eval.side_effect = lambda e, x: e["w"] - x
         >>> oracle.grad.side_effect = lambda e, x: -1
-        >>> network = NetworkOracle(gra, u, oracle)
+        >>> network = NetworkOracle(gra, dist, oracle)
         >>> network.assess_feas(1)
         (2, 3)
     """
 
-    def __init__(self, gra: Graph, u: Dict[Any, float], oracle: EdgeOracle) -> None:
+    def __init__(self, gra: Graph, dist: Dist, oracle: EdgeOracle) -> None:
         """
         Initialize the network oracle with a graph, node potentials, and an edge oracle.
 
         :param gra: The directed graph represented as an adjacency dictionary
             mapping each node to its neighbors and edge attributes.
-        :param u: The initial node potentials, a dictionary mapping each node
-            to its starting potential value.
+        :param dist: The initial node potentials, as a mapping or an indexable
+            sequence of one starting value per node.
         :param oracle: The oracle object that provides `eval(edge, x)` and
             `grad(edge, x)` methods for evaluating edge weights and their
             subgradients at a given iterate x.
         """
-        self._gra = gra
-        self._potential = u
+        # NegCycleFinder indexes the potentials by node; both mappings and
+        # indexable sequences (e.g. lists used by OptScalingOracle) work here.
+        self._dist: Any = dist
         self._oracle = oracle
         self._ncf: NegCycleFinder[Any, Any, float] = NegCycleFinder(gra)
 
@@ -100,8 +113,8 @@ class NetworkOracle(OracleFeas[Any]):
         """
 
         oracle = self._oracle
-        # type-level check so unittest.mock.Mock auto-attributes are not mistaken
-        # for the optional hook
+        # type-level check against FastEdgeOracle's hook so unittest.mock.Mock
+        # auto-attributes are not mistaken for it
         if hasattr(type(oracle), "make_weight_fn"):
             get_weight = getattr(oracle, "make_weight_fn")(x)
         else:
@@ -109,7 +122,7 @@ class NetworkOracle(OracleFeas[Any]):
 
         best: Optional[Cut] = None
         best_ratio = float("inf")
-        for cycle in self._ncf.howard(self._potential, get_weight):
+        for cycle in self._ncf.howard(self._dist, get_weight):
             weight_sum = sum(get_weight(edge) for edge in cycle)
             ratio = weight_sum / len(cycle)
             if ratio < best_ratio:

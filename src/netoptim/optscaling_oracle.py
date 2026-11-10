@@ -1,13 +1,24 @@
+"""Optimal matrix scaling via the network oracle.
+
+Solves ``min π/ψ`` over the node potentials of a matrix ``|a_ij|`` by reducing
+the problem to a parametric network feasibility problem (Orlin & Rothblum,
+1985) handled by :class:`~netoptim.network_oracle.NetworkOracle`.
+"""
+
 from typing import Any, Callable, Optional, Tuple
 
-import numpy as np
+import numpy as np  # noqa: F401 - referenced by the doctest examples
 from ellalgo.ell_typing import OracleOptim
 
-from ._typing import Cut
+from ._typing import GRAD_PI, GRAD_PSI, GRAD_RATIO, Arr, Cut, Dist
 from .network_oracle import NetworkOracle
 
-Arr = np.ndarray
-"""A NumPy array type alias for array operations in the optimization."""
+
+def _min_ratio_diff(x0: float, x1: float, aij: float, aji: float) -> float:
+    """Return ``min(x0 - aji, aij - x1)`` for the two ratio bounds."""
+    d0 = x0 - aji
+    d1 = aij - x1
+    return d0 if d0 < d1 else d1
 
 
 class OptScalingOracle(OracleOptim[Arr]):
@@ -23,25 +34,24 @@ class OptScalingOracle(OracleOptim[Arr]):
     |    min     π/ψ
     |    s.t.    ψ ≤ u[i] * ``|a_ij|`` * u[j]^{−1} ≤ π,
     |            ∀ (i,j) ∈ E,
-    |            π, ψ, utx, positive
+    |            π, ψ, u, positive
     """
 
     class Ratio:
         """Inner class for computing ratio constraints in matrix scaling.
 
-        This class evaluates the constraint ψ ≤ u[i] * |a_ij| * u[j]^{-1} ≤ π
-        by computing the minimum of two differences in logarithmic scale.
+        This class evaluates the constraint
+        ``ψ ≤ u[i] * |a_ij| * u[j]^{-1} ≤ π`` by computing the minimum of two
+        differences in logarithmic scale.
         """
 
-        def __init__(self, gra: Any, get_cost: Any) -> None:
+        def __init__(self, get_cost: Callable[[Any], Tuple[float, float]]) -> None:
             """Initialize the Ratio evaluator.
 
             Args:
-                gra: The graph structure representing the matrix.
                 get_cost: A callable that returns the pair (a_ij, a_ji) of
                     absolute matrix entries for a given edge.
             """
-            self._gra = gra
             self._get_cost = get_cost
 
         def eval(self, edge: Any, x: Arr) -> float:
@@ -58,7 +68,7 @@ class OptScalingOracle(OracleOptim[Arr]):
                 The minimum of the two ratio differences.
             """
             aij, aji = self._get_cost(edge)
-            return min(x[0] - aji, aij - x[1])
+            return _min_ratio_diff(float(x[0]), float(x[1]), aij, aji)
 
         def make_weight_fn(self, x: Arr) -> Callable[[Any], float]:
             """Return a weight evaluator with the iterate's scalars bound once.
@@ -79,9 +89,7 @@ class OptScalingOracle(OracleOptim[Arr]):
 
             def weight(edge: Any) -> float:
                 aij, aji = get_cost(edge)
-                d0 = x0 - aji
-                d1 = aij - x1
-                return d0 if d0 < d1 else d1
+                return _min_ratio_diff(x0, x1, aij, aji)
 
             return weight
 
@@ -101,33 +109,40 @@ class OptScalingOracle(OracleOptim[Arr]):
             """
             aij, aji = self._get_cost(edge)
             if x[0] - aji < aij - x[1]:
-                return np.array([1.0, 0.0])
-            return np.array([0.0, -1.0])
+                return GRAD_PI.copy()
+            return GRAD_PSI.copy()
 
-        def update(self, t: Any) -> None:
+        def update(self, t: float) -> None:
             """No-op hook: matrix scaling has no best-so-far parameter."""
             pass
 
-    def __init__(self, gra: Any, utx: Any, get_cost: Any) -> None:
+    def __init__(
+        self,
+        gra: Any,
+        dist: Dist,
+        get_cost: Callable[[Any], Tuple[float, float]],
+    ) -> None:
         """Construct a new OptScalingOracle instance.
 
         Args:
             gra: The graph structure representing the matrix to be scaled.
-            utx: Initial node potentials (one per node), typically zeros.
+                Kept as ``Any`` because third-party graph adapters (e.g.
+                ``mywheel.MapAdapter``) are not plain dicts.
+            dist: Initial node potentials (one per node), typically zeros.
             get_cost: A callable ``get_cost(edge) -> (a_ij, a_ji)`` that
                 returns the pair of absolute matrix entries for an edge.
 
         Examples:
             >>> from mywheel.map_adapter import MapAdapter
             >>> gra = MapAdapter([[0, 1], [1, 0]])
-            >>> utx = [0.0, 0.0]
+            >>> dist = [0.0, 0.0]
             >>> def get_cost(edge):
             ...     return 1.0, 1.0
-            >>> oracle = OptScalingOracle(gra, utx, get_cost)
+            >>> oracle = OptScalingOracle(gra, dist, get_cost)
             >>> isinstance(oracle._network, NetworkOracle)
             True
         """
-        self._network = NetworkOracle(gra, utx, self.Ratio(gra, get_cost))
+        self._network = NetworkOracle(gra, dist, self.Ratio(get_cost))
 
     def assess_optim(self, xc: Arr, gamma: float) -> Tuple[Cut, Optional[float]]:
         """Assess optimality and return a cutting plane if suboptimal.
@@ -148,10 +163,10 @@ class OptScalingOracle(OracleOptim[Arr]):
         Examples:
             >>> from mywheel.map_adapter import MapAdapter
             >>> gra = MapAdapter([{}, {0: (1.0, 1.0)}])
-            >>> utx = [0.0, 0.0]
+            >>> dist = [0.0, 0.0]
             >>> def get_cost(edge):
             ...     return 1.0, 1.0
-            >>> oracle = OptScalingOracle(gra, utx, get_cost)
+            >>> oracle = OptScalingOracle(gra, dist, get_cost)
             >>> x = np.array([0.0, 0.0])
             >>> t = 0.0
             >>> cut, t1 = oracle.assess_optim(x, t)
@@ -159,7 +174,6 @@ class OptScalingOracle(OracleOptim[Arr]):
             array([ 1., -1.])
             >>> cut[1]
             0.0
-            >>> import numpy as np
             >>> bool(np.isclose(t1, 0.0))
             True
 
@@ -176,7 +190,7 @@ class OptScalingOracle(OracleOptim[Arr]):
             return cut, None
 
         s = xc[0] - xc[1]
-        g = np.array([1.0, -1.0])
+        g = GRAD_RATIO.copy()
         if (fj := s - gamma) > 0.0:
             return (g, fj), None
 

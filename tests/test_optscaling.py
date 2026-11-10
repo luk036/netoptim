@@ -161,7 +161,7 @@ def test_optscaling(
 
 def test_ratio_make_weight_fn_matches_eval() -> None:
     gra = create_fixed_graph()
-    ratio = OptScalingOracle.Ratio(gra, get_cost)
+    ratio = OptScalingOracle.Ratio(get_cost)
     x = np.array([1.25, -0.5])
     weight = ratio.make_weight_fn(x)
     checked = 0
@@ -170,6 +170,11 @@ def test_ratio_make_weight_fn_matches_eval() -> None:
             assert weight(edge) == ratio.eval(edge, x)
             checked += 1
     assert checked > 0
+
+
+def test_ratio_update_is_noop() -> None:
+    ratio = OptScalingOracle.Ratio(get_cost)
+    assert ratio.update(1.0) is None
 
 
 def _build_fixed_problem() -> Tuple[OptScalingOracle, Ell]:

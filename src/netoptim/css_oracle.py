@@ -11,10 +11,10 @@ import numpy as np
 from digraphx.neg_cycle import NegCycleFinder
 from ellalgo.ell_typing import OracleOptim
 
-from ._typing import Cut
+from ._typing import GRAD_RATIO, Arr, Cut
 
-Arr = np.ndarray
-"""A two-element iterate ``(TCP, beta)``."""
+_GRAD_TCP = np.array([-1.0, 0.0])
+_GRAD_BETA = np.array([0.0, -1.0])
 
 
 class ClockScheduleOracle(OracleOptim[Arr]):
@@ -54,7 +54,12 @@ class ClockScheduleOracle(OracleOptim[Arr]):
         """
         TCP, beta = xc
         if TCP < 0.0:
-            return (np.array([-1.0, 0.0]), -TCP), None
+            return (_GRAD_TCP.copy(), -TCP), None
+        # The objective TCP / beta is only defined for positive beta, so cut
+        # off the degenerate/non-positive-margin half-space directly. This also
+        # avoids inf * 0 -> nan and a later ZeroDivisionError.
+        if beta <= 0.0:
+            return (_GRAD_BETA.copy(), -beta), None
         if (fj := TCP - gamma * beta) > 0.0:
             return (np.array([1.0, -gamma]), fj), None
 
@@ -68,4 +73,4 @@ class ClockScheduleOracle(OracleOptim[Arr]):
             )
             return (g, f), None
 
-        return (np.array([1.0, -1.0]), 0.0), TCP / beta
+        return (GRAD_RATIO.copy(), 0.0), TCP / beta

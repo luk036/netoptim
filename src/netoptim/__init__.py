@@ -5,6 +5,7 @@ using cutting-plane methods and ellipsoid algorithms.
 """
 
 from importlib.metadata import PackageNotFoundError, version  # pragma: no cover
+from typing import Any, Optional, Tuple
 
 try:
     # Change here if project is renamed and does not equal the package name
@@ -14,8 +15,6 @@ except PackageNotFoundError:  # pragma: no cover
     __version__ = "unknown"
 finally:
     del version, PackageNotFoundError
-
-from typing import Any, Optional, Tuple
 
 from ellalgo.cutting_plane import cutting_plane_feas, cutting_plane_optim
 from ellalgo.ell import Ell
@@ -37,6 +36,7 @@ explicit ``Options`` to override.
 """
 
 __all__ = [
+    "DEFAULT_TOLERANCE",
     "ClockScheduleOracle",
     "NetworkOracle",
     "OptScalingOracle",
@@ -46,6 +46,7 @@ __all__ = [
 
 
 def _default_options() -> Options:
+    """Return solver options tuned to :data:`DEFAULT_TOLERANCE`."""
     options = Options()
     options.tolerance = DEFAULT_TOLERANCE
     return options

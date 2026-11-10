@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Tuple, Union
 import networkx as nx
 import numpy as np
 from ellalgo.ell import Ell
+from ellalgo.ell_config import Options
 
 from netoptim import solve_network_feas
 from netoptim.network_oracle import NetworkOracle
@@ -127,3 +128,51 @@ def test_solve_network_feas_returns_feasible_point() -> None:
 
     assert x_best is not None
     assert niter == 0
+
+
+def test_network_oracle_picks_most_critical_cycle() -> None:
+    gra: Dict[Any, Dict[Any, Any]] = {
+        0: {1: (0, 1)},
+        1: {0: (1, 0)},
+        2: {3: (2, 3)},
+        3: {2: (3, 2)},
+    }
+    oracle = MockOracle()
+    oracle.values = {(0, 1): -1.0, (1, 0): -1.0, (2, 3): -5.0, (3, 2): 0.0}
+    oracle.grads = {(0, 1): -1.0, (1, 0): -1.0, (2, 3): -1.0, (3, 2): -1.0}
+    net_oracle = NetworkOracle(gra, {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0}, oracle)
+
+    cut = net_oracle.assess_feas([0.0])
+
+    assert cut is not None
+    g, f = cut
+    assert g == 2.0
+    assert f == 5.0
+
+
+def test_network_oracle_empty_or_disconnected_graph() -> None:
+    oracle = MockOracle()
+    x: List[float] = [0.0]
+    empty: Dict[Any, Dict[Any, Any]] = {}
+    assert NetworkOracle(empty, {}, oracle).assess_feas(x) is None
+    no_edges: Dict[Any, Dict[Any, Any]] = {0: {}, 1: {}}
+    assert NetworkOracle(no_edges, {0: 0.0, 1: 0.0}, oracle).assess_feas(x) is None
+
+
+def test_solve_network_feas_forwards_options() -> None:
+    gra: Dict[Any, Dict[Any, Any]] = {0: {1: (0, 1)}, 1: {0: (1, 0)}}
+    oracle = MockOracle()
+    oracle.values = {(0, 1): -1.0, (1, 0): -1.0}
+    oracle.grads = {
+        (0, 1): np.array([-1.0, -1.0]),
+        (1, 0): np.array([-1.0, -1.0]),
+    }
+    net_oracle = NetworkOracle(gra, {0: 0.0, 1: 0.0}, oracle)
+    space = Ell(10.0, np.array([0.0, 0.0]))
+    options = Options()
+    options.max_iters = 1
+
+    x_best, niter = solve_network_feas(net_oracle, space, options)
+
+    assert x_best is None
+    assert niter == 1
