@@ -4,6 +4,7 @@ Network Oracle Example
 
 Demonstrates a parametric network with an oracle for cutting-plane optimization.
 """
+
 import matplotlib.pyplot as plt
 import networkx as nx
 

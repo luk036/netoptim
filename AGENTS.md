@@ -11,7 +11,7 @@ pytest
 pytest tests/test_network_oracle.py::test_network_oracle_update
 
 # Run tests matching a pattern
-pytest -k "cycle_finder"
+pytest -k "network_oracle"
 
 # With explicit coverage
 pytest --cov netoptim --cov-report term-missing
@@ -45,7 +45,7 @@ tox -e linkcheck      # Check for broken doc links
 
 ### Project Structure
 - Source code: `src/netoptim/`
-- Tests: `tests/` (test_network_oracle.py, test_optscaling.py, test_cycle_finder.py, test_ratio.py, test_delay_padding.py, test_stress_*.py)
+- Tests: `tests/` (test_network_oracle.py, test_network_oracle2.py, test_optscaling.py, test_ratio.py, test_stress_network_oracle.py, test_stress_optscaling.py)
 - Version managed via setuptools_scm (`no-guess-dev` scheme)
 
 ### Naming Conventions
@@ -81,11 +81,11 @@ tox -e linkcheck      # Check for broken doc links
 
 ### Python Version
 - Minimum: Python 3.9 (setup.cfg `python_requires`)
-- CI tests on Python 3.9 and 3.11
+- CI tests on Python 3.9-3.13 (Ubuntu) plus Windows 3.12; quality gate on 3.12
 
 ### Configuration Files
-- `setup.cfg`: package metadata, pytest options, flake8 config
-- `.flake8`: formatter-friendly (ignores E1/E2/E3/E501/W1/W2/W3/W5)
+- `setup.cfg`: package metadata and pytest options only
+- `.flake8`: the single flake8 config (formatter-friendly: max line 256, ignores E1/E2/E3/E501/W1/W2/W3/W5 and E203/W503)
 - `.pre-commit-config.yaml`: pre-commit hooks
 - `mypy.ini`: Python 3.12 target, ignores setuptools/matplotlib/digraphx/ellalgo/mywheel
 - `pyproject.toml`: build system (setuptools_scm)

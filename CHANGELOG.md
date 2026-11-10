@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Bug Fixes
+- **`ClockScheduleOracle` non-positive margin**: added an explicit cut for `beta <= 0`, which previously could divide by zero (or produce `nan` from `inf * 0`) on a cycle-free graph.
+- **Packaging**: declared `numpy` in `install_requires` (it is imported by `css_oracle` and `optscaling_oracle`).
+- **Docs**: Read the Docs now installs the package itself; added the missing `networkx`/`mywheel` docs requirements; documented `netoptim.css_oracle`; removed the non-existent `sphinx.ext.apidoc` extension.
+
+### Testing & Code Quality
+- Tightened the `EdgeOracle` protocol (`eval`/`grad`/`update`), added `Arr`/`Dist` aliases and a `FastEdgeOracle` protocol, and typed `get_cost`.
+- Removed dead `_gra` attributes, unified node-potential naming on `dist`, deduplicated the `Arr` alias and ratio math, and named the gradient constants.
+- Added tests for the `TCP < 0` / `beta <= 0` guards, most-critical-cycle selection, empty/disconnected graphs, `Options` forwarding, and the `Ratio.update` no-op (24 tests, ~98% coverage).
+
+### Build & CI
+- Test matrix now covers Python 3.9-3.13 on Ubuntu plus Windows 3.12, with a 90% coverage gate.
+- Added mypy, doctests, Sphinx docs, and package build/`twine check` to CI; removed the unpinned git dependency installs and `setup.py develop`.
+- Consolidated flake8 configuration, refreshed the pre-commit hooks (including a mypy hook), and fixed `master` branch URLs.
+
 ## Version 0.5 (2026-10-12)
 
 ### Features

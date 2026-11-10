@@ -1,3 +1,6 @@
 decorator>=4.1.0
+digraphx>=0.3
+ellalgo>=0.4
+mywheel>=0.3
 networkx>=2.1
 numpy>=1.12.0

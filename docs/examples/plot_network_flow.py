@@ -4,6 +4,7 @@ Network Flow Graph
 
 Visualization of a directed flow network with edge capacities.
 """
+
 import matplotlib.pyplot as plt
 import networkx as nx
 

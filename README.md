@@ -18,7 +18,7 @@
 
 > Network Flow Optimization Python Code
 
-A longer description of your project goes here...
+`netoptim` is a Python library for solving parametric network-flow optimization problems using cutting-plane and ellipsoid methods. It provides a negative-cycle feasibility oracle (`NetworkOracle`), an optimal matrix-scaling oracle (`OptScalingOracle`) based on the Orlin–Rothblum approach, and a clock-skew scheduling oracle. The package builds on `ellalgo` for cutting-plane/ellipsoid routines, `digraphx` for negative-cycle search, and `mywheel` for graph adapters.
 
 ## Dependencies
 

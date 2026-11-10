@@ -3,5 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - pytest
+  - pytest-cov
   - pytest-benchmark
   - networkx
+  - numpy
