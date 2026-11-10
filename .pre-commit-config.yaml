@@ -2,7 +2,7 @@ exclude: "^docs/conf.py"
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: check-added-large-files
@@ -11,6 +11,7 @@ repos:
       - id: check-merge-conflict
       - id: check-xml
       - id: check-yaml
+        exclude: ^paper/slides/beamer\.yaml$
       - id: debug-statements
       - id: end-of-file-fixer
       - id: requirements-txt-fixer
@@ -38,12 +39,12 @@ repos:
   #     ]
 
   - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+    rev: 9.0.2
     hooks:
       - id: isort
 
   - repo: https://github.com/psf/black
-    rev: 23.10.1
+    rev: 26.10.1
     hooks:
       - id: black
         language_version: python3
@@ -55,11 +56,18 @@ repos:
   #   - id: blacken-docs
   #     additional_dependencies: [black]
   - repo: https://github.com/PyCQA/flake8
-    rev: 6.1.0
+    rev: 7.5.0
     hooks:
       - id: flake8
     ## You can add flake8 plugins via `additional_dependencies`:
     #  additional_dependencies: [flake8-bugbear]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v2.4.1
+    hooks:
+      - id: mypy
+        files: ^src/
+        additional_dependencies: [numpy]
 ## Check for misspells in documentation files:
 # - repo: https://github.com/codespell-project/codespell
 #   rev: v2.2.5
